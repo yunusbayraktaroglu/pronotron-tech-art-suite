@@ -1,22 +1,26 @@
 {
-	"name": "@acme/docs",
-	"version": "0.0.0",
+	"name": "@pronotron/demos",
+	"version": "0.1.0",
 	"private": true,
 	"scripts": {
 		"build": "next build",
 		"start": "next start ",
-		"dev": "next dev -p 3002",
+		"dev": "next dev -p 3001",
 		"lint": "next lint",
 		"clean": "rm -rf .turbo && rm -rf node_modules && rm -rf .next"
 	},
 	"dependencies": {
 		"@acme/core": "*",
 		"@acme/utils": "*",
-		"next": "^14.1.1",
-		"react": "^18.2.0",
-		"react-dom": "^18.2.0"
+		"@pronotron/io": "*",
+		"react": "^18",
+		"react-dom": "^18",
+		"next": "14.2.13"
 	},
 	"devDependencies": {
+		"postcss": "^8",
+		"tailwindcss": "^3.4.1",
+		"eslint-config-next": "14.2.13",
 		"@acme/tsconfig": "*",
 		"@next/eslint-plugin-next": "^14.1.1",
 		"@types/node": "^20.11.24",

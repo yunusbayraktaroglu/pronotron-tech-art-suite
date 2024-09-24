@@ -1,28 +1,28 @@
 {
-  "private": true,
-  "scripts": {
-    "build": "turbo build",
-    "dev": "turbo dev",
-    "lint": "turbo lint",
-    "clean": "turbo clean && rm -rf node_modules",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "changeset": "changeset",
-    "version-packages": "changeset version",
-    "release": "turbo build --filter=docs^... && changeset publish"
-  },
-  "devDependencies": {
-    "@changesets/cli": "^2.27.1",
-    "eslint": "^8.57.0",
-    "prettier": "^3.2.5",
-    "turbo": "^2.1.2"
-  },
-  "engines": {
-    "node": ">=18"
-  },
-  "name": "with-changesets",
-  "packageManager": "npm@10.2.4",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ]
+	"name": "pronotron-web-libraries",
+	"private": true,
+	"scripts": {
+		"build": "turbo build",
+		"dev": "turbo dev",
+		"lint": "turbo lint",
+		"clean": "turbo clean && rm -rf node_modules",
+		"format": "prettier --write \"**/*.{ts,tsx,md}\"",
+		"changeset": "changeset",
+		"version-packages": "changeset version",
+		"release": "turbo build --filter=docs^... && changeset publish"
+	},
+	"devDependencies": {
+		"@changesets/cli": "^2.27.1",
+		"eslint": "^8.57.0",
+		"prettier": "^3.2.5",
+		"turbo": "^2.1.2"
+	},
+	"engines": {
+		"node": ">=18"
+	},
+	"packageManager": "npm@10.2.4",
+	"workspaces": [
+		"apps/*",
+		"packages/*"
+	]
 }
