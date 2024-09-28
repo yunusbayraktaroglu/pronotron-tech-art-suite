@@ -1,6 +1,6 @@
 {
 	"name": "@pronotron/io",
-	"version": "0.1.0",
+	"version": "1.0.0",
 	"description": "Custom Intersection Observer that never misses targets. For design purposes.",
 	"author": "Yunus Bayraktaroglu <yunus.bayraktaroglu@gmail.com>",
 	"main": "./dist/index.js",
@@ -31,8 +31,5 @@
 	"dependencies": {
 		"lodash.throttle": "^4.1.1",
 		"react": "^18.2.0"
-	},
-	"publishConfig": {
-		"access": "public"
 	}
 }

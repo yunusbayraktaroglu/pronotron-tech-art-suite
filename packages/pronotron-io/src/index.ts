@@ -1,2 +1,3 @@
-export * from './dispatcher';
-export * from './core/pronotron-io-data-oriented';
+export * from './core/PronotronIOController';
+export * from './hooks/usePronotronIO';
+export * from './components/PronotronIODispatcher';
