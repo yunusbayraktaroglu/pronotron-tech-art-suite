@@ -1,15 +1,6 @@
+import { IOEvent, IONodeOptions } from "../../types/global";
 
-/**
- * In interleaved controlTable, how an item maintained
- */
-export enum NodeData {
-	BottomIn = 0,
-	TopIn = 1,
-	BottomOut = 2,
-	TopOut = 3,
-	NodeYPosition = 4,
-	NodeID = 5
-};
+type BinaryBoolean = 1 | 0;
 
 export class PronotronIONode
 {
@@ -17,32 +8,29 @@ export class PronotronIONode
 
     public id: number;
 	public y: number;
-	public controlTable: number[] = [];
+	public settings: IONodeOptions;
 
-    constructor()
+	/**
+	 * Calculated only if viewport data is assigned
+	 */
+	public possibleEvents: undefined | Record<IOEvent, BinaryBoolean>;
+
+    constructor( settings: IONodeOptions )
 	{
         this.id = PronotronIONode.generateId();
-		this.y = 0;
-		this.controlTable[ NodeData.BottomIn ] = 0;
-		this.controlTable[ NodeData.BottomOut ] = 0;
-		this.controlTable[ NodeData.TopIn ] = 0;
-		this.controlTable[ NodeData.TopOut ] = 0;
-		this.controlTable[ NodeData.NodeYPosition ] = this.y;
-		this.controlTable[ NodeData.NodeID ] = this.id;
+
+		/**
+		 * Node might be added between route changes. So setViewport() bulk setting Y positions might not run.
+		 * Calculate initial y position.
+		 */
+		this.y = settings.getYPosition();
+		this.settings = settings;
     }
 
     static generateId(): number 
 	{
         return ++PronotronIONode.currentId;
     }
-
-	resetControlTable()
-	{
-		this.controlTable[ NodeData.TopIn ] = 0;
-		this.controlTable[ NodeData.TopOut ] = 1;
-		this.controlTable[ NodeData.BottomIn ] = 1;
-		this.controlTable[ NodeData.BottomOut ] = 0;
-	}
 
 	/**
 	 * Calculates possible events by
@@ -51,10 +39,14 @@ export class PronotronIONode
 	 * @param totalPossibleScroll Max Y scroll value
 	 */
 	calculatePossibleEvents( viewportHeight: number, totalPossibleScroll: number ): void
-	{		
-		this.controlTable[ NodeData.NodeYPosition ] = this.y;
-		this.controlTable[ NodeData.NodeID ] = this.id;
-		
+	{				
+		this.possibleEvents = { 
+			"top-in": 0, 
+			"top-out": 0, 
+			"bottom-in": 0, 
+			"bottom-out": 0 
+		};
+
 		if ( this.y < viewportHeight ){
 			/**
 			 * Element Y position is smaller than screen height.
@@ -63,27 +55,28 @@ export class PronotronIONode
 			if ( this.y > totalPossibleScroll ){
 				/**
 				 * Element Y position is bigger than totalPossibleScroll. Element can't dispatch any event.
+				 * This is the only scenario when an element can' dispatch any event.
 				 */
 				console.warn( "Element can't dispatch any event" );
 				return;
 			} else {
-				this.controlTable[ NodeData.TopIn ] = 1;
-				this.controlTable[ NodeData.TopOut ] = 1;
+				this.possibleEvents[ "top-in" ] = 1;
+				this.possibleEvents[ "top-out" ] = 1;
 			}
 		} else {
 			/**
 			 * Element Y position is bigger than screen height.
 			 * Element can "bottom-in" and "bottom-out"
 			 */
-			this.controlTable[ NodeData.BottomIn ] = 1;
-			this.controlTable[ NodeData.BottomOut ] = 1;
+			this.possibleEvents[ "bottom-in" ] = 1;
+			this.possibleEvents[ "bottom-out" ] = 1;
 
 			// Is totalPossibleScroll is enough to element can "top-out"?
 			const canTopOut = this.y < totalPossibleScroll;
 
 			if ( canTopOut ){
-				this.controlTable[ NodeData.TopIn ] = 1;
-				this.controlTable[ NodeData.TopOut ] = 1;
+				this.possibleEvents[ "top-in" ] = 1;
+				this.possibleEvents[ "top-out" ] = 1;
 			}
 		}
 	}

@@ -34,13 +34,12 @@ export default function Home()
 				/>
 			</div>
 			<div className="flex h-[70vh]" />
-			<div className="flex h-[20vh] relative translate-y-[200px]">
-				<p>Dynamic line - CSS transformed</p>
+			<div className="flex h-[20vh] relative">
 				<PronotronIODispatcher 
 					className="absolute block min-h-[2px] w-full touch-none pointer-events-none select-none bg-green-500"
 					dispatch={{
-						"bottom-in": () => console.log( "bottom-in 3 - css transform" ),
-						"bottom-out": () => console.log( "bottom-out 3 - css transform" )
+						"bottom-in": () => console.log( "bottom-in 3" ),
+						"bottom-out": () => console.log( "bottom-out 3" )
 					}} 
 				/>
 			</div>

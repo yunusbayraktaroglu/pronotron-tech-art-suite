@@ -28,8 +28,12 @@ export type IODispatchOptionsWithRetry = RequireExactlyOne<IODispatchFunction> &
  * Object that needs to pass application as member
  */
 export type IONodeOptions = {
+	/**
+	 * Node creation reference, to be used to avoid duplicates and respond remove requests.
+	 */
 	ref: Element;
 	dispatch: IODispatchOptions | IODispatchOptionsWithRetry;
+	onRemoveNode?: () => void;
 	/**
 	 * How to get element initial Y position. (Not relative to scroll value)
 	 */
@@ -37,9 +41,15 @@ export type IONodeOptions = {
 };
 
 /**
- * Generated PronotronIONode.id
+ * To be able to avoid duplicate nodes and respond to remove request, 
+ * we need a value from client to use as KEY.
  */
 export type PronotronNodeRef = Element;
+
+/**
+ * Points the id of PronotronIONode object.
+ * Each add node request from client, generates a PronotronIONode object.
+ */
 export type PronotronNodeID = number;
 
 /**

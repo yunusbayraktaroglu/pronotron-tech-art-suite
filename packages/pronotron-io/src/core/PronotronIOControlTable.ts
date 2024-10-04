@@ -1,75 +1,163 @@
 import { PronotronNodeID } from "../../types/global";
-import { NodeData } from "./PronotronIONode";
+import { PronotronIONode } from "./PronotronIONode";
 
+/**
+ * In interleaved controlTable, how an item maintained
+ */
+export enum NodeData {
+	TopIn = 0,
+	TopOut = 1,
+	BottomIn = 2,
+	BottomOut = 3,
+	NodeYPosition = 4,
+	NodeID = 5,
+	IsActive = 6
+};
+
+type TrackingData = {
+	topIn: 1 | 0,
+	topOut: 1 | 0,
+	bottomIn: 1 | 0,
+	bottomOut: 1 |0
+};
+
+/**
+ * High frequency interleaved flatten @type {NodeData} table.
+ */
 export class PronotronIOControlTable
 {
-	/**
-	 * High frequency interleaved flatten @type {NodeData} table.
-	 */
-	table!: Uint16Array;
-	nodeCount!: number;
+	table: Uint16Array;
 	nodeDataSize: number;
 
 	nodePositions = new Map<PronotronNodeID, number>();
+	maxSlot: number;
 
-	constructor()
+	constructor( nodeCountHint: number )
 	{
 		/**
 		 * @see https://stackoverflow.com/questions/38034673/determine-the-number-of-enum-elements-typescript
 		 */
 		this.nodeDataSize = Object.keys( NodeData ).length / 2;
+		this.maxSlot = nodeCountHint;
+		this.table = new Uint16Array( this.nodeDataSize * nodeCountHint );
 	}
 
-	addNode( nodeID: PronotronNodeID ): void
+	addNode( node: PronotronIONode ): void
 	{
-		if ( ! this.nodePositions.has( nodeID ) ){
+		// Nodes are shifting when removed, so empty slot always have to be equal with nodePositions map size
+		const emptySlot = this.nodePositions.size;
 
-			this.nodePositions.set( nodeID, this.nodePositions.size );
-		}
-		console.warn( `NodeID: '${ nodeID }' is already exist in the control table.` );
+		this.#assignSlot( emptySlot, node );
+		this.nodePositions.set( node.id, emptySlot );
+		console.log( `Added to table: Slot: ${ emptySlot  }. Id: ${ node.id }` );
 	}
 
-	removeNodes( ...nodeIDs: PronotronNodeID[] ): void
+	deleteNodes( ...nodeIDs: PronotronNodeID[] ): void
 	{
-		const newControlTable = new Uint16Array( ( this.nodeCount - nodeIDs.length ) * this.nodeDataSize );
-		let newIndex = 0;
+		for ( let i = 0; i < nodeIDs.length; i++ ){
 
-		for ( let i = 0; i < this.nodeCount; i++ ){
+			const nodePosition = this.nodePositions.get( nodeIDs[ i ] );
+	
+			// Slot might be zero, so check for undefined
+			if ( nodePosition !== undefined ){
 
-			const offset = i * this.nodeDataSize;
-			const currentNodeID = this.table[ offset + NodeData.NodeID ];
-
-			if ( nodeIDs.includes( currentNodeID ) ){
-				continue;
+				// Deactivated slot
+				const deactivatedSlot = nodePosition * this.nodeDataSize;
+	
+				// If it is the last node, only update isActive and delete in nodePositions
+				if ( this.nodePositions.size === 1 ){
+					this.table[ deactivatedSlot + NodeData.IsActive ] = 0;
+					this.nodePositions.delete( nodeIDs[ i ] );
+					console.log(`Removed in table: Slot: ${ nodePosition }. Id: ${ nodeIDs[ i ] }`);
+					continue;
+				}
+	
+				// Last slot will be moved to deactivated slot
+				const lastSlotIndex = this.nodePositions.size - 1;
+				const lastSlot = lastSlotIndex * this.nodeDataSize;
+	
+				// Move last slot to deactivated slot if they're different
+				if ( lastSlot !== deactivatedSlot ){
+					this.table[ deactivatedSlot + NodeData.NodeID ] = this.table[ lastSlot + NodeData.NodeID ];
+					this.table[ deactivatedSlot + NodeData.NodeYPosition ] = this.table[ lastSlot + NodeData.NodeYPosition ];
+					this.table[ deactivatedSlot + NodeData.TopIn ] = this.table[ lastSlot + NodeData.TopIn ];
+					this.table[ deactivatedSlot + NodeData.TopOut ] = this.table[ lastSlot + NodeData.TopOut ];
+					this.table[ deactivatedSlot + NodeData.BottomIn ] = this.table[ lastSlot + NodeData.BottomIn ];
+					this.table[ deactivatedSlot + NodeData.BottomOut ] = this.table[ lastSlot + NodeData.BottomOut ];
+					this.table[ deactivatedSlot + NodeData.IsActive ] = 1;
+	
+					// Update the nodePositions map for the node that was moved
+					const movedNodeID = this.table[ deactivatedSlot + NodeData.NodeID ];
+					this.nodePositions.set( movedNodeID, nodePosition );
+				}
+	
+				// Deactivate the last slot
+				this.table[ lastSlot + NodeData.IsActive ] = 0;
+	
+				// Remove the deleted node from the map
+				this.nodePositions.delete( nodeIDs[ i ] );
+	
+				console.log( `Removed in table: Slot: ${ nodePosition }. Id: ${ nodeIDs[ i ] }` );
+				
+			} else {
+				throw new Error( `NodeID: '${ nodeIDs[ i ] }' is missing in typed control table.` );
 			}
-
-			const newOffset = newIndex * this.nodeDataSize;
-
-			newControlTable[ newOffset ] = this.table[ offset + 0 ];
-			newControlTable[ newOffset + 1 ] = this.table[ offset + 1 ];
-			newControlTable[ newOffset + 2 ] = this.table[ offset + 2 ];
-			newControlTable[ newOffset + 3 ] = this.table[ offset + 3 ];
-			newControlTable[ newOffset + 4 ] = this.table[ offset + 4 ];
-			newControlTable[ newOffset + 5 ] = this.table[ offset + 5 ];
-
-			newIndex++;
-
 		}
+	}
 
-		this.table = newControlTable;
-		this.nodeCount -= nodeIDs.length;
+
+	updateNodeTrackingData( nodeID: number, trackingData: TrackingData )
+	{
+		const nodePosition = this.nodePositions.get( nodeID )!;
+		const nodeOffset = nodePosition * this.nodeDataSize;
+
+		// Only "top-out" and "bottom-in" are possible at the start
+		this.updateTrackingData( nodeOffset, trackingData.topIn, trackingData.topOut, trackingData.bottomIn, trackingData.bottomOut );
+	}
+
+
+	/**
+	 * Runs when screen resized
+	 */
+	updateYPosition( nodeID: number, yPosition: number ): void 
+	{
+		const nodePosition = this.nodePositions.get( nodeID )!;
+		const nodeOffset = nodePosition * this.nodeDataSize;
+
+		this.table[ nodeOffset + NodeData.NodeYPosition ] = yPosition;
+
+		// Only "top-out" and "bottom-in" are possible at the start
+		this.updateTrackingData( nodeOffset, 0, 1, 1, 0 );
+	}
+
+	#assignSlot( emptySlot: number, node: PronotronIONode ): void
+	{
+		const emptyOffset = emptySlot * this.nodeDataSize;
+
+		this.table[ emptyOffset + NodeData.NodeID ] = node.id;
+		this.table[ emptyOffset + NodeData.NodeYPosition ] = node.y;
+		this.table[ emptyOffset + NodeData.IsActive ] = 1;
+
+		// Only "top-out" and "bottom-in" are possible at the start
+		this.updateTrackingData( 
+			emptyOffset, 
+			0, 
+			node.possibleEvents ? node.possibleEvents[ "top-out" ]: 0, 
+			node.possibleEvents ? node.possibleEvents[ "bottom-in" ] : 0, 
+			0
+		);
 	}
 
 	/**
-	 * Updates node's tracking events in _controlTable
+	 * Updates node's tracking events in table
 	 * 
-	 * @param nodeOffset Node start index in interleaved _controlTable native array
+	 * @param nodeOffset NodeData start position in the interleaved table typed array
 	 * @param topIn Track "top-in"
 	 * @param topOut Track "top-out"
 	 * @param bottomIn Track "bottom-in"
 	 * @param bottomOut Track "bottom-out"
 	 */
-	updateControlTable( nodeOffset: number, topIn: 1 | 0, topOut: 1 | 0, bottomIn: 1 | 0, bottomOut: 1 | 0 ): void
+	updateTrackingData( nodeOffset: number, topIn: 1 | 0, topOut: 1 | 0, bottomIn: 1 | 0, bottomOut: 1 | 0 ): void
 	{
 		this.table[ nodeOffset + NodeData.TopIn ] = topIn;
 		this.table[ nodeOffset + NodeData.TopOut ] = topOut;

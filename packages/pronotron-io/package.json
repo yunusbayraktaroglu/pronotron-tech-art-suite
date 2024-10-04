@@ -1,6 +1,6 @@
 {
 	"name": "@pronotron/io",
-	"version": "1.0.0",
+	"version": "0.0.1",
 	"description": "Custom Intersection Observer that never misses targets. For design purposes.",
 	"author": "Yunus Bayraktaroglu <yunus.bayraktaroglu@gmail.com>",
 	"main": "./dist/index.js",
