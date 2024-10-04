@@ -1,7 +1,4 @@
-import throttle from "lodash.throttle";
 import { PronotronIOScroller } from "./PronotronIOScrollGroups";
-
-export { throttle };
 
 export class PronotronIOController
 {

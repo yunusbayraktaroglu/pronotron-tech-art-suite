@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import throttle from "lodash.throttle";
 
-import { PronotronIOController, throttle, PronotronIODispatcher } from "@pronotron/io";
+import { PronotronIOController, PronotronIODispatcher } from "@pronotron/io";
 
 export default function Layout({ children }: Readonly<{ children: React.ReactNode }> )
 {
@@ -21,13 +22,13 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
 			screenHeight: window.innerHeight,
 			totalPageHeight: document.documentElement.scrollHeight
 		});
-
+		
 		const scroll = () => {
 			IO.handleScroll( window.scrollY )
 			setScrollDirection( IO.direction );
 		};
 		const resize = () => {
-			IO.handleResize({
+			IO.setViewport({
 				screenHeight: window.innerHeight,
 				totalPageHeight: document.documentElement.scrollHeight
 			});
@@ -47,7 +48,6 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
 		console.log( IO );
 
 		return () => {
-			console.log( "base unmount" );
 			window.removeEventListener( 'scroll', onScroll );
 			window.removeEventListener( 'resize', onResize );
 		}

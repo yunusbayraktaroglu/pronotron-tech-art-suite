@@ -39,13 +39,11 @@ interface IPronotronIOBase {
 	 * Abstract methods
 	 */
 	handleScroll( scrollY: number ): void;
-	handleResize( viewportProps: ViewportProps ): void;
 }
 
 export abstract class PronotronIOBase implements IPronotronIOBase
 {
 	abstract handleScroll( scrollY: number ): void;
-	abstract handleResize( viewportProps: ViewportProps ): void;
 
 	/**
 	 * We need to get a value from client to use as KEY, 
@@ -57,6 +55,7 @@ export abstract class PronotronIOBase implements IPronotronIOBase
 	 */
 	public _nodes: Map<PronotronNodeID, PronotronIONode> = new Map();
 
+	public _lastScrollY = 0;
 	public _viewport: undefined | {
 		_screenHeight: number,
 		_totalPageHeight: number,
@@ -127,6 +126,13 @@ export abstract class PronotronIOBase implements IPronotronIOBase
 		}
 	}
 
+	/**
+	 * Updates inline viewport properties and performs the following:
+	 * 
+	 * - Recalculates the Y position of each node
+	 * - Recalculates the possible events for each node based on the new viewport properties
+	 * - Resets each node's tracking events as if we are at Y = 0
+	 */
 	setViewport( viewport: ViewportProps ): void
 	{
 		this._viewport = {
@@ -135,18 +141,43 @@ export abstract class PronotronIOBase implements IPronotronIOBase
 			_totalPossibleScroll: viewport.totalPageHeight - viewport.screenHeight
 		};
 
-		this._nodes.forEach(( pronotronNode ) => {
+		this._nodes.forEach( pronotronNode => {
 
 			pronotronNode.y = pronotronNode.settings.getYPosition();
 			pronotronNode.calculatePossibleEvents( this._viewport!._screenHeight, this._viewport!._totalPossibleScroll );
 
 			this._controlTable.updateYPosition( pronotronNode.id, pronotronNode.y );
-			
-			/**
-			 * Only "top-out" and "bottom-in" are possible on initialization.
-			 */
+
+		});
+
+		this._resetNodesTrackingEvents();
+	}
+
+	/**
+	 * Resets tracking events.
+	 * Prepares app to be like in initial state for responding scroll request.
+	 * 
+	 * @todo - There is no need to check again if viewport doesnt changed
+	 */
+	reset()
+	{
+		/**
+		 * If viewport is not defined yet, it means initialization not yet done.
+		 */
+		if ( this._viewport ){
+			this._resetNodesTrackingEvents();
+			this._lastScrollY = 0;
+		}
+	}
+
+	/**
+	 * Resets each node's tracking events as if we are at Y = 0
+	 */
+	_resetNodesTrackingEvents()
+	{
+		this._nodes.forEach( pronotronNode => {
 			if ( pronotronNode.y < this._viewport!._screenHeight ){
-				this._controlTable.updateNodeTrackingData( pronotronNode.id, {
+				this._controlTable.updateNodeTrackingEvents( pronotronNode.id, {
 					topIn: 0,
 					// @ts-expect-error - Possible events calculated at top
 					topOut: pronotronNode.possibleEvents[ "top-out" ] ? 1 : 0,
@@ -154,7 +185,7 @@ export abstract class PronotronIOBase implements IPronotronIOBase
 					bottomOut: 0
 				} );
 			} else {
-				this._controlTable.updateNodeTrackingData( pronotronNode.id, {
+				this._controlTable.updateNodeTrackingEvents( pronotronNode.id, {
 					topIn: 0,
 					topOut: 0,
 					// @ts-expect-error - Possible events calculated at top
@@ -162,7 +193,7 @@ export abstract class PronotronIOBase implements IPronotronIOBase
 					bottomOut: 0
 				} );
 			}
-		});
+		})
 	}
 
 	_removeNodeByIds( nodeIDs: number[] ): void

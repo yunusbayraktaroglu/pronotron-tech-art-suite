@@ -49,7 +49,7 @@ export class PronotronIOControlTable
 
 		this.#assignSlot( emptySlot, node );
 		this.nodePositions.set( node.id, emptySlot );
-		console.log( `Added to table: Slot: ${ emptySlot  }. Id: ${ node.id }` );
+		//console.log( `Added to table: Slot: ${ emptySlot  }. Id: ${ node.id }` );
 	}
 
 	deleteNodes( ...nodeIDs: PronotronNodeID[] ): void
@@ -68,7 +68,7 @@ export class PronotronIOControlTable
 				if ( this.nodePositions.size === 1 ){
 					this.table[ deactivatedSlot + NodeData.IsActive ] = 0;
 					this.nodePositions.delete( nodeIDs[ i ] );
-					console.log(`Removed in table: Slot: ${ nodePosition }. Id: ${ nodeIDs[ i ] }`);
+					//console.log(`Removed in table: Slot: ${ nodePosition }. Id: ${ nodeIDs[ i ] }`);
 					continue;
 				}
 	
@@ -97,7 +97,7 @@ export class PronotronIOControlTable
 				// Remove the deleted node from the map
 				this.nodePositions.delete( nodeIDs[ i ] );
 	
-				console.log( `Removed in table: Slot: ${ nodePosition }. Id: ${ nodeIDs[ i ] }` );
+				//console.log( `Removed in table: Slot: ${ nodePosition }. Id: ${ nodeIDs[ i ] }` );
 				
 			} else {
 				throw new Error( `NodeID: '${ nodeIDs[ i ] }' is missing in typed control table.` );
@@ -106,7 +106,7 @@ export class PronotronIOControlTable
 	}
 
 
-	updateNodeTrackingData( nodeID: number, trackingData: TrackingData )
+	updateNodeTrackingEvents( nodeID: number, trackingData: TrackingData )
 	{
 		const nodePosition = this.nodePositions.get( nodeID )!;
 		const nodeOffset = nodePosition * this.nodeDataSize;

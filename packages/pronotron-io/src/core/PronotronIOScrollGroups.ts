@@ -11,20 +11,11 @@ import { PronotronIOBase } from "./PronotronIOBase";
 export class PronotronIOScroller extends PronotronIOBase
 {
 	// Start at 0 even with a jumpy start value, to track passed nodes correctly
-	private _lastScrollY = 0;
 	public direction: "up" | "down" = "down";
 
-	setScrollY( scrollY: number ): void 
+	setLastScrollY( scrollY: number ): void 
 	{
 		this._lastScrollY = scrollY;
-	}
-
-	/**
-	 * Reset scroll y and reassign viewport.
-	 */
-	handleResize( viewport: ViewportProps ): void 
-	{
-		this.setViewport( viewport );
 	}
 
 	handleScroll( scrollY: number ): void 

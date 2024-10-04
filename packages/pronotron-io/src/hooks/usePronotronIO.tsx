@@ -4,8 +4,6 @@ import { useEffect, useRef, useState } from 'react';
 import { PronotronIOController } from '../core/PronotronIOController';
 import { IODispatchOptions, IODispatchOptionsWithRetry } from '../../types/global';
 
-export type { IODispatchOptions, IODispatchOptionsWithRetry }
-
 interface usePronotronIOProps {
 	dispatch: IODispatchOptions | IODispatchOptionsWithRetry;
 };
@@ -13,31 +11,28 @@ interface usePronotronIOProps {
 export function usePronotronIO({ dispatch }: usePronotronIOProps )
 {
 	const ref = useRef<HTMLElement>( null ! );
-	const [ isActive, setIsActive ] = useState( true );
-	
+
 	useEffect(() => {
-		if ( isActive ){
-			const element = ref.current;
-			const controller = PronotronIOController.getInstance();
-	
-			const nodeID = controller.addNode({
-				ref: element,
-				dispatch: dispatch,
-				onRemoveNode: () => setIsActive( false ),
-				getYPosition: () => element.getBoundingClientRect().top + window.scrollY,
-			});
-			
-			return () => {
-				console.log( "unmount")
-				controller.removeNode( element );
-				// Reset `isActive` to true when unmounting
-				// setIsActive( true ); 
-			};
-		}
 
-		return () => null;
+		const element = ref.current;
+		const controller = PronotronIOController.getInstance();
+
+		element.dataset.deactive = "0";
+
+		const nodeID = controller.addNode({
+			ref: element,
+			dispatch: dispatch,
+			onRemoveNode: () => element.dataset.deactive = "1",
+			getYPosition: () => element.getBoundingClientRect().top + window.scrollY,
+		});
 		
-	}, [ isActive ]);
+		return () => {
+			if ( element.dataset.deactive === "0" ){
+				controller.removeNode( element );
+			}
+		};
 
-	return { ref, isActive };
+	}, []);
+
+	return { ref };
 }

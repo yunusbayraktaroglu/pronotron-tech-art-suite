@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import { PronotronIODispatcher, PronotronIOController } from "@pronotron/io";
 
 export default function Home()
 {
 	useEffect(() => {
 		const controller = PronotronIOController.getInstance();
-		controller.handleScroll( 0 );
+		controller.reset();
+		controller.handleScroll( window.scrollY );
 	}, []);
 
 	return (

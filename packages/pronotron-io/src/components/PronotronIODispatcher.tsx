@@ -9,9 +9,9 @@ interface PronotronIODispatcherProps extends React.ComponentProps<"span"> {
 
 export function PronotronIODispatcher({ dispatch, ...spanProps }: PronotronIODispatcherProps )
 {
-	const { ref, isActive } = usePronotronIO({ dispatch });
+	const { ref } = usePronotronIO({ dispatch });
 	
 	return (
-		<span data-active={ isActive } aria-hidden ref={ ref } { ...spanProps } />
+		<span aria-hidden ref={ ref } { ...spanProps } />
 	)
 };
