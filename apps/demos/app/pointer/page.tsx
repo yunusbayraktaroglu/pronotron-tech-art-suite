@@ -36,8 +36,8 @@ export default function PointerDemoPage()
 
 
 
-
-import { PronotronTouch, PronotronMouse, PronotronAnimationController, PronotronClock } from "@pronotron/pointer";
+import { PronotronTouch, PronotronMouse } from "@pronotron/pointer";
+import { PronotronAnimationController, PronotronClock } from "@pronotron/utils";
 import { Vector2 } from "@pronotron/pointer/src/core/Vector2";
 
 function useAppTicker()

@@ -50,6 +50,7 @@ export abstract class PronotronIOBase implements IPronotronIOBase
 	 * to avoid duplicate and to be able to respond remove requests.
 	 */
 	public _nodeReferences: Map<PronotronNodeRef, PronotronNodeID> = new Map();
+	
 	/**
 	 * PronotronIO node object with id's.
 	 */

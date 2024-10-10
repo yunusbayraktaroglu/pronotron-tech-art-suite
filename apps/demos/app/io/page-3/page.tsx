@@ -1,4 +1,12 @@
-export default function Page() {
+"use client";
+
+import { useEffect } from "react";
+import { PronotronIODispatcher, PronotronIOController, usePronotronIOPageChange } from "@pronotron/io";
+
+export default function Page()
+{
+	usePronotronIOPageChange();
+
 	return (
 		<div className="block">
 			<div className="flex h-[90vh] relative">

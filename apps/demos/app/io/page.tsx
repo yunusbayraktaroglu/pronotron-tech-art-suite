@@ -1,15 +1,27 @@
 "use client";
 
 import { useEffect } from "react";
-import { PronotronIODispatcher, PronotronIOController } from "@pronotron/io";
+import { PronotronIODispatcher, PronotronIOController, usePronotronIOPageChange } from "@pronotron/io";
 
 export default function Home()
 {
-	useEffect(() => {
-		const controller = PronotronIOController.getInstance();
-		controller.reset();
-		controller.handleScroll( window.scrollY );
-	}, []);
+	usePronotronIOPageChange();
+
+	// useEffect(() => {
+	// 	const controller = PronotronIOController.getInstance();
+
+	// 	/**
+	// 	 * If page directly accessed, it runs before general setup
+	// 	 * 
+	// 	 * Layout (General Setup)
+	// 	 *    - Page (Reset)
+	// 	 *    - Page (Reset)
+	// 	 */
+	// 	if ( controller._viewport ){
+	// 		controller.reset();
+	// 		controller.handleScroll( window.scrollY );
+	// 	}
+	// }, []);
 
 	return (
 		<div>

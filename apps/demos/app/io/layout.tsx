@@ -15,7 +15,6 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
 	}, [ scrollDirection ])
 
 	useEffect(() => {
-
 		const IO = PronotronIOController.getInstance();
 
 		IO.setViewport({
@@ -25,15 +24,16 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
 		
 		const scroll = () => {
 			IO.handleScroll( window.scrollY )
-			setScrollDirection( IO.direction );
+			//setScrollDirection( IO.direction );
 		};
 		const resize = () => {
 			IO.setViewport({
 				screenHeight: window.innerHeight,
 				totalPageHeight: document.documentElement.scrollHeight
 			});
+			IO.setLastScrollY( 0 );
 			IO.handleScroll( window.scrollY );
-			setScrollDirection( IO.direction );
+			//setScrollDirection( IO.direction );
 		};
 
 		// Execute manual scroll for jumpy start scrollY values
@@ -43,13 +43,29 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
 		const onResize = throttle( resize, 500, { leading: false, trailing: true } );
 
 		window.addEventListener( 'scroll', onScroll );
-		window.addEventListener( 'resize', onResize );
+
+		/**
+		 * Do not use window.resize its firing every scroll in mobile devices because of topbar.
+		 * Use ResizeObserverPolyfill from '@juggle/resize-observer' to support old devices.
+		 */
+		// window.addEventListener( 'resize', onResize );
+		const ResizeObserver = window.ResizeObserver;
+		const ro = new ResizeObserver(( entries, observer ) => {
+			onResize();
+		});
+		ro.observe( document.body ); // Watch dimension changes on body
 
 		//console.log( IO );
 
 		return () => {
 			window.removeEventListener( 'scroll', onScroll );
-			window.removeEventListener( 'resize', onResize );
+
+			/**
+			 * Do not use window.resize its firing every scroll in mobile devices because of topbar
+			 */
+			// window.removeEventListener( 'resize', onResize );
+			ro.disconnect();
+
 		}
 		
 	}, []);

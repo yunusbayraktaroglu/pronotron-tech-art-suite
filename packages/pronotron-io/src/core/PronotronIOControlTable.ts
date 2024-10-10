@@ -25,7 +25,8 @@ type TrackingData = {
  * High frequency interleaved flatten @type { NodeData } table.
  * 
  * @bug
- * PronotronNode id may be bigger than 256.
+ * Uint16Array: 0 to 65535
+ * PronotronNode id may be bigger than 65535 in a long rally.
  */
 export class PronotronIOControlTable
 {

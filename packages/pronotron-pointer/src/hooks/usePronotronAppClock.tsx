@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { PronotronClock } from '../core/PronotronClock';
+import { PronotronClock } from '@pronotron/utils';
 
 export function usePronotronAppClock()
 {

@@ -1,3 +1,4 @@
-export * from './core/PronotronIOController';
-export * from './hooks/usePronotronIO';
-export * from './components/PronotronIODispatcher';
+export { PronotronIOController } from "./core/PronotronIOController";
+export { PronotronIODispatcher } from "./components/PronotronIODispatcher";
+export { usePronotronIO } from "./hooks/usePronotronIO";
+export { usePronotronIOPageChange } from "./hooks/usePronotronIOPageChange";

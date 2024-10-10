@@ -1,16 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
-import { PronotronIODispatcher, PronotronIOController } from "@pronotron/io";
+import { PronotronIODispatcher, usePronotronIOPageChange } from "@pronotron/io";
 
 export default function Home()
 {
-	useEffect(() => {
-		const controller = PronotronIOController.getInstance();
-		controller.reset();
-		controller.handleScroll( window.scrollY );
-	}, []);
-
+	usePronotronIOPageChange();
+	
 	return (
 		<div>
 			<div className="flex h-[90vh] relative">

@@ -12,6 +12,7 @@ This Turborepo includes the following:
 - `docs`: Documents to how to using packages
 - `@pronotron/io`: Custom intersection observer does not misses any target like default IntersectionObserver API
 - `@pronotron/pointer`: Pointer based animations, tap, hold events
+- `@pronotron/utils`: Shared components
 - `@pronotron/tsconfig`: shared `tsconfig.json`s used throughout the monorepo
 - `@pronotron/eslint-config`: ESLint preset
 

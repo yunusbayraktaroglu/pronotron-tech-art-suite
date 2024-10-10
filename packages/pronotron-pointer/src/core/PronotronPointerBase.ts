@@ -1,6 +1,7 @@
 import { Vector2 } from "./Vector2";
-import { PronotronAnimationController } from "./PronotronAnimationController";
-import { PronotronClock } from "./PronotronClock";
+
+import { PronotronAnimationController } from "@pronotron/utils";
+import { PronotronClock } from "@pronotron/utils";
 
 export abstract class PronotronPointerBase
 {

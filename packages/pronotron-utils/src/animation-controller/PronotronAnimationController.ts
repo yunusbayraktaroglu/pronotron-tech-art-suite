@@ -1,4 +1,4 @@
-import { PronotronClock } from "./PronotronClock";
+import { PronotronClock } from "../clock/PronotronClock";
 
 type AnimationOptionID = string;
 type AnimationInternalID = number;
