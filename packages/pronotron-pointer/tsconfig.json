@@ -1,5 +1,5 @@
 {
-	"extends": "@acme/tsconfig/react-library.json",
+	"extends": "@pronotron/tsconfig/react-library.json",
 	"include": [
 		"."
 	],

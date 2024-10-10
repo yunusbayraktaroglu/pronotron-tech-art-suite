@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { PronotronIOController } from '../core/PronotronIOController';
 import { IODispatchOptions, IODispatchOptionsWithRetry } from '../../types/global';
 
@@ -27,8 +27,12 @@ export function usePronotronIO({ dispatch }: usePronotronIOProps )
 		});
 		
 		return () => {
-			if ( element.dataset.deactive === "0" ){
+			/**
+			 * A node may be manually removed, check if still active
+			 */
+			if ( nodeID && element.dataset.deactive === "0" ){
 				controller.removeNode( element );
+				//controller._removeNodeByIds([ nodeID ]);
 			}
 		};
 

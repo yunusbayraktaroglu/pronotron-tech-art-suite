@@ -8,9 +8,9 @@
 	"access": "public",
 	"updateInternalDependencies": "patch",
 	"ignore": [
-		"@acme/docs",
-		"@acme/core",
-		"@acme/utils",
+		"@pronotron/docs",
+		"@pronotron/core",
+		"@pronotron/utils",
 		"@pronotron/demos"
 	]
 }

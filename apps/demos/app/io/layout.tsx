@@ -45,7 +45,7 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
 		window.addEventListener( 'scroll', onScroll );
 		window.addEventListener( 'resize', onResize );
 
-		console.log( IO );
+		//console.log( IO );
 
 		return () => {
 			window.removeEventListener( 'scroll', onScroll );

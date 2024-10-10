@@ -2,7 +2,7 @@
 	"exclude": [
 		"node_modules"
 	],
-	"extends": "@acme/tsconfig/nextjs.json",
+	"extends": "@pronotron/tsconfig/nextjs.json",
 	"compilerOptions": {
 		"outDir": "dist",
 		"incremental": true,

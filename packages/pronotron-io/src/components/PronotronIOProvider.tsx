@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from 'react';
-import { PronotronIOController, throttle, PronotronIODispatcher } from "@pronotron/io";
+import { PronotronIOController, PronotronIODispatcher } from "@pronotron/io";
 
 const MyLibraryContext = createContext( "down" );
 
@@ -19,13 +19,12 @@ export function PronotronIOProvider({ children }: { children: React.ReactNode })
 			screenHeight: window.innerHeight,
 			totalPageHeight: document.documentElement.scrollHeight
 		});
-
+		
 		const scroll = () => {
 			IO.handleScroll( window.scrollY )
 			setScrollDirection( IO.direction );
 		};
 		const resize = () => {
-			IO.setScrollY( 0 );
 			IO.setViewport({
 				screenHeight: window.innerHeight,
 				totalPageHeight: document.documentElement.scrollHeight
@@ -37,13 +36,15 @@ export function PronotronIOProvider({ children }: { children: React.ReactNode })
 		// Execute manual scroll for jumpy start scrollY values
 		scroll();
 
-		const onScroll = throttle( scroll, 0, { leading: false, trailing: true } );
-		const onResize = throttle( resize, 500, { leading: false, trailing: true } );
+		//const onScroll = throttle( scroll, 250, { leading: false, trailing: true } );
+		//const onResize = throttle( resize, 500, { leading: false, trailing: true } );
+		const onScroll = scroll;
+		const onResize = resize;
 
 		window.addEventListener( 'scroll', onScroll );
 		window.addEventListener( 'resize', onResize );
 
-		console.log( IO );
+		//console.log( IO );
 
 		return () => {
 			window.removeEventListener( 'scroll', onScroll );
