@@ -10,8 +10,8 @@
 		"clean": "rm -rf .turbo && rm -rf node_modules && rm -rf .next"
 	},
 	"dependencies": {
-		"@pronotron/io": "*",
-		"@pronotron/pointer": "*",
+		"@pronotron/io": "0.0.1-beta.0",
+		"@pronotron/pointer": "0.0.1-beta.0",
 		"lodash.throttle": "^4.1.1",
 		"next": "14.2.13",
 		"react": "^18",
