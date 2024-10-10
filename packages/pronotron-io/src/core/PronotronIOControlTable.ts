@@ -22,7 +22,7 @@ type TrackingData = {
 };
 
 /**
- * High frequency interleaved flatten @type {NodeData} table.
+ * High frequency interleaved flatten @type { NodeData } table.
  * 
  * @bug
  * PronotronNode id may be bigger than 256.
@@ -145,7 +145,7 @@ export class PronotronIOControlTable
 		this.updateTrackingData( 
 			emptyOffset, 
 			0, 
-			node.possibleEvents ? node.possibleEvents[ "top-out" ]: 0, 
+			node.possibleEvents ? node.possibleEvents[ "top-out" ] : 0, 
 			node.possibleEvents ? node.possibleEvents[ "bottom-in" ] : 0, 
 			0
 		);

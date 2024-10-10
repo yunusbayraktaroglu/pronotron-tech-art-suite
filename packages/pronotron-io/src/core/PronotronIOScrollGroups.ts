@@ -1,12 +1,7 @@
-import { 
-	IOEvent,
-	ViewportProps,
-} from "../../types/global";
-import { 
-	NodeData 
-} from "./PronotronIOControlTable";
-import { PronotronIOBase } from "./PronotronIOBase";
+import { IOEvent } from "../../types/global";
 
+import { PronotronIOBase } from "./PronotronIOBase";
+import { NodeData } from "./PronotronIOControlTable";
 
 export class PronotronIOScroller extends PronotronIOBase
 {
@@ -102,8 +97,7 @@ export class PronotronIOScroller extends PronotronIOBase
 		/**
 		 * @important
 		 * Check "top-in" first:
-		 * Instant changes on scrollY might be a big value to 
-		 * make an element "top-in" first then "bottom-out".
+		 * Instant changes on scrollY might be a big value to make an element "top-in" first then "bottom-out".
 		 * 
 		 * @important
 		 * We need to iterate over the _controlGroupsTable in reverse order. 

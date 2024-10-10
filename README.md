@@ -1,14 +1,6 @@
-# Turborepo Design System starter with Changesets
+# Pronotron Web Libraries
 
-This is an official React design system starter powered by Turborepo. Versioning and package publishing is handled by [Changesets](https://github.com/changesets/changesets) and fully automated with GitHub Actions.
-
-## Using this example
-
-Run the following command:
-
-```sh
-npx create-turbo@latest -e with-changesets
-```
+Useful libraries to create better websites, without failing performance and web-standards.
 
 ## What's inside?
 
@@ -16,13 +8,12 @@ This Turborepo includes the following:
 
 ### Apps and Packages
 
-- `docs`: A placeholder documentation site powered by [Next.js](https://nextjs.org/)
-- `@acme/core`: core React components
-- `@acme/utils`: shared React utilities
-- `@acme/tsconfig`: shared `tsconfig.json`s used throughout the monorepo
-- `@acme/eslint-config`: ESLint preset
-
-Each package and app is 100% [TypeScript](https://www.typescriptlang.org/).
+- `demos`: Demos using packages
+- `docs`: Documents to how to using packages
+- `@pronotron/io`: Custom intersection observer does not misses any target like default IntersectionObserver API
+- `@pronotron/pointer`: Pointer based animations, tap, hold events
+- `@pronotron/tsconfig`: shared `tsconfig.json`s used throughout the monorepo
+- `@pronotron/eslint-config`: ESLint preset
 
 ### Utilities
 
