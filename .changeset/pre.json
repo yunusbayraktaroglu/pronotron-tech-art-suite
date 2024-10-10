@@ -1,0 +1,14 @@
+{
+  "mode": "pre",
+  "tag": "next",
+  "initialVersions": {
+    "@pronotron/demos": "0.1.0",
+    "@pronotron/docs": "0.0.0",
+    "@pronotron/eslint-config": "0.0.0",
+    "@pronotron/tsconfig": "0.0.0",
+    "@pronotron/io": "0.0.0",
+    "@pronotron/pointer": "0.0.0",
+    "@pronotron/utils": "0.0.0"
+  },
+  "changesets": []
+}

@@ -9,7 +9,6 @@
 	"updateInternalDependencies": "patch",
 	"ignore": [
 		"@pronotron/docs",
-		"@pronotron/utils",
 		"@pronotron/demos"
 	]
 }
