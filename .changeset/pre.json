@@ -11,6 +11,7 @@
     "@pronotron/utils": "0.0.0"
   },
   "changesets": [
-    "forty-months-act"
+    "forty-months-act",
+    "old-ladybugs-hear"
   ]
 }

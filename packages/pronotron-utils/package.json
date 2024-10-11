@@ -1,6 +1,6 @@
 {
 	"name": "@pronotron/utils",
-	"version": "0.0.1-beta.0",
+	"version": "0.0.1-beta.1",
 	"main": "./dist/index.js",
 	"module": "./dist/index.mjs",
 	"types": "./dist/index.d.ts",
@@ -17,8 +17,8 @@
 		"clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
 	},
 	"devDependencies": {
-		"@pronotron/tsconfig": "*",
-		"@pronotron/eslint-config": "*",
+		"@pronotron/tsconfig": "0.0.1-beta.0",
+		"@pronotron/eslint-config": "0.0.1-beta.0",
 		"@types/react": "^18.2.61",
 		"@types/react-dom": "^18.2.19",
 		"eslint": "^8.57.0",
