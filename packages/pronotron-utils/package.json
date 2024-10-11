@@ -1,11 +1,12 @@
 {
 	"name": "@pronotron/utils",
-	"version": "0.0.1-beta.1",
+	"version": "0.0.1-beta.2",
+	"description": "Common components shared between @pronotron packages",
+	"author": "Yunus Bayraktaroglu <yunus.bayraktaroglu@gmail.com>",
 	"main": "./dist/index.js",
 	"module": "./dist/index.mjs",
 	"types": "./dist/index.d.ts",
 	"sideEffects": false,
-	"private": true,
 	"license": "MIT",
 	"files": [
 		"dist/**"
@@ -17,18 +18,13 @@
 		"clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
 	},
 	"devDependencies": {
-		"@pronotron/tsconfig": "0.0.1-beta.0",
-		"@pronotron/eslint-config": "0.0.1-beta.0",
+		"@pronotron/tsconfig": "*",
+		"@pronotron/eslint-config": "*",
 		"@types/react": "^18.2.61",
 		"@types/react-dom": "^18.2.19",
 		"eslint": "^8.57.0",
 		"tsup": "^8.0.2",
-		"typescript": "^5.3.3"
-	},
-	"dependencies": {
+		"typescript": "^5.3.3",
 		"react": "^18.2.0"
-	},
-	"publishConfig": {
-		"access": "public"
 	}
 }

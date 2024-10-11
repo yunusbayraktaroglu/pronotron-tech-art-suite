@@ -1,6 +1,6 @@
 {
 	"name": "@pronotron/io",
-	"version": "0.0.1-beta.1",
+	"version": "0.0.1-beta.2",
 	"description": "Reliable viewport tracking without missed targets, unlike the default IntersectionObserver API.",
 	"author": "Yunus Bayraktaroglu <yunus.bayraktaroglu@gmail.com>",
 	"main": "./dist/index.js",
@@ -23,8 +23,8 @@
 		"clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
 	},
 	"devDependencies": {
-		"@pronotron/eslint-config": "0.0.1-beta.0",
-		"@pronotron/tsconfig": "0.0.1-beta.0",
+		"@pronotron/eslint-config": "*",
+		"@pronotron/tsconfig": "*",
 		"@types/react": "^18.2.61",
 		"@types/react-dom": "^18.2.19",
 		"eslint": "^8.57.0",
@@ -34,6 +34,6 @@
 		"react": "^18.2.0"
 	},
 	"dependencies": {
-		"@pronotron/utils": "0.0.1-beta.1"
+		"@pronotron/utils": "0.0.1-beta.2"
 	}
 }
