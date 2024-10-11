@@ -1,6 +1,6 @@
 # @pronotron/io
 
-Custom Intersection Observer logic, when missing interaction is not an option.
+Reliable viewport tracking without missed targets, unlike the default IntersectionObserver API.
 
 ## TODO
 - Ensure app initialization to be in a top component. (Maybe use a context provider)

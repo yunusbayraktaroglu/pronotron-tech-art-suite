@@ -24,15 +24,15 @@
 	"devDependencies": {
 		"@pronotron/eslint-config": "*",
 		"@pronotron/tsconfig": "*",
-		"@pronotron/utils": "0.0.1-beta.0",
 		"@types/react": "^18.2.61",
 		"@types/react-dom": "^18.2.19",
 		"eslint": "^8.57.0",
 		"terser": "^5.33.0",
 		"tsup": "^8.0.2",
-		"typescript": "^5.3.3"
+		"typescript": "^5.3.3",
+		"react": "^18.2.0"
 	},
 	"dependencies": {
-		"react": "^18.2.0"
+		"@pronotron/utils": "0.0.1-beta.0"
 	}
 }
