@@ -67,7 +67,7 @@ function AppTickerProvider({ children }: { children: React.ReactNode })
 
 	const clock = useRef( new PronotronClock() );
 	const animationController = useRef( new PronotronAnimationController( clock.current ) );
-	const pointerController = useRef( new PronotronTouch( window, animationController.current, clock.current ) );
+	const pointerController = useRef( new PronotronMouse( window, animationController.current, clock.current ) );
 
 	const [ elapsedTime, setElapsedTime ] = useState( 0 );
 	const [ activeElapsedTime, setActiveElapsedTime ] = useState( 0 );
