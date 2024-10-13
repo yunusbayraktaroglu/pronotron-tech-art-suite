@@ -1,5 +1,13 @@
 # @pronotron/io
 
+## 0.0.1-beta.3
+
+### Patch Changes
+
+- Bugs fixed
+- Updated dependencies
+  - @pronotron/utils@0.0.1-beta.3
+
 ## 0.0.1-beta.2
 
 ### Patch Changes

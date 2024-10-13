@@ -1,6 +1,6 @@
 {
 	"name": "@pronotron/pointer",
-	"version": "0.0.1-beta.2",
+	"version": "0.0.1-beta.3",
 	"description": "Tracks mouse and touch pointers, with custom events like holding and tapping for enhanced interaction control.",
 	"author": "Yunus Bayraktaroglu <yunus.bayraktaroglu@gmail.com>",
 	"main": "./dist/index.js",
@@ -33,6 +33,6 @@
 		"react": "^18.2.0"
 	},
 	"dependencies": {
-		"@pronotron/utils": "0.0.1-beta.2"
+		"@pronotron/utils": "0.0.1-beta.3"
 	}
 }
