@@ -1,6 +1,4 @@
-import { PronotronPointerBase } from "./PronotronPointerBase";
-
-type MouseStates = "idle" | "started" | "moving" | "holding" | "tap";
+import { PointerStates, PronotronPointerBase } from "./PronotronPointerBase";
 
 /**
  * The movementX and movementY properties in PointerEvent are not supported in Safari on iOS, including on an iPhone 6. 
@@ -11,46 +9,55 @@ type MouseStates = "idle" | "started" | "moving" | "holding" | "tap";
  */
 export class PronotronMouse extends PronotronPointerBase 
 {
-	currentState: MouseStates = "idle";
-
-	startEvents()
+	startEvents(): void
 	{
-		this.target.addEventListener( "pointermove", this.onMove as EventListener, { passive: false } );
-		this.currentState = "started";
-		this.isRunning = true;
+		super._startEvents();
+		this._target.addEventListener( "pointermove", this._onMove as EventListener, { passive: false } );
+		this._target.addEventListener( "pointerdown", this._onStart as EventListener, { passive: false } );
+		/**
+		 * Dragging event causes missing pointerup listener, and fires pointercancel event.
+		 * @see https://stackoverflow.com/questions/68932661/js-event-listeners-stop-working-during-item-drag-only-fire-after-pointerup-and
+		 */
+		this._target.addEventListener( "dragstart", ( event ) => event.preventDefault() );
+		this._currentState = PointerStates.MOVING;
 	}
 
-	stopEvents()
+	stopEvents(): void
 	{
-		this.target.removeEventListener( "pointermove", this.onMove as EventListener );
-		this.currentState = "idle";
-		this.isRunning = false;
+		super._stopEvents();
+		this._target.removeEventListener( "pointermove", this._onMove as EventListener );
+		this._target.removeEventListener( "pointerdown", this._onStart as EventListener );
+		this._target.removeEventListener( "pointerup", this._onEnd as EventListener );
+		this._target.removeEventListener( "pointercancel", this._onEnd as EventListener );
+		this._currentState = PointerStates.IDLE;
 	}
 
-	onStart( event: MouseEvent ): void {}
-	onEnd( event: MouseEvent ): void {}
-	onMove( event: MouseEvent ): void
+	_onStart( event: MouseEvent ): void
 	{
-		this.currentState = "moving";
+		this._target.addEventListener( "pointerup", this._onEnd as EventListener, { passive: false } );
+		super._onStart( event );
+	}
 
-		const { x, y } = this.getPointerPosition( event );
-
-		this.updatePointer( x, y );
+	_onMove( event: MouseEvent ): void
+	{
+		super._onMove( event );
+		const { x, y } = this._getPointerPosition( event );
+		this._updatePointer( x, y );
     }
 
-	getPointerPosition( event: MouseEvent ): { x: number; y: number }
+	_onEnd( event: MouseEvent ): void
+	{
+		this._target.removeEventListener( "pointerup", this._onEnd as EventListener );
+		this._target.removeEventListener( "pointercancel", this._onEnd as EventListener );
+		super._onEnd( event );
+		this._currentState = PointerStates.MOVING;
+	}
+
+	_getPointerPosition( event: MouseEvent ): { x: number; y: number }
 	{
 		return { 
 			x: event.clientX, 
 			y: event.clientY 
 		};
 	}
-
 }
-
-
-
-
-
-
-

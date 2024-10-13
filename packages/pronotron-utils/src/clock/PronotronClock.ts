@@ -35,12 +35,16 @@ export class PronotronClock
 		this.pauseDiff += ( now() - this.pauseTime ) / 1000;
 	}
 
-	tick()
+	/**
+	 * Ticks the clock
+	 * @returns number Delta time
+	 */
+	tick(): number
 	{
-		this.getDelta();
+		return this._getDelta();
 	}
 
-	getDelta()
+	private _getDelta()
 	{
 		let diff = 0;
 		const newTime = now();
