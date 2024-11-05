@@ -1,8 +1,8 @@
 import { PronotronClock } from "../clock/PronotronClock";
+import { NativeControlTable } from "../native-control-table/NativeControlTable";
 
 type AnimationOptionID = string;
 type AnimationInternalID = number;
-type AnimationInternalSlotPosition = number;
 enum AnimationData {
 	ID,
 	DURATION,
@@ -11,192 +11,182 @@ enum AnimationData {
 	RENDERABLE,
 	TIMESTYLE,
 };
+
 type AnimationOption = {
 	id: AnimationOptionID;
 	/**
-	 * Animation duration in seconds
+	 * Duration of the animation in seconds.
 	 */
 	duration: number;
 	/**
-	 * - pausable: Time will not ticking when screen is unfocused.
-	 * - continious: Time will be ticking even screen is unfocused.
+	 * - pausable: Time does not progress when the screen is unfocused.
+	 * - continious: Time continues to progress even when the screen is unfocused.
 	 */
 	timeStyle: "pausable" | "continious",
 } & ({
-	onRender?: ( currentTime: number, startTime: number, duration: number ) => void;
+	/**
+	 * Can be used as a callback for when the animation ends, with two time styles available.
+	 */
 	onEnd: () => void;
 	/**
-	 * Should onEnd() executed if the animation ended forcibly? (Adding a new animation with the same id)
+	 * Determines if onEnd() should be executed if the animation is forcibly ended 
+	 * (e.g., by adding a new animation with the same ID).
 	 */
 	forceFinish: "runOnEnd" | "doNotRunOnEnd";
+	onRender?: ( currentTime: number, startTime: number, duration: number ) => void;
 } | {
 	onRender: ( currentTime: number, startTime: number, duration: number ) => void;
 });
 
-
+/**
+ * 1. Generates an internalID number that points given client animationID
+ * 2. Adds to nativeControlTable with given ID ( givenID -> slotPosition )
+ */
 export class PronotronAnimationController
 {
-	clock: PronotronClock;
-	animationsTable: Float32Array;
-	animationDataSize: number;
-	animationTableMaxSlot: number;
+	/**
+	 * Stores options passed when creating animations, 
+	 * allowing access to onRender(), onEnd(), etc.
+	 * 
+	 * The key is a number to facilitate passing to NativeControlTable.
+	 */
+	private _animationReferences: Record<AnimationInternalID, AnimationOption> = {};
 
 	/**
-	 * Passed options while animation creation, 
-	 * to hold references of onRender(), onEnd(), etc.
+	 * Holds generated internal IDs for each created animation.
 	 */
-	animationOptions: Record<AnimationInternalID, AnimationOption> = {};
+	private _animationInternalIDs = new Map<AnimationOptionID, AnimationInternalID>();
+	private _animationInternalIDsTable: Uint8Array;
 
-	/**
-	 * Holds generated internal ID's for each created animation
-	 */
-	animationInternalIds = new Map<AnimationOptionID, AnimationInternalID>();
-	animationInternalSlotPositions = new Map<AnimationInternalID, AnimationInternalSlotPosition>();
+	private _controlTable: NativeControlTable<typeof AnimationData>;
+	private _clock: PronotronClock;
 	
-	/**
-	 * Available internal ID's
-	 */
-	availableIdsTable = new Uint8Array( 255 ).fill( 1 );
-
 	constructor( clock: PronotronClock, nodeCountHint = 20 )
 	{
-		this.clock = clock;
-
-		/**
-		 * @see https://stackoverflow.com/questions/38034673/determine-the-number-of-enum-elements-typescript
-		 */
-		this.animationTableMaxSlot = nodeCountHint;
-		this.animationDataSize = Object.keys( AnimationData ).length / 2;
-		this.animationsTable = new Float32Array( this.animationDataSize * this.animationTableMaxSlot );
+		this._clock = clock;
+		this._controlTable = new NativeControlTable( AnimationData, nodeCountHint );
+		this._animationInternalIDsTable = new Uint8Array( nodeCountHint ).fill( 1 );
 	}
 
 	addAnimation( animationOption: AnimationOption )
 	{
-		const existingAnimationInternalID = this.animationInternalIds.get( animationOption.id );
-
-		// ID might be zero, so check for undefined
-		if ( existingAnimationInternalID !== undefined ){
-			this.forceFinish( existingAnimationInternalID );
+		if ( this._controlTable.isSlotExist( animationOption.id ) ){
+			this.removeAnimation( animationOption.id, true );
 		}
 
-		// Nodes are shifting when removed, so empty slot always have to be equal with nodePositions map size
-		const emptySlotPosition = this.animationInternalIds.size;
-		const animationInternalID = this.findEmptyID();
+		const animationInternalID = this._findEmptyID();
+		const now = animationOption.timeStyle === "continious" ? this._clock.elapsedTime : this._clock.elapsedPausedTime;
 
-		if ( animationInternalID < 0 ){
-			console.warn( "No available id" );
-			return;
-		}
-
-		const now = animationOption.timeStyle === "continious" ? this.clock.elapsedTime : this.clock.elapsedPausedTime;
-		const emptyOffset = emptySlotPosition * this.animationDataSize;
-
-		this.animationsTable[ emptyOffset + AnimationData.ID ] = animationInternalID;
-		this.animationsTable[ emptyOffset + AnimationData.DURATION ] = animationOption.duration;
-		this.animationsTable[ emptyOffset + AnimationData.STARTTIME ] = now;
-		this.animationsTable[ emptyOffset + AnimationData.ENDTIME ] = now + animationOption.duration;
-		this.animationsTable[ emptyOffset + AnimationData.RENDERABLE ] = animationOption.onRender ? 1 : 0;
-		this.animationsTable[ emptyOffset + AnimationData.TIMESTYLE ] = animationOption.timeStyle === "continious" ? 1 : 0;
-
-		// Add to information tables
-		this.animationInternalIds.set( animationOption.id, animationInternalID );
-		this.animationInternalSlotPositions.set( animationInternalID, emptySlotPosition );
-		this.animationOptions[ animationInternalID ] = animationOption;
-	}
-
-	forceFinish( animationInternalID: AnimationInternalID )
-	{
-		if ( "forceFinish" in this.animationOptions[ animationInternalID ] ){
-			if ( this.animationOptions[ animationInternalID ].forceFinish === "runOnEnd" ){
-				this.animationOptions[ animationInternalID ].onEnd();
-			}
-		}
-		this.removeAnimation( animationInternalID );
+		// Add animation
+		this._controlTable.addSlot( animationOption.id, {
+			[ AnimationData.ID ]: animationInternalID,
+			[ AnimationData.DURATION ]: animationOption.duration,
+			[ AnimationData.STARTTIME ]: now,
+			[ AnimationData.ENDTIME ]: now + animationOption.duration,
+			[ AnimationData.RENDERABLE ]: animationOption.onRender ? 1 : 0,
+			[ AnimationData.TIMESTYLE] : animationOption.timeStyle === "continious" ? 1 : 0,
+		});
+		this._animationInternalIDs.set( animationOption.id, animationInternalID );
+		this._animationInternalIDsTable[ animationInternalID ] = 0; // Consume id
+		this._animationReferences[ animationInternalID ] = animationOption;
 	}
 
 	/**
-	 * Finds an available index between 0-255 to use as animationInternalID
+	 * Removes an animation using the given animation ID.
+	 * 
+	 * @param animationID The animation ID provided during creation.
+	 * @param complete If true, runs the onEnd() method of the animation before removal, if it exists.
 	 */
-	findEmptyID(): number {
-		for ( let i = 0; i < this.availableIdsTable.length; i++ ){
-			if ( this.availableIdsTable[ i ] ){
-				this.availableIdsTable[ i ] = 0; 
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	/**
-	 * We do not remove anything actually,
-	 * Only shifting data of the last slot to removed slot, and iterating over 1 less
-	 */
-	removeAnimation( animationInternalID: AnimationInternalID )
+	removeAnimation( animationID: string, complete?: boolean ): void
 	{
-		const animationSlotPosition = this.animationInternalSlotPositions.get( animationInternalID )!;
-		const lastSlotPosition = this.animationInternalIds.size - 1; // Correct
+		const animationInternalID = this._animationInternalIDs.get( animationID );
 
-		// Move last slot to deactivated slot if they're different
-		if ( animationSlotPosition !== lastSlotPosition ){
+		if ( animationInternalID !== undefined ){
 
-			const deactivatedOffset = animationSlotPosition * this.animationDataSize;
-			const lastSlotOffset = lastSlotPosition * this.animationDataSize;
-
-			this.animationInternalSlotPositions.set( this.animationsTable[ lastSlotOffset + AnimationData.ID ], animationSlotPosition );
-
-			for ( let i = 0; i < this.animationDataSize; i++ ){
-				this.animationsTable[ deactivatedOffset + i ] = this.animationsTable[ lastSlotOffset + i ];
+			// Runs the animation's onEnd() method (if present) before removal
+			if ( complete && ( "forceFinish" in this._animationReferences[ animationInternalID ] ) ){
+				if ( this._animationReferences[ animationInternalID ].forceFinish === "runOnEnd" ){
+					this._animationReferences[ animationInternalID ].onEnd();
+				}
 			}
 
+			this._removeAnimationByInternalID( animationInternalID );
+
+		} else {
+			console.warn( `AnimationID: '${ animationID }' does not exist.` );
 		}
-
-		const animationOptionID = this.animationOptions[ animationInternalID ].id;
-
-		// Mark ID as available again
-		this.availableIdsTable[ animationInternalID ] = 1;
-
-		// Clean in information tables
-		this.animationInternalIds.delete( animationOptionID );
-		this.animationInternalSlotPositions.delete( animationInternalID );
-		delete this.animationOptions[ animationInternalID ];
-
-		//console.log( this.animationOptions );
-		//console.log( this.animationInternalIds );
-		//console.log( this.animationInternalSlotPositions );
-		//console.log( this.availableIdsTable );
 	}
-	
+
 	tick()
 	{
-		for ( let i = 0; i < this.animationInternalIds.size; i++ ){
+		const elapsedTime = this._clock.elapsedTime;
+		const elapsedPausedTime = this._clock.elapsedPausedTime;
+
+		/**
+		 * @bug
+		 * Iterate reverse order to avoid removed elements mix up iteration
+		 */
+		for ( let i = 0; i < this._controlTable._usedSlots; i++ ){
 		
-			const offset = i * this.animationDataSize;
-			const time = this.animationsTable[ offset + AnimationData.TIMESTYLE ] ? this.clock.elapsedTime : this.clock.elapsedPausedTime;
+			const offset = i * this._controlTable._stride;
+			const time = this._controlTable._controlTable[ offset + AnimationData.TIMESTYLE ] ? elapsedTime : elapsedPausedTime;
 
 			/**
-			 * Animation has onRender function.
-			 * If screen is unfocused, animation needs to be rendered last one time before removed
+			 * Animation has onRender() function.
+			 * If screen is unfocused, animation needs to be rendered last one time before removed.
+			 * So run before endtime control below.
 			 */
-			if ( this.animationsTable[ offset + AnimationData.RENDERABLE ] ){
+			if ( this._controlTable._controlTable[ offset + AnimationData.RENDERABLE ] ){
 				// @ts-expect-error - onRender is defined if the animation is RENDERABLE
-				this.animationOptions[ this.animationsTable[ offset + AnimationData.ID ] ].onRender( 
-					time, 
-					this.animationsTable[ offset + AnimationData.STARTTIME ], 
-					this.animationsTable[ offset + AnimationData.DURATION ] 
+				this._animationReferences[ this._controlTable._controlTable[ offset + AnimationData.ID ] ].onRender( 
+					time,
+					this._controlTable._controlTable[ offset + AnimationData.STARTTIME ], 
+					this._controlTable._controlTable[ offset + AnimationData.DURATION ] 
 				);
 			}
 
 			/**
-			 * Animation is finished
+			 * Check if the animation is finished.
 			 */
-			if ( time > this.animationsTable[ offset + AnimationData.ENDTIME ] ){
-				const animationInternalID = this.animationsTable[ offset + AnimationData.ID ];
-				if ( "onEnd" in this.animationOptions[ animationInternalID ] ){
-					this.animationOptions[ animationInternalID ].onEnd();
+			if ( time > this._controlTable._controlTable[ offset + AnimationData.ENDTIME ] ){
+				const animationInternalID = this._controlTable._controlTable[ offset + AnimationData.ID ];
+				if ( "onEnd" in this._animationReferences[ animationInternalID ] ){
+					this._animationReferences[ animationInternalID ].onEnd();
 				}
-				this.removeAnimation( animationInternalID );
+				this._removeAnimationByInternalID( animationInternalID );
 			}
 		}
 	}
 
+	/**
+	 * During ticking, only the generated animationInternalID stored in NativeControlTable is available.
+	 * @param animationInternalID The generated number when adding an animation.
+	 */
+	private _removeAnimationByInternalID( animationInternalID: number )
+	{
+		const animationID = this._animationReferences[ animationInternalID ].id;
+
+		this._controlTable.removeSlot( animationID );
+		this._animationInternalIDs.delete( animationID );
+		this._animationInternalIDsTable[ animationInternalID ] = 1; // Release id
+		delete this._animationReferences[ animationInternalID ];
+	}
+
+	/**
+	 * Returns an available slot.
+	 * @fix
+	 * Add expandCapacity() method
+	 */
+	private _findEmptyID(): number
+	{
+		// Search for an available slot
+		for ( let i = 0; i < this._animationInternalIDsTable.length; i++ ){
+			if ( this._animationInternalIDsTable[ i ] ){
+				return i;
+			}
+		}
+
+		console.warn( `No available slot found. Expand the capacity.` );
+		return -1;
+	}
 }

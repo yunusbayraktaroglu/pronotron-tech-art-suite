@@ -1,6 +1,5 @@
-import { IOEvent, IONodeOptions } from "../../types/global";
+import type { IOVerticalEvent, IONodeOptions, BinaryBoolean } from "../../types/global";
 
-type BinaryBoolean = 1 | 0;
 
 export class PronotronIONode
 {
@@ -11,9 +10,9 @@ export class PronotronIONode
 	public settings: IONodeOptions;
 
 	/**
-	 * Calculated only if viewport data is assigned
+	 * Calculated only if viewport is assigned
 	 */
-	public possibleEvents: undefined | Record<IOEvent, BinaryBoolean>;
+	public possibleEvents: undefined | Record<IOVerticalEvent, BinaryBoolean>;
 
     constructor( settings: IONodeOptions )
 	{
@@ -33,7 +32,7 @@ export class PronotronIONode
     }
 
 	/**
-	 * Calculates possible events by
+	 * Calculates possible events can node dispatch by
 	 * 
 	 * @param viewportHeight Visible viewport height
 	 * @param totalPossibleScroll Max Y scroll value
@@ -48,9 +47,10 @@ export class PronotronIONode
 		};
 
 		if ( this.y < viewportHeight ){
+
 			/**
 			 * Element Y position is smaller than screen height.
-			 * Element can only "top-out" and "top-in".
+			 * Element can only dispatch "top-in" and "top-out".
 			 */
 			if ( this.y > totalPossibleScroll ){
 				/**
@@ -63,10 +63,12 @@ export class PronotronIONode
 				this.possibleEvents[ "top-in" ] = 1;
 				this.possibleEvents[ "top-out" ] = 1;
 			}
+
 		} else {
+
 			/**
 			 * Element Y position is bigger than screen height.
-			 * Element can "bottom-in" and "bottom-out"
+			 * Element can dispatch "bottom-in" and "bottom-out".
 			 */
 			this.possibleEvents[ "bottom-in" ] = 1;
 			this.possibleEvents[ "bottom-out" ] = 1;
@@ -78,6 +80,7 @@ export class PronotronIONode
 				this.possibleEvents[ "top-in" ] = 1;
 				this.possibleEvents[ "top-out" ] = 1;
 			}
+
 		}
 	}
 }

@@ -2,18 +2,21 @@
  * Utils
  */
 type RequireAtLeastOne<T> = {
-	[K in keyof T]: Pick<T, K> & Partial<T>;
-  }[keyof T];
+	[ K in keyof T ]: Pick<T, K> & Partial<T>;
+}[ keyof T ];
 
 type RequireExactlyOne<T> = {
-    [K in keyof T]: { [P in K]: T[P] } & Partial<Record<Exclude<keyof T, K>, never>>;
-}[keyof T];
+	[ K in keyof T ]: { [ P in K ]: T[ P ] } & Partial<Record<Exclude<keyof T, K>, never>>;
+}[ keyof T ];
+
+export type BinaryBoolean = 1 | 0;
 
 /**
  * Possible events of an element
  */
-export type IOEvent = "top-in" | "top-out" | "bottom-in" | "bottom-out";
-export type IODispatchFunction = Record<IOEvent, () => void>;
+export type IOVerticalEvent = "top-in" | "top-out" | "bottom-in" | "bottom-out";
+export type IOHorizontalEvent = "left-in" | "left-out" | "right-in" | "right-out";
+export type IODispatchFunction = Record<IOVerticalEvent, () => void>;
 
 /**
  * Options to passed

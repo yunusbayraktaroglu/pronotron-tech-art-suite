@@ -2,6 +2,12 @@
 
 Useful libraries to create better websites, without failing performance and web-standards.
 
+## TODO
+- Manually remove animation with ID
+- Pointer: Wasm for ease CPU intensive work
+- IO: Add horizontal check
+
+
 ## What's inside?
 
 This Turborepo includes the following:

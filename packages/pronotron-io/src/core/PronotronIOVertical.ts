@@ -1,9 +1,27 @@
-import { IOEvent } from "../../types/global";
+import { IOVerticalEvent } from "../../types/global";
 
-import { PronotronIOBase } from "./PronotronIOBase";
+import { IONodeData, PronotronIOBase } from "./PronotronIOBase2";
 import { NodeData } from "./PronotronIOControlTable";
 
-export class PronotronIOScroller extends PronotronIOBase
+/**
+ * Virtually checks intersection over node's y position and viewport properties. 
+ * Waits for handleScroll() method.
+ * 
+ * @example
+ * const pronotronIO = new PronotronIOVertical();
+ * pronotronIO.setScrollY( 0 );
+ * pronotronIO.addNode({
+ * 	ref: element,
+ * 	dispatch: {
+ * 		"top-in": () => console.log( "Element in from top" ),
+ * 		"bottom-out": () => console.log( "Element out from bottom" ),
+ * 	},
+ * 	onRemoveNode: () => element.dataset.ioActive = "0",
+ * 	getYPosition: () => element.getBoundingClientRect().top + window.scrollY,
+ * });
+ * window.addEventListener( 'scroll', () => pronotronIO.handleScroll( window.scrollY ) );
+ */
+export class PronotronIOVertical extends PronotronIOBase
 {
 	// Start at 0 even with a jumpy start value, to track passed nodes correctly
 	public direction: "up" | "down" = "down";
@@ -16,14 +34,18 @@ export class PronotronIOScroller extends PronotronIOBase
 	handleScroll( scrollY: number ): void 
 	{
 		// Skips initial run for scroll value = 0
-		if ( scrollY == this._lastScrollY ) return;
+		if ( scrollY === this._lastScrollY ) return;
 
 		if ( scrollY > this._lastScrollY ){
+
 			this.direction = "down";
-			this.#handleScrollDown( scrollY, this._viewport!._screenHeight );
+			this._handleScrollDown( scrollY, this._viewport!._screenHeight );
+
 		} else {
+
 			this.direction = "up";
-			this.#handleScrollUp( scrollY, this._viewport!._screenHeight );
+			this._handleScrollUp( scrollY, this._viewport!._screenHeight );
+
 		}
 
 		this._lastScrollY = scrollY;
@@ -32,11 +54,11 @@ export class PronotronIOScroller extends PronotronIOBase
 	/**
 	 * User is SCROLLING DOWN.
 	 * Only "top-out" and "bottom-in" events are possible.
-
+	 * 
 	 * @param scrollY Current scrollY value (window.scrollY) to calculate top (scrollY)
 	 * @param viewportHeight Current viewportHeight to calculate bottom (scrollY + viewportHeight)
 	 */
-	#handleScrollDown( scrollY: number, viewportHeight: number ): void 
+	private _handleScrollDown( scrollY: number, viewportHeight: number ): void 
 	{
 		/**
 		 * @important
@@ -48,34 +70,41 @@ export class PronotronIOScroller extends PronotronIOBase
 		 * This way, removing elements won't affect the indices of the yet-to-be-processed elements.
 		 */
 		const nodesToRemove: number[] = [];
-		const controlTable = this._controlTable.table;
+		const controlTable = this._controlTable._controlTable;
 
-		for ( let i = 0; i < this._nodes.size; i++ ){
+		for ( let i = 0; i < this._controlTable._usedSlots; i++ ){
 
-			let offset = i * this._controlTable.nodeDataSize;
+			const offset = i * this._controlTable._stride;
+			const nodeID = controlTable[ offset + NodeData.NodeID ];
+			const elementY = controlTable[ offset + NodeData.NodeYPosition ];
 
-			let nodeID = controlTable[ offset + NodeData.NodeID ];
-			let elementY = controlTable[ offset + NodeData.NodeYPosition ];
-
-			// bottom-in
+			// Check bottom-in
 			if ( controlTable[ offset + NodeData.BottomIn ] && elementY < ( scrollY + viewportHeight ) ){
-				if ( this.#dispatchEvent( nodeID, "bottom-in" ) ){
+				if ( this._dispatchEvent( nodeID, "bottom-in" ) ){
 					nodesToRemove.push( nodeID );
 					continue;
 				} else {
-					// Activate "top-out", "bottom-out"
-					this._controlTable.updateTrackingData( offset, 0, 1, 0, 1 );
+					this._controlTable.modifySlotByPosition( i, {
+						[ IONodeData.TopIn ]: 0,
+						[ IONodeData.TopOut ]: 1,
+						[ IONodeData.BottomIn ]: 0,
+						[ IONodeData.BottomOut ]: 1,
+					} );
 				}
 			}
 
-			// top-out
+			// Check top-out
 			if ( controlTable[ offset + NodeData.TopOut ] && elementY < scrollY ){
-				if ( this.#dispatchEvent( nodeID, "top-out" ) ){
+				if ( this._dispatchEvent( nodeID, "top-out" ) ){
 					nodesToRemove.push( nodeID );
 					continue;
 				} else {
-					// Activate "top-in"
-					this._controlTable.updateTrackingData( offset, 1, 0, 0, 0 );
+					this._controlTable.modifySlotByPosition( i, {
+						[ IONodeData.TopIn ]: 1,
+						[ IONodeData.TopOut ]: 0,
+						[ IONodeData.BottomIn ]: 0,
+						[ IONodeData.BottomOut ]: 0,
+					} );
 				}
 			}
 
@@ -92,7 +121,7 @@ export class PronotronIOScroller extends PronotronIOBase
 	 * @param scrollY Current scrollY value (window.scrollY) to calculate top (scrollY)
 	 * @param viewportHeight Current viewportHeight to calculate bottom (scrollY + viewportHeight)
 	 */
-	#handleScrollUp( scrollY: number, viewportHeight: number ): void
+	private _handleScrollUp( scrollY: number, viewportHeight: number ): void
 	{
 		/**
 		 * @important
@@ -106,34 +135,43 @@ export class PronotronIOScroller extends PronotronIOBase
 
 		// Iterate over map size
 		const nodesToRemove = [];
-		const controlTable = this._controlTable.table;
+		const controlTable = this._controlTable._controlTable;
 
-		for ( let i = 0; i < this._nodes.size; i++ ){
+		for ( let i = 0; i < this._controlTable._usedSlots; i++ ){
 
-			let offset = i * this._controlTable.nodeDataSize;
+			const offset = i * this._controlTable._stride;
+			const nodeID = controlTable[ offset + NodeData.NodeID ];
+			const elementY = controlTable[ offset + NodeData.NodeYPosition ];
 
-			let nodeID = controlTable[ offset + NodeData.NodeID ];
-			let elementY = controlTable[ offset + NodeData.NodeYPosition ];
-
-			// top-in
+			// Check top-in
 			if ( controlTable[ offset + NodeData.TopIn ] && elementY > scrollY ){
-				if ( this.#dispatchEvent( nodeID, "top-in" ) ){
+				if ( this._dispatchEvent( nodeID, "top-in" ) ){
 					nodesToRemove.push( nodeID );
 					continue;
 				} else {
 					// Activate "top-out", "bottom-out"
-					this._controlTable.updateTrackingData( offset, 0, 1, 0, 1 );
+					this._controlTable.modifySlotByPosition( i, {
+						[ IONodeData.TopIn ]: 0,
+						[ IONodeData.TopOut ]: 1,
+						[ IONodeData.BottomIn ]: 0,
+						[ IONodeData.BottomOut ]: 1,
+					} );
 				}
 			}
 
-			// bottom-out
+			// Check bottom-out
 			if ( controlTable[ offset + NodeData.BottomOut ] && elementY > ( scrollY + viewportHeight ) ){
-				if ( this.#dispatchEvent( nodeID, "bottom-out" ) ){
+				if ( this._dispatchEvent( nodeID, "bottom-out" ) ){
 					nodesToRemove.push( nodeID );
 					continue;
 				} else {
 					// Activate "bottom-in"
-					this._controlTable.updateTrackingData( offset, 0, 0, 1, 0 );
+					this._controlTable.modifySlotByPosition( i, {
+						[ IONodeData.TopIn ]: 0,
+						[ IONodeData.TopOut ]: 0,
+						[ IONodeData.BottomIn ]: 1,
+						[ IONodeData.BottomOut ]: 0,
+					} );
 				}
 			}
 
@@ -150,7 +188,7 @@ export class PronotronIOScroller extends PronotronIOBase
 	 * @param event Dispatched event
 	 * @returns true if node needs to be deleted
 	 */
-	#dispatchEvent( nodeID: number, event: IOEvent ): boolean
+	private _dispatchEvent( nodeID: number, event: IOVerticalEvent ): boolean
 	{
 		const ioNodeOptions = this._nodes.get( nodeID )!.settings;
 

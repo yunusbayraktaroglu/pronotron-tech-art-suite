@@ -12,8 +12,8 @@ export class PronotronMouse extends PronotronPointerBase
 	startEvents(): void
 	{
 		super._startEvents();
-		this._target.addEventListener( "pointermove", this._onMove as EventListener, { passive: false } );
 		this._target.addEventListener( "pointerdown", this._onStart as EventListener, { passive: false } );
+		this._target.addEventListener( "pointermove", this._onMove as EventListener, { passive: false } );
 		/**
 		 * Dragging event causes missing pointerup listener, and fires pointercancel event.
 		 * @see https://stackoverflow.com/questions/68932661/js-event-listeners-stop-working-during-item-drag-only-fire-after-pointerup-and

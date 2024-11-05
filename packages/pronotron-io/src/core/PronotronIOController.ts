@@ -1,15 +1,15 @@
-import { PronotronIOScroller } from "./PronotronIOScrollGroups";
+// import { PronotronIOVertical } from "./PronotronIOScrollGroups";
 
-export class PronotronIOController
-{
-    private static instance: PronotronIOScroller;
+// export class PronotronIOController
+// {
+//     private static instance: PronotronIOVertical;
 
-    private constructor(){}
+//     private constructor(){}
 
-    public static getInstance(): PronotronIOScroller {
-        if ( ! PronotronIOController.instance ){
-            PronotronIOController.instance = new PronotronIOScroller();
-        }
-        return PronotronIOController.instance;
-    }
-}
+//     public static getInstance(): PronotronIOVertical {
+//         if ( ! PronotronIOController.instance ){
+//             PronotronIOController.instance = new PronotronIOVertical();
+//         }
+//         return PronotronIOController.instance;
+//     }
+// }
