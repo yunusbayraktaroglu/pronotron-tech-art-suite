@@ -86,7 +86,7 @@ export function PronotronIOProvider({ children }: { children: React.ReactNode })
 		const onScroll = throttle( scroll, 250, { leading: false, trailing: true } );
 		const onResize = throttle( resize, 500, { leading: false, trailing: true } );
 
-		window.addEventListener( 'scroll', onScroll );
+		window.addEventListener( 'scroll', scroll );
 
 		/**
 		 * (x) window.addEventListener( 'resize', onResize );
@@ -103,7 +103,7 @@ export function PronotronIOProvider({ children }: { children: React.ReactNode })
 		console.log( pronotronIO );
 
 		return () => {
-			window.removeEventListener( 'scroll', onScroll );
+			window.removeEventListener( 'scroll', scroll );
 			ro.disconnect();
 		}
 		

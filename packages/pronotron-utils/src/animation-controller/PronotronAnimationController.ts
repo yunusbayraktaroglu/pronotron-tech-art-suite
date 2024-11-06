@@ -1,5 +1,6 @@
 import { PronotronClock } from "../clock/PronotronClock";
 import { NativeControlTable } from "../native-control-table/NativeControlTable";
+import { IDPool } from "../utils/IDPool";
 
 type AnimationOptionID = string;
 type AnimationInternalID = number;
@@ -45,6 +46,11 @@ type AnimationOption = {
 export class PronotronAnimationController
 {
 	/**
+	 * A number ID is generated for each animation to be holdable in the typed control array.
+	 */
+	private _animationOptionIDtoInternalID = new Map<AnimationOptionID, AnimationInternalID>();
+
+	/**
 	 * Stores options passed when creating animations, 
 	 * allowing access to onRender(), onEnd(), etc.
 	 * 
@@ -52,29 +58,32 @@ export class PronotronAnimationController
 	 */
 	private _animationReferences: Record<AnimationInternalID, AnimationOption> = {};
 
-	/**
-	 * Holds generated internal IDs for each created animation.
-	 */
-	private _animationInternalIDs = new Map<AnimationOptionID, AnimationInternalID>();
-	private _animationInternalIDsTable: Uint8Array;
-
-	private _controlTable: NativeControlTable<typeof AnimationData>;
 	private _clock: PronotronClock;
-	
+	private _animationInternalIDsPool: IDPool;
+	private _controlTable: NativeControlTable<typeof AnimationData>;
+
+	/**
+	 * @param clock Clock instance
+	 * @param nodeCountHint Max expected animation object at the same time, will be auto expand if needed
+	 */
 	constructor( clock: PronotronClock, nodeCountHint = 20 )
 	{
 		this._clock = clock;
-		this._controlTable = new NativeControlTable( AnimationData, nodeCountHint );
-		this._animationInternalIDsTable = new Uint8Array( nodeCountHint ).fill( 1 );
+		this._animationInternalIDsPool = new IDPool( nodeCountHint );
+		this._controlTable = new NativeControlTable( AnimationData, Float32Array, nodeCountHint );
 	}
 
-	addAnimation( animationOption: AnimationOption )
+	getAnimationCount(): number {
+		return this._controlTable.usedSlots;
+	}
+
+	addAnimation( animationOption: AnimationOption ): void
 	{
 		if ( this._controlTable.isSlotExist( animationOption.id ) ){
 			this.removeAnimation( animationOption.id, true );
 		}
 
-		const animationInternalID = this._findEmptyID();
+		const animationInternalID = this._animationInternalIDsPool.getID();
 		const now = animationOption.timeStyle === "continious" ? this._clock.elapsedTime : this._clock.elapsedPausedTime;
 
 		// Add animation
@@ -86,20 +95,20 @@ export class PronotronAnimationController
 			[ AnimationData.RENDERABLE ]: animationOption.onRender ? 1 : 0,
 			[ AnimationData.TIMESTYLE] : animationOption.timeStyle === "continious" ? 1 : 0,
 		});
-		this._animationInternalIDs.set( animationOption.id, animationInternalID );
-		this._animationInternalIDsTable[ animationInternalID ] = 0; // Consume id
+		this._animationOptionIDtoInternalID.set( animationOption.id, animationInternalID );
+		this._animationInternalIDsPool.consumeID( animationInternalID );
 		this._animationReferences[ animationInternalID ] = animationOption;
 	}
 
 	/**
-	 * Removes an animation using the given animation ID.
+	 * Removes an animation using the given animationID.
 	 * 
 	 * @param animationID The animation ID provided during creation.
 	 * @param complete If true, runs the onEnd() method of the animation before removal, if it exists.
 	 */
-	removeAnimation( animationID: string, complete?: boolean ): void
+	removeAnimation( animationID: AnimationOptionID, complete?: boolean ): void
 	{
-		const animationInternalID = this._animationInternalIDs.get( animationID );
+		const animationInternalID = this._animationOptionIDtoInternalID.get( animationID );
 
 		if ( animationInternalID !== undefined ){
 
@@ -117,39 +126,39 @@ export class PronotronAnimationController
 		}
 	}
 
-	tick()
+	tick(): void
 	{
 		const elapsedTime = this._clock.elapsedTime;
 		const elapsedPausedTime = this._clock.elapsedPausedTime;
 
 		/**
-		 * @bug
-		 * Iterate reverse order to avoid removed elements mix up iteration
+		 * Iterate reverse order to avoid removed elements mix up iteration.
+		 * If a node is removed in _controlTable, the last slot is moved to removed slot position
 		 */
-		for ( let i = 0; i < this._controlTable._usedSlots; i++ ){
+		for ( let i = this._controlTable.usedSlots - 1; i >= 0; i-- ){
 		
-			const offset = i * this._controlTable._stride;
-			const time = this._controlTable._controlTable[ offset + AnimationData.TIMESTYLE ] ? elapsedTime : elapsedPausedTime;
+			const offset = i * this._controlTable.stride;
+			const time = this._controlTable.table[ offset + AnimationData.TIMESTYLE ] ? elapsedTime : elapsedPausedTime;
 
 			/**
 			 * Animation has onRender() function.
 			 * If screen is unfocused, animation needs to be rendered last one time before removed.
 			 * So run before endtime control below.
 			 */
-			if ( this._controlTable._controlTable[ offset + AnimationData.RENDERABLE ] ){
+			if ( this._controlTable.table[ offset + AnimationData.RENDERABLE ] ){
 				// @ts-expect-error - onRender is defined if the animation is RENDERABLE
-				this._animationReferences[ this._controlTable._controlTable[ offset + AnimationData.ID ] ].onRender( 
+				this._animationReferences[ this._controlTable.table[ offset + AnimationData.ID ] ].onRender( 
 					time,
-					this._controlTable._controlTable[ offset + AnimationData.STARTTIME ], 
-					this._controlTable._controlTable[ offset + AnimationData.DURATION ] 
+					this._controlTable.table[ offset + AnimationData.STARTTIME ], 
+					this._controlTable.table[ offset + AnimationData.DURATION ] 
 				);
 			}
 
 			/**
 			 * Check if the animation is finished.
 			 */
-			if ( time > this._controlTable._controlTable[ offset + AnimationData.ENDTIME ] ){
-				const animationInternalID = this._controlTable._controlTable[ offset + AnimationData.ID ];
+			if ( time > this._controlTable.table[ offset + AnimationData.ENDTIME ] ){
+				const animationInternalID = this._controlTable.table[ offset + AnimationData.ID ];
 				if ( "onEnd" in this._animationReferences[ animationInternalID ] ){
 					this._animationReferences[ animationInternalID ].onEnd();
 				}
@@ -160,33 +169,16 @@ export class PronotronAnimationController
 
 	/**
 	 * During ticking, only the generated animationInternalID stored in NativeControlTable is available.
+	 * 
 	 * @param animationInternalID The generated number when adding an animation.
 	 */
-	private _removeAnimationByInternalID( animationInternalID: number )
+	private _removeAnimationByInternalID( animationInternalID: AnimationInternalID ): void
 	{
 		const animationID = this._animationReferences[ animationInternalID ].id;
 
 		this._controlTable.removeSlot( animationID );
-		this._animationInternalIDs.delete( animationID );
-		this._animationInternalIDsTable[ animationInternalID ] = 1; // Release id
+		this._animationOptionIDtoInternalID.delete( animationID );
+		this._animationInternalIDsPool.releaseID( animationInternalID );
 		delete this._animationReferences[ animationInternalID ];
-	}
-
-	/**
-	 * Returns an available slot.
-	 * @fix
-	 * Add expandCapacity() method
-	 */
-	private _findEmptyID(): number
-	{
-		// Search for an available slot
-		for ( let i = 0; i < this._animationInternalIDsTable.length; i++ ){
-			if ( this._animationInternalIDsTable[ i ] ){
-				return i;
-			}
-		}
-
-		console.warn( `No available slot found. Expand the capacity.` );
-		return -1;
 	}
 }

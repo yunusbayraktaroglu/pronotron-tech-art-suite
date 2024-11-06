@@ -17,6 +17,10 @@ export enum IONodeData {
 };
 
 interface IPronotronIOBase {
+	/**
+	 * Uint16: 0 to 65535
+	 * Uint32: 0 to 4294967295
+	 */
 	_controlTable: NativeControlTable<typeof IONodeData>;
 
 	/**
@@ -76,6 +80,7 @@ export abstract class PronotronIOBase implements IPronotronIOBase
 
 	/**
 	 * High frequency access interleaved typed array
+	 * Uint16: 0 to 65535 for long scroll values
 	 */
 	_controlTable: NativeControlTable<typeof IONodeData>;
 
@@ -84,7 +89,7 @@ export abstract class PronotronIOBase implements IPronotronIOBase
 	 */
 	constructor( nodeCountHint = 20 )
 	{
-		this._controlTable =  new NativeControlTable( IONodeData, nodeCountHint );
+		this._controlTable =  new NativeControlTable( IONodeData, Uint32Array, nodeCountHint );
 	}
 
 	addNode( newNodeOptions: IONodeOptions ): false | PronotronNodeID

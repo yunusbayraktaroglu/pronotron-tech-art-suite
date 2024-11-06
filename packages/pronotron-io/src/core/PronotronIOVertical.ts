@@ -70,11 +70,11 @@ export class PronotronIOVertical extends PronotronIOBase
 		 * This way, removing elements won't affect the indices of the yet-to-be-processed elements.
 		 */
 		const nodesToRemove: number[] = [];
-		const controlTable = this._controlTable._controlTable;
+		const controlTable = this._controlTable.table;
 
-		for ( let i = 0; i < this._controlTable._usedSlots; i++ ){
+		for ( let i = 0; i < this._controlTable.usedSlots; i++ ){
 
-			const offset = i * this._controlTable._stride;
+			const offset = i * this._controlTable.stride;
 			const nodeID = controlTable[ offset + NodeData.NodeID ];
 			const elementY = controlTable[ offset + NodeData.NodeYPosition ];
 
@@ -84,6 +84,7 @@ export class PronotronIOVertical extends PronotronIOBase
 					nodesToRemove.push( nodeID );
 					continue;
 				} else {
+					// Activate "top-out", "bottom-out"
 					this._controlTable.modifySlotByPosition( i, {
 						[ IONodeData.TopIn ]: 0,
 						[ IONodeData.TopOut ]: 1,
@@ -99,6 +100,7 @@ export class PronotronIOVertical extends PronotronIOBase
 					nodesToRemove.push( nodeID );
 					continue;
 				} else {
+					// Activate "top-in"
 					this._controlTable.modifySlotByPosition( i, {
 						[ IONodeData.TopIn ]: 1,
 						[ IONodeData.TopOut ]: 0,
@@ -135,11 +137,11 @@ export class PronotronIOVertical extends PronotronIOBase
 
 		// Iterate over map size
 		const nodesToRemove = [];
-		const controlTable = this._controlTable._controlTable;
+		const controlTable = this._controlTable.table;
 
-		for ( let i = 0; i < this._controlTable._usedSlots; i++ ){
+		for ( let i = 0; i < this._controlTable.usedSlots; i++ ){
 
-			const offset = i * this._controlTable._stride;
+			const offset = i * this._controlTable.stride;
 			const nodeID = controlTable[ offset + NodeData.NodeID ];
 			const elementY = controlTable[ offset + NodeData.NodeYPosition ];
 

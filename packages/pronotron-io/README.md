@@ -3,6 +3,5 @@
 Reliable viewport tracking without missed targets, unlike the default IntersectionObserver API.
 
 ## TODO
-- Ensure app initialization to be in a top component. (Maybe use a context provider)
 - Find a better way to manually removing nodes. (See: usePronotronIO.tsx)
 - Ensure IO node id is safe. (See: PronotronIONode.ts)

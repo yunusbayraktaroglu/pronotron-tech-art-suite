@@ -37,10 +37,11 @@ export class PronotronClock
 
 	/**
 	 * Ticks the clock
-	 * @returns number Delta time
+	 * @returns Delta time
 	 */
 	tick(): number
 	{
+		if ( ! this.running ) this.start();
 		return this._getDelta();
 	}
 

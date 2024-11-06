@@ -1,42 +1,38 @@
 import { useEffect, useState } from "react";
+import { PronotronClock } from "@pronotron/utils";
 
-let lastScrollTime = performance.now();
-let frameCount = 0;
-let scrollFPS = 0;
-let lastUpdate = performance.now();
+const clock = new PronotronClock();
 
-export function ScrollPerformanceUI()
+export function FPSTracker()
 {
 	const [ fps, setFps ] = useState( 0 );
 
 	useEffect(() => {
 
-		const updateScrollFPS = () => {
-			const currentTime = performance.now();
-			frameCount++;
-			const delta = currentTime - lastScrollTime;
-		
-			// Update FPS every second or when user stops scrolling
-			if ( currentTime - lastUpdate >= 1000 ) {
-				scrollFPS = ( frameCount / ( currentTime - lastUpdate ) ) * 1000;
-				setFps( scrollFPS );
-				frameCount = 0;
-				lastUpdate = currentTime;
+		const tick = () => {
+			const deltaTime = clock.tick();
+			setFps( Math.round( 1.0 / deltaTime ) );
+			requestAnimationFrame( tick );
+		};
+
+		const animationFrameId = requestAnimationFrame( tick );
+
+		const handleVisibilityChange = () => {
+			if ( document.hidden ){
+				clock.pause();
+			} else {
+				clock.continue();
 			}
-			
-			lastScrollTime = currentTime;
-		}
-		// Event listener for scroll
-		window.addEventListener( 'scroll', updateScrollFPS );
+		};
+
+		document.addEventListener( 'visibilitychange', handleVisibilityChange );
 
 		return () => {
-			window.removeEventListener( 'scroll', updateScrollFPS );
-		}
+			cancelAnimationFrame( animationFrameId );
+			document.removeEventListener( 'visibilitychange', handleVisibilityChange );
+		};
+		
 	}, []);
 
-	return (
-		<div className="fixed right-0 top-0 bg-green-500 p-3">
-			<p>Scroll FPS: { fps }</p>
-		</div>
-	)
+	return fps;
 }

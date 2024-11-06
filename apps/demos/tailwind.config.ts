@@ -7,6 +7,10 @@ const config: Config = {
 		"./app/**/*.{js,ts,jsx,tsx,mdx}",
 	],
 	theme: {
+		screens: {
+			portrait: '(orientation: portrait)',
+			landscape: '(orientation: landscape)'
+		},
 		extend: {
 			colors: {
 				background: "var(--background)",
