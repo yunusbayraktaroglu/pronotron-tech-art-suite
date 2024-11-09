@@ -1,18 +1,20 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { PronotronAnimationController, PronotronClock } from "@pronotron/utils";
+import { PronotronStats, PronotronStatsComponent } from "@/app/components/PerformanceStats";
 
 const clock = new PronotronClock();
 const animationController = new PronotronAnimationController( clock, 50 );
+const stats = new PronotronStats();
 
 export default function AnimationControllerDemoPage()
 {
 	return (
 		<AppTickerProvider>
+			<PronotronStatsComponent stats={ stats } />
 			<p>PronotronAnimationController uses TypedArray to hold animations in flatten typed array and iterates over it with using direct access to memory</p>
 			<p>Adds 50 animation</p>
-			<p>FPS: <span><FPSTracker /></span></p>
 			<div className="grid grid-cols-4 gap-3">
 				{ Array.from({ length: 50 }).map(( item, index ) => (
 					<SingleAnimation key={ index } ID={ index } /> 
@@ -36,15 +38,16 @@ function SingleAnimation({ ID }: { ID: number })
 				const timeline = ( currentTime - startTime ) / duration;
 				setTimeline( Math.min( timeline, 1.0 ) );
 			},
-			onEnd: () => {
-				setState( "end" );
+			onEnd: ( forced ) => {
+				if ( forced ){
+					console.log( "forcibly finished" )
+				}
 				if ( animationController.getAnimationCount() < 2 ){
 					console.log( animationController );
 				}
-				//console.log( `Finish: animation_${ ID }` )
+				setState( "end" );
 			},
 			timeStyle: "pausable",
-			forceFinish: "runOnEnd"
 		});
 		return () => animationController.removeAnimation( `animation_${ ID }`, true );
 	}, []);
@@ -52,24 +55,16 @@ function SingleAnimation({ ID }: { ID: number })
 	return (
 		<div className={ state === "running" ? "p-3 bg-orange-300" : "p-3 bg-green-300" }>
 			<h1>Animation: #{ ID }</h1>
-			<div className="w-full block bg-red-500 h-[5px] origin-left" style={{ transform: `translate3d( 0, 0, 0 ) scaleX(${ timeline })`}} />
+			<div className="w-full block bg-slate-900 h-[5px] origin-left" style={{ transform: `translate3d( 0, 0, 0 ) scaleX(${ timeline })`}} />
 		</div>
 	)
 }
 
 
-
-function FPSTracker()
-{
-	const appTicker = useAppTicker();
-	return appTicker.fps
-}
-
 interface AppTickerContextProps {
 	elapsedTime: number;
 	activeElapsedTime: number;
 	clockDelta: number;
-	fps: number;
 }
 
 import { createContext, useContext } from "react";
@@ -81,17 +76,17 @@ function AppTickerProvider({ children }: { children: React.ReactNode })
 	const [ clockDelta, setClockDelta ] = useState( 0 );
 	const [ elapsedTime, setElapsedTime ] = useState( 0 );
 	const [ activeElapsedTime, setActiveElapsedTime ] = useState( 0 );
-	const [ fps, setFps ] = useState( 0 );
 
 	useEffect(() => {
 
 		const tick = () => {
+			stats.begin();
 			const deltaTime = clock.tick();
 			animationController.tick();
 			setElapsedTime( clock.elapsedTime );
 			setActiveElapsedTime( clock.elapsedPausedTime );
 			setClockDelta( deltaTime );
-			setFps( Math.round( 1.0 / deltaTime ) );
+			stats.end();
 			requestAnimationFrame( tick );
 		};
 
@@ -120,7 +115,6 @@ function AppTickerProvider({ children }: { children: React.ReactNode })
 				elapsedTime,
 				activeElapsedTime,
 				clockDelta,
-				fps
 			}}
 		>
 			{ children }

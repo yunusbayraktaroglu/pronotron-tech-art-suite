@@ -10,6 +10,9 @@ export class IDPool
 	private _capacity: number;
 	private _availableIDs: Uint8Array; // We will store only 0 | 1 to define used or not
 
+	/**
+	 * @param capacityHint Initial capacity. Will be expanded auto if needed.
+	 */
 	constructor( capacityHint: number )
 	{
 		this._capacity = capacityHint;

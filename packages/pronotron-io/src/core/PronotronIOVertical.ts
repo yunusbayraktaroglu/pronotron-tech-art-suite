@@ -1,7 +1,5 @@
 import { IOVerticalEvent } from "../../types/global";
-
-import { IONodeData, PronotronIOBase } from "./PronotronIOBase2";
-import { NodeData } from "./PronotronIOControlTable";
+import { IONodeData, PronotronIOBase } from "./PronotronIOBase";
 
 /**
  * Virtually checks intersection over node's y position and viewport properties. 
@@ -19,6 +17,7 @@ import { NodeData } from "./PronotronIOControlTable";
  * 	onRemoveNode: () => element.dataset.ioActive = "0",
  * 	getYPosition: () => element.getBoundingClientRect().top + window.scrollY,
  * });
+ * // It's better to use with a throttle function
  * window.addEventListener( 'scroll', () => pronotronIO.handleScroll( window.scrollY ) );
  */
 export class PronotronIOVertical extends PronotronIOBase
@@ -75,11 +74,11 @@ export class PronotronIOVertical extends PronotronIOBase
 		for ( let i = 0; i < this._controlTable.usedSlots; i++ ){
 
 			const offset = i * this._controlTable.stride;
-			const nodeID = controlTable[ offset + NodeData.NodeID ];
-			const elementY = controlTable[ offset + NodeData.NodeYPosition ];
+			const nodeID = controlTable[ offset + IONodeData.NodeID ];
+			const elementY = controlTable[ offset + IONodeData.NodeYPosition ];
 
 			// Check bottom-in
-			if ( controlTable[ offset + NodeData.BottomIn ] && elementY < ( scrollY + viewportHeight ) ){
+			if ( controlTable[ offset + IONodeData.BottomIn ] && elementY < ( scrollY + viewportHeight ) ){
 				if ( this._dispatchEvent( nodeID, "bottom-in" ) ){
 					nodesToRemove.push( nodeID );
 					continue;
@@ -95,7 +94,7 @@ export class PronotronIOVertical extends PronotronIOBase
 			}
 
 			// Check top-out
-			if ( controlTable[ offset + NodeData.TopOut ] && elementY < scrollY ){
+			if ( controlTable[ offset + IONodeData.TopOut ] && elementY < scrollY ){
 				if ( this._dispatchEvent( nodeID, "top-out" ) ){
 					nodesToRemove.push( nodeID );
 					continue;
@@ -142,11 +141,11 @@ export class PronotronIOVertical extends PronotronIOBase
 		for ( let i = 0; i < this._controlTable.usedSlots; i++ ){
 
 			const offset = i * this._controlTable.stride;
-			const nodeID = controlTable[ offset + NodeData.NodeID ];
-			const elementY = controlTable[ offset + NodeData.NodeYPosition ];
+			const nodeID = controlTable[ offset + IONodeData.NodeID ];
+			const elementY = controlTable[ offset + IONodeData.NodeYPosition ];
 
 			// Check top-in
-			if ( controlTable[ offset + NodeData.TopIn ] && elementY > scrollY ){
+			if ( controlTable[ offset + IONodeData.TopIn ] && elementY > scrollY ){
 				if ( this._dispatchEvent( nodeID, "top-in" ) ){
 					nodesToRemove.push( nodeID );
 					continue;
@@ -162,7 +161,7 @@ export class PronotronIOVertical extends PronotronIOBase
 			}
 
 			// Check bottom-out
-			if ( controlTable[ offset + NodeData.BottomOut ] && elementY > ( scrollY + viewportHeight ) ){
+			if ( controlTable[ offset + IONodeData.BottomOut ] && elementY > ( scrollY + viewportHeight ) ){
 				if ( this._dispatchEvent( nodeID, "bottom-out" ) ){
 					nodesToRemove.push( nodeID );
 					continue;

@@ -3,8 +3,6 @@ import type { IOVerticalEvent, IONodeOptions, BinaryBoolean } from "../../types/
 
 export class PronotronIONode
 {
-    private static currentId: number = 0;
-
     public id: number;
 	public y: number;
 	public settings: IONodeOptions;
@@ -14,21 +12,16 @@ export class PronotronIONode
 	 */
 	public possibleEvents: undefined | Record<IOVerticalEvent, BinaryBoolean>;
 
-    constructor( settings: IONodeOptions )
+    constructor( settings: IONodeOptions, id: number )
 	{
-        this.id = PronotronIONode.generateId();
+        this.id = id;
 
 		/**
-		 * Node might be added between route changes. So setViewport() bulk setting Y positions might not run.
 		 * Calculate initial y position.
+		 * Node might be added between route changes. So setViewport() bulk setting Y positions might not run.
 		 */
 		this.y = settings.getYPosition();
 		this.settings = settings;
-    }
-
-    static generateId(): number 
-	{
-        return ++PronotronIONode.currentId;
     }
 
 	/**
@@ -55,7 +48,7 @@ export class PronotronIONode
 			if ( this.y > totalPossibleScroll ){
 				/**
 				 * Element Y position is bigger than totalPossibleScroll. Element can't dispatch any event.
-				 * This is the only scenario when an element can' dispatch any event.
+				 * This is the only scenario when an element can't dispatch any event.
 				 */
 				console.warn( "Element can't dispatch any event" );
 				return;

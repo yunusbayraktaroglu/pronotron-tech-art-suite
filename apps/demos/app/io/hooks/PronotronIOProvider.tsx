@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import throttle from "lodash.throttle";
 
 import { PronotronIOVertical } from "@pronotron/io";
+import { stats } from "@/app/components/PerformanceStats";
 
 export const pronotronIO = new PronotronIOVertical( 55 );
 
@@ -34,7 +35,6 @@ export function usePronotronIOContext<T>( selector: ( context: PronotronIOContex
  * 
  * Using a provider helps the initialization of the IO controller in a top component,
  * calculating viewport props at the end after registering all nodes to IO controller
- * 
  */
 export function PronotronIOProvider({ children }: { children: React.ReactNode })
 {
@@ -42,7 +42,7 @@ export function PronotronIOProvider({ children }: { children: React.ReactNode })
 	const [ scrollDirection, setScrollDirection ] = useState<"down" | "up">( "down" );
 
 	useEffect(() => {
-		console.log( "path changed" );
+		window.scrollTo({ top: 0 });
 		/**
 		 * - If a page directly accessed, it runs before general setup
 		 * - run handleScroll() for jumpy page starts
@@ -52,23 +52,21 @@ export function PronotronIOProvider({ children }: { children: React.ReactNode })
 		 *    <Page> (Reset tracking events, set scroll 0)
 		 * </Layout>
 		 */
-		if ( pronotronIO._viewport ){
-			pronotronIO.reset();
-			pronotronIO.handleScroll( window.scrollY );
-		}
-	}, [ pathname ]);
-
-	useEffect(() => {
-		console.log( "initialization" );
-
 		pronotronIO.setViewport({
 			screenHeight: window.innerHeight,
 			totalPageHeight: document.documentElement.scrollHeight
 		});
-		
+		pronotronIO.reset();
+		pronotronIO.handleScroll( window.scrollY );
+	}, [ pathname ]);
+
+	useEffect(() => {
+		let needsCheck = false;
+
 		const scroll = () => {
 			pronotronIO.handleScroll( window.scrollY )
 			setScrollDirection( pronotronIO.direction );
+			needsCheck = false;
 		};
 		const resize = () => {
 			pronotronIO.setViewport({
@@ -85,8 +83,20 @@ export function PronotronIOProvider({ children }: { children: React.ReactNode })
 
 		const onScroll = throttle( scroll, 250, { leading: false, trailing: true } );
 		const onResize = throttle( resize, 500, { leading: false, trailing: true } );
+		let animationFrameId = 0;
 
-		window.addEventListener( 'scroll', scroll );
+		const tick = () => {
+			stats.begin();
+			if ( needsCheck ){
+				scroll();
+			}
+			stats.end();
+			animationFrameId = requestAnimationFrame( tick );
+		};
+
+		animationFrameId = requestAnimationFrame( tick );
+
+		window.addEventListener( 'scroll', () => needsCheck = true );
 
 		/**
 		 * (x) window.addEventListener( 'resize', onResize );
@@ -103,6 +113,8 @@ export function PronotronIOProvider({ children }: { children: React.ReactNode })
 		console.log( pronotronIO );
 
 		return () => {
+			cancelAnimationFrame( animationFrameId );
+			stats.resetPanels();
 			window.removeEventListener( 'scroll', scroll );
 			ro.disconnect();
 		}

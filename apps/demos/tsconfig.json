@@ -10,8 +10,11 @@
 			{
 				"name": "next"
 			}
-		]
-	},
+		],
+		"paths": {
+			"@/*": [ "./*" ]
+		},
+	},		
 	"include": [
 		"src",
 		"next-env.d.ts",

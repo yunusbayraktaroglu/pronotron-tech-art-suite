@@ -27,9 +27,12 @@ export function usePronotronIO({ dispatch }: usePronotronIOProps )
 		
 		return () => {
 			/**
-			 * A node may be manually removed, check if still active
+			 * A node may be manually removed if using 'retry' option, 
+			 * check if still active before removal.
+			 * nodeID might be zero.
 			 */
-			if ( nodeID && element.dataset.ioActive === "1" ){
+			if ( nodeID !== false && element.dataset.ioActive === "1" ){
+				console.log( "remove node")
 				io.removeNode( element );
 			}
 		};

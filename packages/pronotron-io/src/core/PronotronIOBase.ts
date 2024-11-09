@@ -5,9 +5,24 @@ import {
 	ViewportProps,
 } from "../../types/global";
 import { PronotronIONode } from "./PronotronIONode";
-import { PronotronIOControlTable } from "./PronotronIOControlTable";
+import { NativeControlTable, IDPool } from "@pronotron/utils";
+
+export enum IONodeData {
+	TopIn = 0,
+	TopOut = 1,
+	BottomIn = 2,
+	BottomOut = 3,
+	NodeYPosition = 4,
+	NodeID = 5,
+};
 
 interface IPronotronIOBase {
+	/**
+	 * Uint16: 0 to 65535
+	 * Uint32: 0 to 4294967295
+	 */
+	_controlTable: NativeControlTable<typeof IONodeData>;
+
 	/**
 	 * Creates a tracking node.
 	 * 
@@ -21,12 +36,7 @@ interface IPronotronIOBase {
 	 * @param ref Node reference passed while executing addNode()
 	 */
 	removeNode( ref: PronotronNodeRef ): void;
-	/**
-	 * Removes tracking nodes by their id's.
-	 * 
-	 * @param nodeIDs Previosly created Node id
-	 */
-	_removeNodeByIds( nodeIDs: PronotronNodeID[] ): void;
+
 	/**
 	 * Viewport props should be passed externally, 
 	 * every app might have a different logic. (Eg: transform 3D scroll apps).
@@ -65,26 +75,40 @@ export abstract class PronotronIOBase implements IPronotronIOBase
 
 	/**
 	 * High frequency access interleaved typed array
+	 * Uint16: 0 to 65535 for long scroll values
+	 * Uint32: 0 to 4294967295 for very long scroll values
 	 */
-	public _controlTable: PronotronIOControlTable;
+	_controlTable: NativeControlTable<typeof IONodeData>;
+
+	private _idPool: IDPool;
 
 	/**
 	 * @param nodeCountHint To populate fixed Typed Array length
 	 */
 	constructor( nodeCountHint = 20 )
 	{
-		this._controlTable = new PronotronIOControlTable( nodeCountHint );
+		this._controlTable =  new NativeControlTable( IONodeData, Uint32Array, nodeCountHint );
+		this._idPool = new IDPool( nodeCountHint );
 	}
 
+	/**
+	 * Creates a tracking node.
+	 * 
+	 * @param nodeOptions IO node creation options
+	 * @returns false if error, node instance id if success
+	 */
 	addNode( newNodeOptions: IONodeOptions ): false | PronotronNodeID
 	{
 		if ( ! this._nodeReferences.has( newNodeOptions.ref ) ){
 
-			const newPronotronNode = new PronotronIONode( newNodeOptions );
+			const internalID = this._idPool.getID();
+			this._idPool.consumeID( internalID );
+
+			const newPronotronNode = new PronotronIONode( newNodeOptions, internalID );
 
 			/**
-			 * Nodes may be added while application is already running and ready,
-			 * if the application is already running execute calculatePossibleEvents() for the node
+			 * Nodes may be added while application is already running and ready, (next.js page change)
+			 * if the application is already running, execute calculatePossibleEvents() for the node
 			 */
 			if ( this._viewport ){
 				newPronotronNode.calculatePossibleEvents( this._viewport._screenHeight, this._viewport._totalPossibleScroll );
@@ -98,7 +122,16 @@ export abstract class PronotronIOBase implements IPronotronIOBase
 			 */
 			this._nodeReferences.set( newNodeOptions.ref, newPronotronNode.id );
 			this._nodes.set( newPronotronNode.id, newPronotronNode );
-			this._controlTable.addNode( newPronotronNode );
+
+			// Only "top-out" and "bottom-in" are possible at the start (y = zero)
+			this._controlTable.addSlot( newPronotronNode.id, {
+				[ IONodeData.TopIn ]: 0,
+				[ IONodeData.TopOut ]: 1,
+				[ IONodeData.BottomIn ]: 1,
+				[ IONodeData.BottomOut ]: 0,
+				[ IONodeData.NodeID ]: newPronotronNode.id,
+				[ IONodeData.NodeYPosition]: newPronotronNode.y,
+			});
 
 			return newPronotronNode.id;
 
@@ -108,22 +141,32 @@ export abstract class PronotronIOBase implements IPronotronIOBase
 		}
 	}
 
+	/**
+	 * Removes tracking of an active IO node
+	 * 
+	 * @param existingNodeRef Node reference passed while executing addNode()
+	 */
 	removeNode( existingNodeRef: Element ): void
 	{	
 		const nodeID = this._nodeReferences.get( existingNodeRef );
 
-		if ( ! nodeID ){
+		if ( nodeID === undefined ){
+
 			console.warn( `Node is not found in the list.`, existingNodeRef );
+
 		} else {
+
 			const node = this._nodes.get( nodeID )!;
 			
-			this._controlTable.deleteNodes( nodeID );
+			this._controlTable.removeSlot( nodeID );
 			this._nodeReferences.delete( existingNodeRef );
 			this._nodes.delete( nodeID );
+			this._idPool.releaseID( nodeID );
 
 			if ( node.settings.onRemoveNode ){
 				node.settings.onRemoveNode();
 			}
+
 		}
 	}
 
@@ -147,8 +190,10 @@ export abstract class PronotronIOBase implements IPronotronIOBase
 			pronotronNode.y = pronotronNode.settings.getYPosition();
 			pronotronNode.calculatePossibleEvents( this._viewport!._screenHeight, this._viewport!._totalPossibleScroll );
 
-			this._controlTable.updateYPosition( pronotronNode.id, pronotronNode.y );
-
+			this._controlTable.modifySlotByID( pronotronNode.id, {
+				[ IONodeData.NodeYPosition ]: pronotronNode.y
+			});
+			
 		});
 
 		this._resetNodesTrackingEvents();
@@ -174,43 +219,48 @@ export abstract class PronotronIOBase implements IPronotronIOBase
 	/**
 	 * Resets each node's tracking events as if we are at Y = 0
 	 */
-	_resetNodesTrackingEvents()
+	protected _resetNodesTrackingEvents()
 	{
 		this._nodes.forEach( pronotronNode => {
 			if ( pronotronNode.y < this._viewport!._screenHeight ){
-				this._controlTable.updateNodeTrackingEvents( pronotronNode.id, {
-					topIn: 0,
+				this._controlTable.modifySlotByID( pronotronNode.id, {
+					[ IONodeData.TopIn ]: 0,
 					// @ts-expect-error - Possible events calculated at top
-					topOut: pronotronNode.possibleEvents[ "top-out" ] ? 1 : 0,
-					bottomIn: 0,
-					bottomOut: 0
+					[ IONodeData.TopOut ]: pronotronNode.possibleEvents[ "top-out" ] ? 1 : 0,
+					[ IONodeData.BottomIn ]: 0,
+					[ IONodeData.BottomOut ]: 0,
 				} );
 			} else {
-				this._controlTable.updateNodeTrackingEvents( pronotronNode.id, {
-					topIn: 0,
-					topOut: 0,
+				this._controlTable.modifySlotByID( pronotronNode.id, {
+					[ IONodeData.TopIn ]: 0,
+					[ IONodeData.TopOut ]: 0,
 					// @ts-expect-error - Possible events calculated at top
-					bottomIn: pronotronNode.possibleEvents[ "bottom-in" ] ? 1 : 0,
-					bottomOut: 0
+					[ IONodeData.BottomIn ]: pronotronNode.possibleEvents[ "bottom-in" ] ? 1 : 0,
+					[ IONodeData.BottomOut ]: 0,
 				} );
 			}
 		})
 	}
 
-	_removeNodeByIds( nodeIDs: number[] ): void
+	/**
+	 * Removes tracking nodes by their internal id's.
+	 * 
+	 * @param nodeIDs Previosly created Node id
+	 */
+	protected _removeNodeByIds( nodeIDs: number[] ): void
 	{
 		for ( const nodeID of nodeIDs ){
 			const pronotronNode = this._nodes.get( nodeID )!;
 			
 			this._nodeReferences.delete( pronotronNode.settings.ref );
 			this._nodes.delete( nodeID );
+			this._controlTable.removeSlot( nodeID );
+			this._idPool.releaseID( nodeID );
 
 			if ( pronotronNode.settings.onRemoveNode ){
 				pronotronNode.settings.onRemoveNode();
 			}
 		}
-
-		this._controlTable.deleteNodes( ...nodeIDs );
 	}
 
 }

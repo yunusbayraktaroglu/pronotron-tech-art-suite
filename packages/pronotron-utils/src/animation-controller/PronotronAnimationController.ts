@@ -2,8 +2,6 @@ import { PronotronClock } from "../clock/PronotronClock";
 import { NativeControlTable } from "../native-control-table/NativeControlTable";
 import { IDPool } from "../utils/IDPool";
 
-type AnimationOptionID = string;
-type AnimationInternalID = number;
 enum AnimationData {
 	ID,
 	DURATION,
@@ -13,6 +11,8 @@ enum AnimationData {
 	TIMESTYLE,
 };
 
+type AnimationOptionID = string;
+type AnimationInternalID = number;
 type AnimationOption = {
 	id: AnimationOptionID;
 	/**
@@ -27,13 +27,9 @@ type AnimationOption = {
 } & ({
 	/**
 	 * Can be used as a callback for when the animation ends, with two time styles available.
+	 * @param forced Is animation forcibly finished. (With using removeAnimation())
 	 */
-	onEnd: () => void;
-	/**
-	 * Determines if onEnd() should be executed if the animation is forcibly ended 
-	 * (e.g., by adding a new animation with the same ID).
-	 */
-	forceFinish: "runOnEnd" | "doNotRunOnEnd";
+	onEnd: ( forced: boolean ) => void;
 	onRender?: ( currentTime: number, startTime: number, duration: number ) => void;
 } | {
 	onRender: ( currentTime: number, startTime: number, duration: number ) => void;
@@ -77,6 +73,11 @@ export class PronotronAnimationController
 		return this._controlTable.usedSlots;
 	}
 
+	/**
+	 * Adds an animation to tick
+	 * 
+	 * @param animationOption 
+	 */
 	addAnimation( animationOption: AnimationOption ): void
 	{
 		if ( this._controlTable.isSlotExist( animationOption.id ) ){
@@ -104,7 +105,7 @@ export class PronotronAnimationController
 	 * Removes an animation using the given animationID.
 	 * 
 	 * @param animationID The animation ID provided during creation.
-	 * @param complete If true, runs the onEnd() method of the animation before removal, if it exists.
+	 * @param complete If true, runs the onEnd( forced: true ) method of the animation before removal, if it exists.
 	 */
 	removeAnimation( animationID: AnimationOptionID, complete?: boolean ): void
 	{
@@ -112,11 +113,8 @@ export class PronotronAnimationController
 
 		if ( animationInternalID !== undefined ){
 
-			// Runs the animation's onEnd() method (if present) before removal
-			if ( complete && ( "forceFinish" in this._animationReferences[ animationInternalID ] ) ){
-				if ( this._animationReferences[ animationInternalID ].forceFinish === "runOnEnd" ){
-					this._animationReferences[ animationInternalID ].onEnd();
-				}
+			if ( complete && ( "onEnd" in this._animationReferences[ animationInternalID ] ) ){
+				this._animationReferences[ animationInternalID ].onEnd( true );
 			}
 
 			this._removeAnimationByInternalID( animationInternalID );
@@ -160,7 +158,7 @@ export class PronotronAnimationController
 			if ( time > this._controlTable.table[ offset + AnimationData.ENDTIME ] ){
 				const animationInternalID = this._controlTable.table[ offset + AnimationData.ID ];
 				if ( "onEnd" in this._animationReferences[ animationInternalID ] ){
-					this._animationReferences[ animationInternalID ].onEnd();
+					this._animationReferences[ animationInternalID ].onEnd( false );
 				}
 				this._removeAnimationByInternalID( animationInternalID );
 			}
