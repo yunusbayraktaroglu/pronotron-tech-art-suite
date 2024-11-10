@@ -6,9 +6,10 @@ import { usePronotronIOContext } from "./PronotronIOProvider";
 
 interface usePronotronIOProps {
 	dispatch: IODispatchOptions | IODispatchOptionsWithRetry;
+	offset?: number;
 };
 
-export function usePronotronIO({ dispatch }: usePronotronIOProps )
+export function usePronotronIO({ dispatch, offset }: usePronotronIOProps )
 {
 	const io = usePronotronIOContext( context => context.io );
 	const ref = useRef<HTMLElement>( null ! );
@@ -21,6 +22,7 @@ export function usePronotronIO({ dispatch }: usePronotronIOProps )
 		const nodeID = io.addNode({
 			ref: element,
 			dispatch: dispatch,
+			offset,
 			onRemoveNode: () => element.dataset.ioActive = "0",
 			getYPosition: () => element.getBoundingClientRect().top + window.scrollY,
 		});
@@ -32,7 +34,7 @@ export function usePronotronIO({ dispatch }: usePronotronIOProps )
 			 * nodeID might be zero.
 			 */
 			if ( nodeID !== false && element.dataset.ioActive === "1" ){
-				console.log( "remove node")
+				console.log( "remove node");
 				io.removeNode( element );
 			}
 		};

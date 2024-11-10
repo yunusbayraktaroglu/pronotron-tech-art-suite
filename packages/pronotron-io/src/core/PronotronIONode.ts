@@ -49,8 +49,11 @@ export class PronotronIONode
 				/**
 				 * Element Y position is bigger than totalPossibleScroll. Element can't dispatch any event.
 				 * This is the only scenario when an element can't dispatch any event.
+				 * 
+				 * @note
+				 * This is a design matter. Scroll area may expanded or more nodes may be added lately.
 				 */
-				console.warn( "Element can't dispatch any event" );
+				// console.warn( "Element can't dispatch any event" );
 				return;
 			} else {
 				this.possibleEvents[ "top-in" ] = 1;

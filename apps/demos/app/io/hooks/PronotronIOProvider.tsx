@@ -7,7 +7,7 @@ import throttle from "lodash.throttle";
 import { PronotronIOVertical } from "@pronotron/io";
 import { stats } from "@/app/components/PerformanceStats";
 
-export const pronotronIO = new PronotronIOVertical( 55 );
+export const pronotronIO = new PronotronIOVertical( 20 );
 
 /**
  * CONTEXT
@@ -61,8 +61,13 @@ export function PronotronIOProvider({ children }: { children: React.ReactNode })
 	}, [ pathname ]);
 
 	useEffect(() => {
-		let needsCheck = false;
 
+		let needsCheck = false;
+		let animationFrameId = 0;
+
+		const scrollTicker = () => {
+			needsCheck = true;
+		};
 		const scroll = () => {
 			pronotronIO.handleScroll( window.scrollY )
 			setScrollDirection( pronotronIO.direction );
@@ -83,7 +88,6 @@ export function PronotronIOProvider({ children }: { children: React.ReactNode })
 
 		const onScroll = throttle( scroll, 250, { leading: false, trailing: true } );
 		const onResize = throttle( resize, 500, { leading: false, trailing: true } );
-		let animationFrameId = 0;
 
 		const tick = () => {
 			stats.begin();
@@ -96,7 +100,7 @@ export function PronotronIOProvider({ children }: { children: React.ReactNode })
 
 		animationFrameId = requestAnimationFrame( tick );
 
-		window.addEventListener( 'scroll', () => needsCheck = true );
+		window.addEventListener( 'scroll', scrollTicker );
 
 		/**
 		 * (x) window.addEventListener( 'resize', onResize );
@@ -113,9 +117,9 @@ export function PronotronIOProvider({ children }: { children: React.ReactNode })
 		console.log( pronotronIO );
 
 		return () => {
+			window.removeEventListener( 'scroll', scrollTicker );
 			cancelAnimationFrame( animationFrameId );
 			stats.resetPanels();
-			window.removeEventListener( 'scroll', scroll );
 			ro.disconnect();
 		}
 		

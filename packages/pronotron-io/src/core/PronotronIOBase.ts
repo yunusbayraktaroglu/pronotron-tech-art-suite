@@ -8,12 +8,14 @@ import { PronotronIONode } from "./PronotronIONode";
 import { NativeControlTable, IDPool } from "@pronotron/utils";
 
 export enum IONodeData {
-	TopIn = 0,
-	TopOut = 1,
-	BottomIn = 2,
-	BottomOut = 3,
-	NodeYPosition = 4,
-	NodeID = 5,
+	TopIn,
+	TopOut,
+	BottomIn,
+	BottomOut,
+	NodeYPosition,
+	NodeOffset,
+	NodeID,
+	TrackViewport,
 };
 
 interface IPronotronIOBase {
@@ -130,7 +132,9 @@ export abstract class PronotronIOBase implements IPronotronIOBase
 				[ IONodeData.BottomIn ]: 1,
 				[ IONodeData.BottomOut ]: 0,
 				[ IONodeData.NodeID ]: newPronotronNode.id,
-				[ IONodeData.NodeYPosition]: newPronotronNode.y,
+				[ IONodeData.NodeYPosition ]: newPronotronNode.y,
+				[ IONodeData.NodeOffset ]: newNodeOptions.offset ?? 0,
+				[ IONodeData.TrackViewport ]: newNodeOptions.dispatch.visible ? 1 : 0,
 			});
 
 			return newPronotronNode.id;

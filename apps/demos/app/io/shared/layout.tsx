@@ -1,22 +1,20 @@
 "use client";
 
-import { IODispatcher } from "../hooks/IODispatcher";
+import { IOLineDomManipulate } from "../components/IOLineDomManipulate";
 
 export default function Layout({ children }: Readonly<{ children: React.ReactNode }> )
 {
 	return (
-		<>
-			<div className="flex flex-col h-[30vh] landscape:h-[20vh] relative">
-				<p>Shared line (top-in, top-out)</p>
-				<IODispatcher 
-					className="block min-h-[3px] w-full touch-none pointer-events-none select-none bg-red-500"
-					dispatch={{
-						"top-in": () => console.log( "RED: top-in static" ),
-						"top-out": () => console.log( "RED: top-out static" )
-					}} 
-				/>
+		<div className="flex flex-col">
+			<div className="container">
+				<p className="text-center">Red lines are shared between page-1 and page-2 and do not unmounts</p>
 			</div>
+			<div className="flex h-[40vh] landscape:h-[20vh] relative"></div>
+			<IOLineDomManipulate id="Static line" topOut topIn color="red" />
 			{ children }
-		</>
+			<div className="flex h-[40vh] landscape:h-[20vh] relative"></div>
+			<IOLineDomManipulate id="Static line" topOut topIn color="red" />
+		</div>
 	);
 }
+

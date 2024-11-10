@@ -2,6 +2,48 @@
 @tailwind components;
 @tailwind utilities;
 
+/**
+	Create content width
+
+	We are avoiding min(), max(), clamp() to support old devices. Normally using following is easier 
+
+	--width: min( 75%, 1650px );
+
+	This approach uses media queries to set --width to 1650px when the viewport is wider than 2200px (which is 75% of 2200px). 
+	You can adjust the 2200px to match the exact breakpoint where 1650px should be used instead of 75%.
+*/
+:root {
+	--width: 90vw;
+	/** 
+		To be able to discard scrollbar width, we use % 
+	*/
+	--content-outside-width: calc( ( 100% - var( --width ) ) / 2 );
+	/** 
+		To be able to use as spacing units (height, margin, ...) value, we use VW 
+	*/
+	--spacing-base: calc( ( 100vw - var( --width ) ) / 2 );
+	/** 
+		Spacing variations 
+	*/
+	--spacing-xs: calc( 0.25 * var( --spacing-base ) );
+	--spacing-sm: calc( 0.5 * var( --spacing-base ) );
+	--spacing-lg: calc( 1.5 * var( --spacing-base ) );
+	--spacing-xl: calc( 3 * var( --spacing-base ) );
+	--spacing-2xl: calc( 4 * var( --spacing-base ) );
+	--spacing-3xl: calc( 5 * var( --spacing-base ) );
+}
+@media ( orientation: landscape ){
+    :root {
+        --width: 75vw;
+		--spacing-base: 2rem;
+    }
+}
+@media ( min-width: 2200px ){
+    :root {
+        --width: 1650px;
+    }
+}
+
 :root {
 	--background: #ffffff;
 	--foreground: #171717;
@@ -21,6 +63,12 @@ body {
 }
 
 @layer components {
+	.container {
+		@apply
+		w-[var(--width)]
+		max-w-[var(--width)]
+		mx-auto
+	}
 	.pointer {
 		--cursor-size: max( 15px, calc( 100vw / 60 ) );
 		background-color: #FF0000;

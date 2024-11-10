@@ -199,5 +199,5 @@ export function PronotronStatsComponent()
 
 	}, []);
 
-	return <div className="fixed top-2 right-2 flex opacity-[1] z-100 space-x-[1px]" ref={ containerRef } />;
+	return <div className="fixed left-2 bottom-2 flex opacity-[1] z-100 space-x-[1px]" ref={ containerRef } />;
 }

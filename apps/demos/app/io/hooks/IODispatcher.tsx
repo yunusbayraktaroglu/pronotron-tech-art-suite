@@ -5,11 +5,12 @@ import { IODispatchOptions, IODispatchOptionsWithRetry } from '@pronotron/io';
 
 interface PronotronIODispatcherProps extends React.ComponentProps<"span"> {
 	dispatch: IODispatchOptions | IODispatchOptionsWithRetry;
+	offset?: number;
 };
 
-export function IODispatcher({ dispatch, ...spanProps }: PronotronIODispatcherProps )
+export function IODispatcher({ dispatch, offset, ...spanProps }: PronotronIODispatcherProps )
 {
-	const { ref } = usePronotronIO({ dispatch });
+	const { ref } = usePronotronIO({ dispatch, offset });
 	
 	return (
 		<span aria-hidden ref={ ref } { ...spanProps } />

@@ -6,6 +6,9 @@ const config: Config = {
 		"./components/**/*.{js,ts,jsx,tsx,mdx}",
 		"./app/**/*.{js,ts,jsx,tsx,mdx}",
 	],
+	corePlugins: {
+		container: false
+	},
 	theme: {
 		screens: {
 			portrait: '(orientation: portrait)',

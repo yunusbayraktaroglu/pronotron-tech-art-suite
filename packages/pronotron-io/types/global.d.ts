@@ -16,15 +16,22 @@ export type BinaryBoolean = 1 | 0;
  */
 export type IOVerticalEvent = "top-in" | "top-out" | "bottom-in" | "bottom-out";
 export type IOHorizontalEvent = "left-in" | "left-out" | "right-in" | "right-out";
-export type IODispatchFunction = Record<IOVerticalEvent, () => void>;
+export type IODispatchFunction = Record<IOVerticalEvent, () => void | {
+	dispatch: () => void;
+	retry: number;
+}>;
+
+export type IODispatchFunction2 = {
+	visible: ( normalizedPosition: number ) => void;
+} & IODispatchFunction;
 
 /**
  * Options to passed
  */
-export type IODispatchOptions = RequireAtLeastOne<IODispatchFunction>;
-export type IODispatchOptionsWithRetry = RequireExactlyOne<IODispatchFunction> & { 
+export type IODispatchOptions = RequireAtLeastOne<IODispatchFunction2>;
+export type IODispatchOptionsWithRetry = RequireExactlyOne<IODispatchFunction2> & { 
 	/** With retry, only 1 kind of event can be defined */
-	retry: number 
+	retry: number;
 };
 
 /**
@@ -36,6 +43,7 @@ export type IONodeOptions = {
 	 */
 	ref: Element;
 	dispatch: IODispatchOptions | IODispatchOptionsWithRetry;
+	offset?: number;
 	onRemoveNode?: () => void;
 	/**
 	 * How to get element initial Y position. (Not relative to scroll value)
