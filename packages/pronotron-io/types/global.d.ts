@@ -14,24 +14,36 @@ export type BinaryBoolean = 1 | 0;
 /**
  * Possible events of an element
  */
-export type IOVerticalEvent = "top-in" | "top-out" | "bottom-in" | "bottom-out";
-export type IOHorizontalEvent = "left-in" | "left-out" | "right-in" | "right-out";
-export type IODispatchFunction = Record<IOVerticalEvent, () => void | {
-	dispatch: () => void;
-	retry: number;
-}>;
+export type IOVerticalEvent = "onTopIn" | "onTopOut" | "onBottomIn" | "onBottomOut";
+export type IOHorizontalEvent = "onLeftIn" | "onLeftOut" | "onRightIn" | "onRightOut";
 
-export type IODispatchFunction2 = {
-	visible: ( normalizedPosition: number ) => void;
-} & IODispatchFunction;
+/**
+ * Jumpy scroll values might cause an element "fast forward", 
+ * eg: first "bottom-in" following with "top-out" in the same loop.
+ */
+export type FastForwardOptions = "skip_both" | "execute_both" | "execute_last"; 
+
+/**
+ * One time events
+ */
+export type IODispatchFunction = Record<IOVerticalEvent, ( () => void ) | ({
+	dispatch: () => void;
+	limit: number;
+})>;
+
+export type IOEventsDispatch = IODispatchFunction & {
+	onInViewport: ( normalizedPosition: number ) => void
+};
 
 /**
  * Options to passed
  */
-export type IODispatchOptions = RequireAtLeastOne<IODispatchFunction2>;
-export type IODispatchOptionsWithRetry = RequireExactlyOne<IODispatchFunction2> & { 
-	/** With retry, only 1 kind of event can be defined */
-	retry: number;
+export type IODispatchOptions = RequireAtLeastOne<IOEventsDispatch> & {
+	/**
+	 * Jumpy scroll values might cause an element "fast forward", 
+	 * eg: first "bottom-in" following with "top-out" in the same loop.
+	 */
+	onFastForward?: FastForwardOptions;
 };
 
 /**
@@ -42,7 +54,7 @@ export type IONodeOptions = {
 	 * Node creation reference, to be used to avoid duplicates and respond remove requests.
 	 */
 	ref: Element;
-	dispatch: IODispatchOptions | IODispatchOptionsWithRetry;
+	dispatch: IODispatchOptions;
 	offset?: number;
 	onRemoveNode?: () => void;
 	/**

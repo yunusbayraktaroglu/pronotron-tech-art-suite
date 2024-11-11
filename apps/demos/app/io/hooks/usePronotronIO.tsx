@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useRef } from 'react';
-import { IODispatchOptions, IODispatchOptionsWithRetry } from '@pronotron/io';
+import { IODispatchOptions } from '@pronotron/io';
 import { usePronotronIOContext } from "./PronotronIOProvider";
 
 interface usePronotronIOProps {
-	dispatch: IODispatchOptions | IODispatchOptionsWithRetry;
+	dispatch: IODispatchOptions;
 	offset?: number;
 };
 

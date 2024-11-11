@@ -56,7 +56,7 @@ export function PronotronIOProvider({ children }: { children: React.ReactNode })
 			screenHeight: window.innerHeight,
 			totalPageHeight: document.documentElement.scrollHeight
 		});
-		pronotronIO.reset();
+		pronotronIO.setLastScrollY( 0 );
 		pronotronIO.handleScroll( window.scrollY );
 	}, [ pathname ]);
 

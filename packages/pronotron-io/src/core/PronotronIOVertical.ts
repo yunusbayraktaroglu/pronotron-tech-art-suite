@@ -1,5 +1,5 @@
 import { IOVerticalEvent } from "../../types/global";
-import { IONodeData, PronotronIOBase } from "./PronotronIOBase";
+import { IONodeData, FastForwardData, PronotronIOBase } from "./PronotronIOBase";
 
 /**
  * Virtually checks intersection over node's y position and viewport properties. 
@@ -11,11 +11,19 @@ import { IONodeData, PronotronIOBase } from "./PronotronIOBase";
  * pronotronIO.addNode({
  * 	ref: element,
  * 	dispatch: {
- * 		"top-in": () => console.log( "Element in from top" ),
- * 		"bottom-out": () => console.log( "Element out from bottom" ),
+ * 		onInViewport: ( normalizedPosition: number ) => console.log( "Element in from top" ),
+ * 		onTopIn: () => console.log( "Element in from top" ),
+ * 		onTopOut: {
+ * 			dispatch: () => console.log( "Element out from top" ),
+ * 			limit: 1
+ * 		},
+ * 		onBottomIn,
+ * 		onBottomOut,
+ * 		onFastForward: "execute_both",
  * 	},
  * 	onRemoveNode: () => element.dataset.ioActive = "0",
  * 	getYPosition: () => element.getBoundingClientRect().top + window.scrollY,
+ * 	offset: 100, // pixel
  * });
  * // It's better to use with a throttle function
  * window.addEventListener( 'scroll', () => pronotronIO.handleScroll( window.scrollY ) );
@@ -25,11 +33,21 @@ export class PronotronIOVertical extends PronotronIOBase
 	// Start at 0 even with a jumpy start value, to track passed nodes correctly
 	public direction: "up" | "down" = "down";
 
+	/**
+	 * Handles scroll by last scroll and current scroll
+	 * 
+	 * @param scrollY Scroll value
+	 */
 	setLastScrollY( scrollY: number ): void 
 	{
 		this._lastScrollY = scrollY;
 	}
 
+	/**
+	 * Handles scroll by last scroll and current scroll
+	 * 
+	 * @param scrollY Current scroll value
+	 */
 	handleScroll( scrollY: number ): void 
 	{
 		// Skips initial run for scroll value = 0
@@ -56,6 +74,8 @@ export class PronotronIOVertical extends PronotronIOBase
 	 * 
 	 * @param scrollY Current scrollY value (window.scrollY) to calculate top (scrollY)
 	 * @param viewportHeight Current viewportHeight to calculate bottom (scrollY + viewportHeight)
+	 * 
+	 * @internal
 	 */
 	private _handleScrollDown( scrollY: number, viewportHeight: number ): void 
 	{
@@ -83,61 +103,72 @@ export class PronotronIOVertical extends PronotronIOBase
 			
 			/**
 			 * @note
-			 * We need to track every event even the node is not has a dispatcher on these events, 
+			 * We need to track every in-out events, even the node hasn't a dispatcher on these events, 
 			 * to switch between possible events for fast calculation
 			 */
 			// Check bottom-in
-			if ( controlTable[ offset + IONodeData.BottomIn ] && elementY - elementOffset < ( scrollY + viewportHeight ) ){
+			if ( controlTable[ offset + IONodeData.TrackBottomIn ] && ( elementY - elementOffset < scrollY + viewportHeight ) ){
 				bottomIn = 1;
 				// Activate "top-out", "bottom-out"
 				this._controlTable.modifySlotByPosition( i, {
-					[ IONodeData.TopIn ]: 0,
-					[ IONodeData.TopOut ]: 1,
-					[ IONodeData.BottomIn ]: 0,
-					[ IONodeData.BottomOut ]: 1,
+					[ IONodeData.InViewport ]: 1,
+					[ IONodeData.TrackTopIn ]: 0,
+					[ IONodeData.TrackTopOut ]: 1,
+					[ IONodeData.TrackBottomIn ]: 0,
+					[ IONodeData.TrackBottomOut ]: 1,
 				} );
 			}
 
 			// Check top-out
-			if ( controlTable[ offset + IONodeData.TopOut ] && elementY + elementOffset < scrollY ){
+			if ( controlTable[ offset + IONodeData.TrackTopOut ] && ( elementY + elementOffset < scrollY ) ){
 				topOut = 1;
 				// Activate "top-in"
 				this._controlTable.modifySlotByPosition( i, {
-					[ IONodeData.TopIn ]: 1,
-					[ IONodeData.TopOut ]: 0,
-					[ IONodeData.BottomIn ]: 0,
-					[ IONodeData.BottomOut ]: 0,
+					[ IONodeData.InViewport ]: 0,
+					[ IONodeData.TrackTopIn ]: 1,
+					[ IONodeData.TrackTopOut ]: 0,
+					[ IONodeData.TrackBottomIn ]: 0,
+					[ IONodeData.TrackBottomOut ]: 0,
 				} );
 			}
 
 			// Element fast-forwarded (bottom-in then top-out, jumpy scroll)
 			if ( bottomIn && topOut ){
-				console.log( "FAST FORWARD" );
-				continue;
-			} else {
 
-				/**
-				 * @todo
-				 * Dispatch events if only exist
-				 * add IONodeData.DispatchBottomIn ...
-				 */
-				if ( bottomIn && this._dispatchEvent( nodeID, "bottom-in" ) ){
-					nodesToRemove.push( nodeID );
-					continue;
+				if ( controlTable[ offset + IONodeData.OnFastForward ] !== FastForwardData.SkipBoth ){
+					switch( controlTable[ offset + IONodeData.OnFastForward ] ){
+						case FastForwardData.ExecuteLast: {
+							if ( controlTable[ offset + IONodeData.OnTopOutEvent ] ){
+								controlTable[ offset + IONodeData.OnTopOutEvent ] = this._dispatchEvent( nodeID, "onTopOut" );
+							}
+							break;
+						}
+						case FastForwardData.ExecuteBoth: {
+							if ( controlTable[ offset + IONodeData.OnBottomInEvent ] ){
+								controlTable[ offset + IONodeData.OnBottomInEvent ] = this._dispatchEvent( nodeID, "onBottomIn" );
+							}
+							if ( controlTable[ offset + IONodeData.OnTopOutEvent ] ){
+								controlTable[ offset + IONodeData.OnTopOutEvent ] = this._dispatchEvent( nodeID, "onTopOut" );
+							}
+							break;
+						};
+					}
 				}
-				if ( topOut && this._dispatchEvent( nodeID, "top-out" ) ){
-					nodesToRemove.push( nodeID );
-					continue;
+				
+				continue;
+
+			} else {
+				if ( controlTable[ offset + IONodeData.OnBottomInEvent ] && bottomIn ){
+					controlTable[ offset + IONodeData.OnBottomInEvent ] = this._dispatchEvent( nodeID, "onBottomIn" );
+				}
+				if ( controlTable[ offset + IONodeData.OnTopOutEvent ] && topOut ){
+					controlTable[ offset + IONodeData.OnTopOutEvent ] = this._dispatchEvent( nodeID, "onTopOut" );
 				}
 			}
 
 			// Element in viewport
-			if ( 
-				controlTable[ offset + IONodeData.TrackViewport ] && 
-				controlTable[ offset + IONodeData.TopOut ] && 
-				controlTable[ offset + IONodeData.BottomOut ] 
-			){
-				const normalizedViewPosition = ( 2 * ( elementY - scrollY ) / viewportHeight ) - 1;
+			if ( controlTable[ offset + IONodeData.OnViewportEvent ] && controlTable[ offset + IONodeData.InViewport ] ){
+				//const normalizedViewPosition = ( 2 * ( elementY - scrollY ) / viewportHeight ) - 1;
 				const normalizedWithOffset = ( 2 * ( elementY - scrollY + elementOffset ) / ( viewportHeight + elementOffset + elementOffset ) ) - 1;
 				this._renderEvent( nodeID, normalizedWithOffset );
 			}
@@ -154,16 +185,14 @@ export class PronotronIOVertical extends PronotronIOBase
 	 * 
 	 * @param scrollY Current scrollY value (window.scrollY) to calculate top (scrollY)
 	 * @param viewportHeight Current viewportHeight to calculate bottom (scrollY + viewportHeight)
+	 * 
+	 * @internal
 	 */
 	private _handleScrollUp( scrollY: number, viewportHeight: number ): void
 	{
 		/**
 		 * @important
-		 * Check "top-in" first:
-		 * Instant changes on scrollY might be a big value to make an element "top-in" first then "bottom-out".
-		 * 
-		 * @important
-		 * We need to iterate over the _controlGroupsTable in reverse order. 
+		 * We need to iterate over the _controlGroupsTable in reverse order.
 		 * This way, removing elements won't affect the indices of the yet-to-be-processed elements.
 		 */
 		const nodesToRemove: number[] = [];
@@ -176,55 +205,76 @@ export class PronotronIOVertical extends PronotronIOBase
 			const elementY = controlTable[ offset + IONodeData.NodeYPosition ];
 			const elementOffset = controlTable[ offset + IONodeData.NodeOffset ];
 
+			// To understand if element does "fast forward"
 			let topIn = 0;
 			let bottomOut = 0;
 
-			// Check top-in
-			if ( controlTable[ offset + IONodeData.TopIn ] && elementY + elementOffset > scrollY ){
+			/**
+			 * Check "top-in" first:
+			 * Instant changes on scrollY might be a big value to make an element "top-in" first then "bottom-out".
+			 */
+			if ( controlTable[ offset + IONodeData.TrackTopIn ] && elementY + elementOffset > scrollY ){
 				topIn = 1;
 				// Activate "top-out", "bottom-out"
 				this._controlTable.modifySlotByPosition( i, {
-					[ IONodeData.TopIn ]: 0,
-					[ IONodeData.TopOut ]: 1,
-					[ IONodeData.BottomIn ]: 0,
-					[ IONodeData.BottomOut ]: 1,
+					[ IONodeData.InViewport ]: 1,
+					[ IONodeData.TrackTopIn ]: 0,
+					[ IONodeData.TrackTopOut ]: 1,
+					[ IONodeData.TrackBottomIn ]: 0,
+					[ IONodeData.TrackBottomOut ]: 1,
 				} );
 			}
 
 			// Check bottom-out
-			if ( controlTable[ offset + IONodeData.BottomOut ] && elementY - elementOffset > ( scrollY + viewportHeight ) ){
+			if ( controlTable[ offset + IONodeData.TrackBottomOut ] && elementY - elementOffset > ( scrollY + viewportHeight ) ){
 				bottomOut = 1;
 				// Activate "bottom-in"
 				this._controlTable.modifySlotByPosition( i, {
-					[ IONodeData.TopIn ]: 0,
-					[ IONodeData.TopOut ]: 0,
-					[ IONodeData.BottomIn ]: 1,
-					[ IONodeData.BottomOut ]: 0,
+					[ IONodeData.InViewport ]: 0,
+					[ IONodeData.TrackTopIn ]: 0,
+					[ IONodeData.TrackTopOut ]: 0,
+					[ IONodeData.TrackBottomIn ]: 1,
+					[ IONodeData.TrackBottomOut ]: 0,
 				} );
 			}
 
 			// Element fast-forwarded (bottom-in then top-out, jumpy scroll)
 			if ( topIn && bottomOut ){
-				console.log( "FAST FORWARD" );
-				continue;
-			} else {
-				if ( topIn && this._dispatchEvent( nodeID, "top-in" ) ){
-					nodesToRemove.push( nodeID );
-					continue;
+
+				if ( controlTable[ offset + IONodeData.OnFastForward ] !== FastForwardData.SkipBoth ){
+					switch( controlTable[ offset + IONodeData.OnFastForward ] ){
+						case FastForwardData.ExecuteLast: {
+							if ( controlTable[ offset + IONodeData.OnBottomOutEvent ] ){
+								controlTable[ offset + IONodeData.OnBottomOutEvent ] = this._dispatchEvent( nodeID, "onBottomOut" );
+							}
+							break;
+						}
+						case FastForwardData.ExecuteBoth: {
+							if ( controlTable[ offset + IONodeData.OnTopInEvent ] ){
+								controlTable[ offset + IONodeData.OnTopInEvent ] = this._dispatchEvent( nodeID, "onTopIn" );
+							}
+							if ( controlTable[ offset + IONodeData.OnBottomOutEvent ] ){
+								controlTable[ offset + IONodeData.OnBottomOutEvent ] = this._dispatchEvent( nodeID, "onBottomOut" );
+							}
+							break;
+						};
+					}
 				}
-				if ( bottomOut && this._dispatchEvent( nodeID, "bottom-out" ) ){
-					nodesToRemove.push( nodeID );
-					continue;
+
+				continue;
+
+			} else {
+				if ( controlTable[ offset + IONodeData.OnTopInEvent ] && topIn ){
+					controlTable[ offset + IONodeData.OnTopInEvent ] = this._dispatchEvent( nodeID, "onTopIn" );
+				}
+				if ( controlTable[ offset + IONodeData.OnBottomOutEvent ] && bottomOut ){
+					controlTable[ offset + IONodeData.OnBottomOutEvent ] = this._dispatchEvent( nodeID, "onBottomOut" );
 				}
 			}
 
 			// Element in viewport
-			if ( 
-				controlTable[ offset + IONodeData.TrackViewport ] && 
-				controlTable[ offset + IONodeData.TopOut ] && 
-				controlTable[ offset + IONodeData.BottomOut ] 
-			){
-				const normalizedViewPosition = ( 2 * ( elementY - scrollY ) / viewportHeight ) - 1;
+			if ( controlTable[ offset + IONodeData.OnViewportEvent ] && controlTable[ offset + IONodeData.InViewport ] ){
+				//const normalizedViewPosition = ( 2 * ( elementY - scrollY ) / viewportHeight ) - 1;
 				const normalizedWithOffset = ( 2 * ( elementY - scrollY + elementOffset ) / ( viewportHeight + elementOffset + elementOffset ) ) - 1;
 				this._renderEvent( nodeID, normalizedWithOffset );
 			}
@@ -235,46 +285,44 @@ export class PronotronIOVertical extends PronotronIOBase
 		this._removeNodeByIds( nodesToRemove );
 	}
 
+	/**
+	 * Executes onInViewport() method
+	 * 
+	 * @param nodeID Node internal id
+	 * @param normalizedViewPosition -1 | 0 | +1
+	 * 
+	 * @internal
+	 */
 	private _renderEvent( nodeID: number, normalizedViewPosition: number )
 	{
-		const ioNodeOptions = this._nodes.get( nodeID )!.settings;
-		ioNodeOptions.dispatch.visible!( normalizedViewPosition );
+		// Function will be executed if only the node has onInViewport event
+		const nodeSettings = this._nodes.get( nodeID )!;
+		nodeSettings.dispatch.onInViewport!( normalizedViewPosition );
 	}
 
 	/**
-	 * Dispatch defined Node function for given event
+	 * Dispatch defined Node function for given event.
+	 * Function will be executed if only the node has a listener on given event
 	 * 
 	 * @param nodeID Node id
 	 * @param event Dispatched event
 	 * @returns true if node needs to be deleted
+	 * 
+	 * @internal
 	 */
-	private _dispatchEvent( nodeID: number, event: IOVerticalEvent ): boolean
+	private _dispatchEvent( nodeID: number, event: IOVerticalEvent ): number
 	{
-		const ioNodeOptions = this._nodes.get( nodeID )!.settings;
+		const ioNodeOptions = this._nodes.get( nodeID )!;
 
-		/**
-		 * Node may be tracked for only certain events
-		 */
-		if ( ioNodeOptions.dispatch[ event ] ){
-
-			ioNodeOptions.dispatch[ event ]();
-
-			/**
-			 * Node may have limited dispatch
-			 */
-			if ( "retry" in ioNodeOptions.dispatch ){
-
-				// Update usage time
-				ioNodeOptions.dispatch.retry -= 1;
-				return ioNodeOptions.dispatch.retry < 1;
-
-			}
-
-			return false;
-
+		if ( "limit" in ioNodeOptions.dispatch[ event ]! ){
+			ioNodeOptions.dispatch[ event ].dispatch();
+			ioNodeOptions.dispatch[ event ].limit -= 1;
+			return ioNodeOptions.dispatch[ event ].limit < 1 ? 0 : 1;
 		} else {
-			return false;
+			ioNodeOptions.dispatch[ event ]!();
+			return 1;
 		}
+
 	}
 
 }

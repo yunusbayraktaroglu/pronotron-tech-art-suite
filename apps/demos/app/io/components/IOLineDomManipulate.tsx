@@ -19,6 +19,29 @@ interface IOLineDomManipulateProps {
 	bottomOut?: boolean;
 };
 
+const testOnce = {
+	onTopIn: {
+		dispatch: () => console.log( "Top-in Once" ),
+		limit: 1
+	},
+	onTopOut: {
+		dispatch: () => console.log( "Top-out Once" ),
+		limit: 1,
+	},
+	onBottomOut: {
+		dispatch: () => console.log( "Bottom-out Once" ),
+		limit: 1
+	},
+	onBottomIn: {
+		dispatch: () => console.log( "Bottom-in Once" ),
+		limit: 1
+	},
+	onInViewport: ( normalizedPosition: number ) => {
+		console.log( normalizedPosition );
+	},
+	//onFastForward: "skip_both",
+};
+
 export function IOLineDomManipulate({ id, color, topIn, topOut, bottomIn, bottomOut }: IOLineDomManipulateProps)
 {
 	const [ state, setState ] = useState<string | false>( false );
@@ -28,33 +51,12 @@ export function IOLineDomManipulate({ id, color, topIn, topOut, bottomIn, bottom
 			<p className="text-center">{ id }:{ color } - <strong>Last event:{ state ?? "idle" }</strong></p>
 			<div className="bg-green-500">
 				<IODispatcher 
-					className={ `block min-h-[1px] w-full ${ colorMap[ color ] } my-[120px]`}
+					className={ `block min-h-[1px] w-full ${ colorMap[ color ] } my-[120px]` }
 					offset={ 120 }
-					dispatch={{
-						visible: ( normalizedPosition ) => {
-							console.log( normalizedPosition );
-						},
-						"top-in": topIn ? () => setState( "Top-in" ) : undefined,
-						"top-out": topOut ? () => setState( "Top-out" ) : undefined,
-						"bottom-in": bottomIn ? () => setState( "Bottom-in" ) : undefined,
-						"bottom-out": bottomOut ? () => setState( "Bottom-out" ) : undefined,
-					}}
+					dispatch={ testOnce }
 				/>
 			</div>
 			<p className="text-center">{ id }:{ color } - <strong>Last event:{ state ?? "idle" }</strong></p>
 		</div>
 	)
-}
-
-const dispatch = {
-	onViewport: ( normalizedPosition: number ) => console.log( "Element is in the viewport" ),
-	onTopOut: () => console.log( "Element top-out" ),
-	counter: {
-		topIn: 2,
-		topOut: 1,
-	},
-	topIn: {
-		dispatch: () => console.log( "deneme" ),
-		retry: 2
-	},
 }

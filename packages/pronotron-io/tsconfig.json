@@ -1,5 +1,8 @@
 {
 	"extends": "@pronotron/tsconfig/react-library.json",
+	"compilerOptions": {
+		"stripInternal": true
+	},
 	"include": [
 		"."
 	],

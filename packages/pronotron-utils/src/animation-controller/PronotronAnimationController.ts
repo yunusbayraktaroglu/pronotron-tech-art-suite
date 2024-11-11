@@ -66,7 +66,7 @@ export class PronotronAnimationController
 	{
 		this._clock = clock;
 		this._animationInternalIDsPool = new IDPool( nodeCountHint );
-		this._controlTable = new NativeControlTable( AnimationData, Float32Array, nodeCountHint );
+		this._controlTable = new NativeControlTable( 6, Float32Array, nodeCountHint );
 	}
 
 	getAnimationCount(): number {

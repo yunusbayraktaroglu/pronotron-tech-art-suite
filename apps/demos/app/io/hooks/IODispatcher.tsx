@@ -1,10 +1,10 @@
 "use client";
 
 import { usePronotronIO } from "../hooks/usePronotronIO";
-import { IODispatchOptions, IODispatchOptionsWithRetry } from '@pronotron/io';
+import { IODispatchOptions } from '@pronotron/io';
 
 interface PronotronIODispatcherProps extends React.ComponentProps<"span"> {
-	dispatch: IODispatchOptions | IODispatchOptionsWithRetry;
+	dispatch: IODispatchOptions;
 	offset?: number;
 };
 

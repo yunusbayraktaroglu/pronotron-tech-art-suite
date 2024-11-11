@@ -61,17 +61,17 @@ export class NativeControlTable<EnumType extends Record<string | number, string 
 	public stride: number;
 
 	/**
-	 * @param enumType Determines the stride size and infers the type.
+	 * @param stride Determines the stride size
 	 * @param tableType Typed array version
 	 * @param nodeCountHint Used to initialize the fixed-size native array, capacity will expand if needed.
 	 */
-	constructor( enumType: EnumType, tableType: { new ( length: number ): NativeTableTypes }, nodeCountHint: number )
+	constructor( stride: number, tableType: { new ( length: number ): NativeTableTypes }, nodeCountHint: number )
 	{
 		/**
-		 * Calculate stride length by dividing Enum to 2
+		 * Stride could be calculated with passing Enum but that causes Enum bundled as object in related library
 		 * @see https://stackoverflow.com/questions/38034673/determine-the-number-of-enum-elements-typescript
 		 */
-		const stride = Object.keys( enumType ).length / 2;
+		//const stride = Object.keys( enumType ).length / 2;
 
 		this._maxSlots = nodeCountHint;
 		this.stride = stride;
