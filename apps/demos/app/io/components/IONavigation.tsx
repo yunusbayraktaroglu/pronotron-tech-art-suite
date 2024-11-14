@@ -21,6 +21,7 @@ export function IONavigation()
 					const color = item.href !== pathname ? "bg-blue-600 hover:bg-blue-700" : "bg-green-600 hover:bg-green-700"	
 					return (
 						<Link
+							scroll={ false }
 							key={ item.href } 
 							href={ item.href } 
 							className={ `text-white py-2 px-4 leading-none rounded-full transition-colors ${ color }` }

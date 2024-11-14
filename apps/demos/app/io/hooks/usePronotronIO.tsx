@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from 'react';
-import { IODispatchOptions } from '@pronotron/io';
+import { IODispatchOptions, IONodeOptions } from '@pronotron/io';
 import { usePronotronIOContext } from "./PronotronIOProvider";
 
 interface usePronotronIOProps {
@@ -24,7 +24,13 @@ export function usePronotronIO({ dispatch, offset }: usePronotronIOProps )
 			dispatch: dispatch,
 			offset,
 			onRemoveNode: () => element.dataset.ioActive = "0",
-			getYPosition: () => element.getBoundingClientRect().top + window.scrollY,
+			getBounds: () => {
+				const { top, bottom } = element.getBoundingClientRect();
+				return { 
+					start: top + window.scrollY, 
+					end: bottom + window.scrollY 
+				};
+			},
 		});
 		
 		return () => {
@@ -42,4 +48,46 @@ export function usePronotronIO({ dispatch, offset }: usePronotronIOProps )
 	}, []);
 
 	return { ref };
+}
+
+
+type PronotronIODispatcherProps = React.ComponentProps<"div"> & Omit<IONodeOptions, "ref" | "getBounds" | "onRemoveNode">;
+
+
+export function IODispatcher({ dispatch, offset, ...divProps }: PronotronIODispatcherProps)
+{
+	const divRef = useRef<HTMLDivElement>( null ! );
+	const io = usePronotronIOContext( context => context.io );
+
+	useEffect(() => {
+
+		if ( ! divRef.current ) return;
+
+		const element = divRef.current;
+
+		const IONodeID = io.addNode({
+			ref: element,
+			dispatch,
+			offset,
+			getBounds: () => {
+				const { top, bottom } = element.getBoundingClientRect();
+				return { 
+					start: top + window.scrollY, 
+					end: bottom + window.scrollY 
+				};
+			},
+			onRemoveNode: () => console.log( "node removed" ),
+		});
+		
+		return () => {
+			if ( IONodeID !== false ){
+				io.removeNode( element );
+			}
+		};
+
+	}, []);
+
+	return (
+		<div ref={ divRef } { ...divProps } data-io="1" />
+	)
 }

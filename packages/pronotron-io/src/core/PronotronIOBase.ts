@@ -1,11 +1,10 @@
+import { NativeControlTable, IDPool } from "@pronotron/utils";
 import { 
 	PronotronNodeRef,
 	IONodeOptions,
 	PronotronNodeID,
-	ViewportProps,
 	FastForwardOptions
 } from "../../types/global";
-import { NativeControlTable, IDPool } from "@pronotron/utils";
 
 export enum IONodeData {
 	TrackTopIn,
@@ -13,8 +12,8 @@ export enum IONodeData {
 	TrackBottomIn,
 	TrackBottomOut,
 	InViewport,
-	NodeYPosition,
-	NodeOffset,
+	NodeStart,
+	NodeEnd,
 	NodeID,
 	OnViewportEvent,
 	OnTopInEvent,
@@ -23,13 +22,13 @@ export enum IONodeData {
 	OnBottomOutEvent,
 	OnFastForward
 };
+const nodeDataSize = 14;
 
 export enum FastForwardData {
 	SkipBoth,
 	ExecuteBoth,
 	ExecuteLast
 };
-
 
 export abstract class PronotronIOBase
 {
@@ -70,16 +69,21 @@ export abstract class PronotronIOBase
 	/** @internal */
 	private _idPool: IDPool;
 
+	/** @internal */
+	private _useRounded: boolean;
+
 	/**
-	 * @param nodeCountHint To populate fixed Typed Array length
+	 * @param nodeCountHint To populate fixed typed array length, will be expanded if needed
+	 * @param useRounded Uses integers instead of floating numbers, changes table data model
 	 */
-	constructor( nodeCountHint = 20 )
+	constructor( nodeCountHint = 20, useRounded = true )
 	{
+		this._useRounded = useRounded;
+
 		/**
-		 * Using Object.keys( IONodeData ).length / 2 to calculate stride is possible,
-		 * but that causes IONodeData included in the export as object.
+		 * Start with Uint16Array, if totalPageHeight > 65535, it will be converted into Uint32Array below
 		 */
-		this._controlTable =  new NativeControlTable( 14, Uint32Array, nodeCountHint );
+		this._controlTable =  new NativeControlTable( nodeDataSize, useRounded ? Uint16Array : Float32Array, nodeCountHint );
 		this._idPool = new IDPool( nodeCountHint );
 	}
 
@@ -96,14 +100,6 @@ export abstract class PronotronIOBase
 			const internalID = this._idPool.getID();
 
 			/**
-			 * Nodes may be added while application is already running and ready, (next.js page change)
-			 * if the application is already running, execute calculatePossibleEvents() for the node
-			 */
-			if ( this._viewport ){
-				//newPronotronNode.calculatePossibleEvents( this._viewport._screenHeight, this._viewport._totalPossibleScroll );
-			}
-
-			/**
 			 * In interleaved controlTable array we could only know PronotronIONode.id
 			 * 
 			 * - Use _nodeReferences as avoid duplicate and removal only
@@ -112,27 +108,30 @@ export abstract class PronotronIOBase
 			this._nodeReferences.set( newNodeOptions.ref, internalID );
 			this._nodes.set( internalID, newNodeOptions );
 
-			const yPosition = newNodeOptions.getYPosition();
-			const isInViewport = ( this._viewport && yPosition < this._viewport._screenHeight ) ? 1 : 0;
-			const fastForwardOptions = this._getFastForwardOption( newNodeOptions.dispatch.onFastForward );
+			const fastForwardOption = this._getFastForwardOption( newNodeOptions.dispatch.onFastForward );
 
-			// Only "top-out" and "bottom-in" are possible at the start (y = zero)
+			// Add all properties as placeholder
 			this._controlTable.addSlot( internalID, {
 				[ IONodeData.NodeID ]: internalID,
-				[ IONodeData.NodeYPosition ]: yPosition,
-				[ IONodeData.NodeOffset ]: newNodeOptions.offset ? newNodeOptions.offset : 0,
+				[ IONodeData.NodeStart ]: 0,
+				[ IONodeData.NodeEnd ]: 0,
 				[ IONodeData.TrackTopIn ]: 0,
-				[ IONodeData.TrackTopOut ]: 1,
-				[ IONodeData.TrackBottomIn ]: 1,
+				[ IONodeData.TrackTopOut ]: 0,
+				[ IONodeData.TrackBottomIn ]: 0,
 				[ IONodeData.TrackBottomOut ]: 0,
-				[ IONodeData.InViewport ]: isInViewport,
+				[ IONodeData.InViewport ]: 0,
 				[ IONodeData.OnViewportEvent ]: newNodeOptions.dispatch.onInViewport ? 1 : 0,
 				[ IONodeData.OnTopInEvent ]: newNodeOptions.dispatch.onTopIn ? 1 : 0,
 				[ IONodeData.OnTopOutEvent ]: newNodeOptions.dispatch.onTopOut ? 1 : 0,
 				[ IONodeData.OnBottomInEvent ]: newNodeOptions.dispatch.onBottomIn ? 1 : 0,
 				[ IONodeData.OnBottomOutEvent ]: newNodeOptions.dispatch.onBottomOut ? 1 : 0,
-				[ IONodeData.OnFastForward ]: fastForwardOptions
+				[ IONodeData.OnFastForward ]: fastForwardOption
 			});
+
+			// Element might be added while app is running. Calculate bounds
+			this._setElementBounds( internalID, newNodeOptions );
+
+			// Consume internal ID
 			this._idPool.consumeID( internalID );
 
 			return internalID;
@@ -144,7 +143,7 @@ export abstract class PronotronIOBase
 	}
 
 	/**
-	 * Removes tracking of an active IO node
+	 * Removes IONode by ref
 	 * 
 	 * @param existingNodeRef Node reference passed while executing addNode()
 	 */
@@ -153,22 +152,9 @@ export abstract class PronotronIOBase
 		const nodeID = this._nodeReferences.get( existingNodeRef );
 
 		if ( nodeID === undefined ){
-
 			console.warn( `Node is not found in the list.`, existingNodeRef );
-
 		} else {
-
-			const nodeSettings = this._nodes.get( nodeID )!;
-			
-			this._controlTable.removeSlot( nodeID );
-			this._nodeReferences.delete( existingNodeRef );
-			this._nodes.delete( nodeID );
-			this._idPool.releaseID( nodeID );
-
-			if ( nodeSettings.onRemoveNode ){
-				nodeSettings.onRemoveNode();
-			}
-
+			this._removeNodeByIds([ nodeID ]);
 		}
 	}
 
@@ -177,44 +163,25 @@ export abstract class PronotronIOBase
 	 * 
 	 * - Recalculates the Y position of each node
 	 * - Resets each node's tracking events as if we are at Y = 0
+	 * 
+	 * @param screenHeight Visible screen height
+	 * @param totalPageHeight Total page height including unvisible area to calculate total scroll value
 	 */
-	setViewport( viewport: ViewportProps ): void
+	setViewport( screenHeight: number, totalPageHeight: number ): void
 	{
 		this._viewport = {
-			_screenHeight: viewport.screenHeight,
-			_totalPageHeight: viewport.totalPageHeight,
-			_totalPossibleScroll: viewport.totalPageHeight - viewport.screenHeight
+			_screenHeight: screenHeight,
+			_totalPageHeight: totalPageHeight,
+			_totalPossibleScroll: totalPageHeight - screenHeight
 		};
 
-		this._nodes.forEach(( nodeSettings, nodeID ) => {
+		// Convert controlTable to Uint32Array if it's not enough
+		if ( this._useRounded && this._viewport._totalPageHeight > 65535 && this._controlTable.table.constructor !== Uint32Array ){
+			const newControlTable = Uint32Array.from( this._controlTable.table );
+			this._controlTable.table = newControlTable;
+		}
 
-			const newYPosition = nodeSettings.getYPosition();
-
-			if ( newYPosition < this._viewport!._screenHeight ){
-
-				this._controlTable.modifySlotByID( nodeID, {
-					[ IONodeData.NodeYPosition ]: newYPosition,
-					[ IONodeData.InViewport ]: 1,
-					[ IONodeData.TrackTopIn ]: 0,
-					[ IONodeData.TrackTopOut ]: 1,
-					[ IONodeData.TrackBottomIn ]: 0,
-					[ IONodeData.TrackBottomOut ]: 0,
-				} );
-
-			} else {
-
-				this._controlTable.modifySlotByID( nodeID, {
-					[ IONodeData.NodeYPosition ]: newYPosition,
-					[ IONodeData.InViewport ]: 0,
-					[ IONodeData.TrackTopIn ]: 0,
-					[ IONodeData.TrackTopOut ]: 0,
-					[ IONodeData.TrackBottomIn ]: 1,
-					[ IONodeData.TrackBottomOut ]: 0,
-				} );
-
-			}
-
-		});
+		this._nodes.forEach(( nodeSettings, nodeID ) => this._setElementBounds( nodeID, nodeSettings ));
 	}
 
 	/**
@@ -228,6 +195,30 @@ export abstract class PronotronIOBase
 			case "execute_last": return FastForwardData.ExecuteLast;
 			default: return FastForwardData.SkipBoth;
 		}
+	}
+
+	/**
+	 * @internal
+	 */
+	private _setElementBounds( nodeID: number, nodeSettings: IONodeOptions )
+	{
+		const { start, end } = nodeSettings.getBounds();
+		const elementOffset = nodeSettings.offset ? nodeSettings.offset : 0;
+		
+		const nodeStart = this._useRounded ? Math.round( start - elementOffset ) : start - elementOffset;
+		const nodeEnd = this._useRounded ? Math.round( end + elementOffset ) : end + elementOffset;
+		const isInViewport = ( this._viewport && nodeStart < this._viewport._screenHeight ) ? 1 : 0;
+
+		// Only "top-out" and "bottom-in" are possible at the start (y = zero)
+		this._controlTable.modifySlotByID( nodeID, {
+			[ IONodeData.NodeStart ]: nodeStart,
+			[ IONodeData.NodeEnd ]: nodeEnd,
+			[ IONodeData.InViewport ]: isInViewport,
+			[ IONodeData.TrackTopIn ]: 0,
+			[ IONodeData.TrackTopOut ]: isInViewport ? 1 : 0,
+			[ IONodeData.TrackBottomIn ]: isInViewport ? 0 : 1,
+			[ IONodeData.TrackBottomOut ]: 0,
+		} );
 	}
 
 	/**

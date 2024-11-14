@@ -55,12 +55,17 @@ export type IONodeOptions = {
 	 */
 	ref: Element;
 	dispatch: IODispatchOptions;
+	/**
+	 * How to get element initial position. (Not relative to scroll value)
+	 * Will be executed for each node if viewport has been changed
+	 * Start & end values can be same for lines.
+	 */
+	getBounds: () => { 
+		start: number;
+		end: number; 
+	};
 	offset?: number;
 	onRemoveNode?: () => void;
-	/**
-	 * How to get element initial Y position. (Not relative to scroll value)
-	 */
-	getYPosition: () => number;
 };
 
 /**
@@ -74,17 +79,3 @@ export type PronotronNodeRef = Element;
  * Each add node request from client, generates a PronotronIONode object.
  */
 export type PronotronNodeID = number;
-
-/**
- * Viewport Props should be passed from parent application, since scroll logic might be different
- */
-export type ViewportProps = {
-	/**
-	 * Visible screen height
-	 */
-	screenHeight: number;
-	/**
-	 * Total page height including unvisible area to calculate total scroll value
-	 */
-	totalPageHeight: number;
-};

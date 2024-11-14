@@ -19,28 +19,43 @@ interface IOLineDomManipulateProps {
 	bottomOut?: boolean;
 };
 
-const testOnce = {
-	onTopIn: {
-		dispatch: () => console.log( "Top-in Once" ),
-		limit: 1
-	},
-	onTopOut: {
-		dispatch: () => console.log( "Top-out Once" ),
-		limit: 1,
-	},
-	onBottomOut: {
-		dispatch: () => console.log( "Bottom-out Once" ),
-		limit: 1
-	},
-	onBottomIn: {
-		dispatch: () => console.log( "Bottom-in Once" ),
-		limit: 1
-	},
-	onInViewport: ( normalizedPosition: number ) => {
-		console.log( normalizedPosition );
-	},
-	//onFastForward: "skip_both",
-};
+function returnDispatchWithRetry( id: number | string ){
+	return {
+		onTopIn: {
+			dispatch: () => console.log( "Top-in Once", id ),
+			limit: 1
+		},
+		onTopOut: {
+			dispatch: () => console.log( "Top-out Once", id ),
+			limit: 1,
+		},
+		onBottomOut: {
+			dispatch: () => console.log( "Bottom-out Once", id ),
+			limit: 1
+		},
+		onBottomIn: {
+			dispatch: () => console.log( "Bottom-in Once", id ),
+			limit: 1
+		},
+		onInViewport: ( normalizedPosition: number ) => {
+			console.log( normalizedPosition );
+		},
+		//onFastForward: "skip_both",
+	};
+}
+
+function returnDispatch( id: number | string ){
+	return {
+		onTopIn: () => console.log( "Top-in Once", id ),
+		onTopOut: () => console.log( "Top-out Once", id ),
+		onBottomOut: () => console.log( "Bottom-out Once", id ),
+		onBottomIn: () => console.log( "Bottom-in Once", id ),
+		onInViewport: ( normalizedPosition: number ) => {
+			console.log( normalizedPosition );
+		},
+		//onFastForward: "skip_both",
+	};
+}
 
 export function IOLineDomManipulate({ id, color, topIn, topOut, bottomIn, bottomOut }: IOLineDomManipulateProps)
 {
@@ -53,7 +68,7 @@ export function IOLineDomManipulate({ id, color, topIn, topOut, bottomIn, bottom
 				<IODispatcher 
 					className={ `block min-h-[1px] w-full ${ colorMap[ color ] } my-[120px]` }
 					offset={ 120 }
-					dispatch={ testOnce }
+					dispatch={ returnDispatch( id ) }
 				/>
 			</div>
 			<p className="text-center">{ id }:{ color } - <strong>Last event:{ state ?? "idle" }</strong></p>

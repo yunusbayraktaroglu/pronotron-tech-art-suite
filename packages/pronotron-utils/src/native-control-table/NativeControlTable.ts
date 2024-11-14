@@ -42,8 +42,11 @@ export class NativeControlTable<EnumType extends Record<string | number, string 
 	/**
 	 * Keeps track of slot IDs and their current slot positions to enable slot removal.
 	 * Slot positions may change during removals due to shifting.
+	 * @internal
 	 */
 	private _slotIDToSlotPosition = new Map<SlotID, SlotPosition>();
+
+	/** @internal */
 	private _slotPositionToSlotID = new Map<SlotPosition, SlotID>();
 
 	/**
@@ -51,6 +54,8 @@ export class NativeControlTable<EnumType extends Record<string | number, string 
 	 * This property tracks how many slots are currently used.
 	 */
 	public usedSlots = 0;
+
+	/** @internal */
 	private _maxSlots: number;
 
 	/**
@@ -164,6 +169,10 @@ export class NativeControlTable<EnumType extends Record<string | number, string 
 	{
 		const offset = position * this.stride;
 
+		/**
+		 * @fix
+		 * No need to ensure Number( key ), item keys must be number already
+		 */
 		for ( const [ key, value ] of Object.entries<number>( item ) ){
 			this.table[ offset + Number( key ) ] = value;
 		}
@@ -178,6 +187,8 @@ export class NativeControlTable<EnumType extends Record<string | number, string 
 	 * Returns an available slot.
 	 * Since we shift the last slot to the removed slot, 
 	 * the empty slot should always equal to _usedSlots.
+	 * 
+	 * @internal
 	 */
 	private _findEmptySlot(): number 
 	{
@@ -191,6 +202,8 @@ export class NativeControlTable<EnumType extends Record<string | number, string 
 
 	/**
 	 * Expands the capacity of table.
+	 * 
+	 * @internal
 	 */
 	private _expandCapacity(): void 
 	{
@@ -206,26 +219,3 @@ export class NativeControlTable<EnumType extends Record<string | number, string 
 		this._maxSlots = newMaxSlots;
 	}
 }
-
-
-
-
-
-// enum AnimationData {
-// 	ID,
-// 	DURATION,
-// 	STARTTIME,
-// 	ENDTIME,
-// 	RENDERABLE,
-// 	TIMESTYLE,
-// };
-
-// const controlTable = new NativeControlTable( AnimationData, 10 );
-// controlTable.addSlot( "animation_5", {
-// 	[AnimationData.ID]: 5,
-// 	[AnimationData.DURATION]: 1,
-// 	[AnimationData.STARTTIME]: 10,
-// 	[AnimationData.ENDTIME]: 10,
-// 	[AnimationData.RENDERABLE]: 10,
-// 	[AnimationData.TIMESTYLE]: 10,
-// });

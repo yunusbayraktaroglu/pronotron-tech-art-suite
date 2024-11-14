@@ -1,17 +1,36 @@
 "use client";
 
 import React from "react";
+import { IODispatcher } from "../../hooks/usePronotronIO";
 
-import { IOLineLogger } from "../../components/IOLineLogger";
+const colors = [
+	"bg-teal-500",
+	"bg-orange-500",
+	"bg-purple-500",
+	"bg-green-500",
+	"bg-red-500",
+];
 
-const colors = [ "blue" , "red", "orange", "purple", "green" ] as Array<"blue" | "red" | "orange" | "purple" | "green">;
-
-export default function Home()
+export default function SharedPageTwo()
 {
 	return Array.from({ length: 10 }).map(( item, index ) => (
-		<React.Fragment key={ index }>
-			<div className="flex h-[40vh] landscape:h-[120vh] relative"></div>
-			<IOLineLogger id={ index } topIn topOut bottomIn bottomOut color={ colors[ index % colors.length ] } />
-		</React.Fragment>
-	)) 
+		<IODispatcher 
+			key={ index }
+			className={ `block py-[1px] my-[40vh] landscape:my-[140vh] ${ colors[ index % 5 ] }` }
+			offset={ 0 }
+			dispatch={{
+				onTopIn: () => console.log( `#${ index } Top-in` ),
+				onTopOut: () => console.log( `#${ index } Top-out` ),
+				onBottomOut: () => console.log( `#${ index } Bottom-out` ),
+				onBottomIn: () => console.log( `#${ index } Bottomin` ),
+				onInViewport: ( normalizedPosition: number ) => {
+					console.log( `#${ index } In Viewport`, normalizedPosition );
+				},
+				//onFastForward: "execute_both"
+			}}
+		>
+			<p className="text-center">Node: #{ index }</p>
+		</IODispatcher>
+			
+	))
 }
