@@ -10,6 +10,7 @@ enum AnimationData {
 	RENDERABLE,
 	TIMESTYLE,
 };
+const animationDataLength = 6;
 
 type AnimationOptionID = string;
 type AnimationInternalID = number;
@@ -43,6 +44,7 @@ export class PronotronAnimationController
 {
 	/**
 	 * A number ID is generated for each animation to be holdable in the typed control array.
+	 * @internal
 	 */
 	private _animationOptionIDtoInternalID = new Map<AnimationOptionID, AnimationInternalID>();
 
@@ -51,11 +53,17 @@ export class PronotronAnimationController
 	 * allowing access to onRender(), onEnd(), etc.
 	 * 
 	 * The key is a number to facilitate passing to NativeControlTable.
+	 * @internal
 	 */
 	private _animationReferences: Record<AnimationInternalID, AnimationOption> = {};
 
+	/** @internal */
 	private _clock: PronotronClock;
+
+	/** @internal */
 	private _animationInternalIDsPool: IDPool;
+
+	/** @internal */
 	private _controlTable: NativeControlTable<typeof AnimationData>;
 
 	/**
@@ -66,11 +74,7 @@ export class PronotronAnimationController
 	{
 		this._clock = clock;
 		this._animationInternalIDsPool = new IDPool( nodeCountHint );
-		this._controlTable = new NativeControlTable( 6, Float32Array, nodeCountHint );
-	}
-
-	getAnimationCount(): number {
-		return this._controlTable.usedSlots;
+		this._controlTable = new NativeControlTable( animationDataLength, Float32Array, nodeCountHint );
 	}
 
 	/**
@@ -166,9 +170,17 @@ export class PronotronAnimationController
 	}
 
 	/**
+	 * @returns Total active animation count 
+	 */
+	getAnimationCount(): number {
+		return this._controlTable.usedSlots;
+	}
+
+	/**
 	 * During ticking, only the generated animationInternalID stored in NativeControlTable is available.
 	 * 
 	 * @param animationInternalID The generated number when adding an animation.
+	 * @internal
 	 */
 	private _removeAnimationByInternalID( animationInternalID: AnimationInternalID ): void
 	{

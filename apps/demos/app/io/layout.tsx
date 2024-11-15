@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import { PronotronIOProvider } from "./hooks/PronotronIOProvider";
 import { IONavigation } from "./components/IONavigation";
+
+export const metadata: Metadata = {
+	title: "PronotronIO",
+	description: "PronotronIO Demos.",
+};
 
 export default function Layout({ children }: Readonly<{ children: React.ReactNode }> )
 {
@@ -23,7 +29,6 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
 					<IONavigation />
 				</header>
 			</div>
-			<div className="flex h-[40vh] landscape:h-[20vh] relative"></div>
 			<PronotronIOProvider>
 				{ children }
 			</PronotronIOProvider>

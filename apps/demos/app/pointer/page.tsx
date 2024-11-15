@@ -16,8 +16,10 @@ export default function PointerDemoPage()
 		<AppTickerProvider>
 			<div className="pointer" />
 			<PointerComponent />
-			<div className="flex flex-col h-[80vh] relative bg-slate-300 holdable" />
-			<div className="flex flex-col h-[90vh] relative bg-slate-500" />
+			<div className="container my-spacing-base">
+				<div className="flex flex-col h-[50vh] relative bg-slate-300 holdable" />
+				<div className="flex flex-col h-[50vh] relative bg-slate-500" />
+			</div>
 		</AppTickerProvider>
 	);
 }
@@ -25,10 +27,12 @@ export default function PointerDemoPage()
 const PointerComponent = () => {
 	const { pointer, easedPointer, elapsedTime, pointerState } = useAppTicker();
 	return (
-		<div className="fixed left-0 top-0 p-3 z-50">
-			<p>Pointer State: { pointerState }</p>
-			<p>Pointer: {pointer.x}, {pointer.y}</p>
-			{/* <p>Eased Pointer: {easedPointer.x}, {easedPointer.y}</p> */}
+		<div className="bg-black/25 sticky top-0 z-50 py-spacing-sm">
+			<div className="container">
+				<p>Pointer State: { pointerState }</p>
+				<p>Pointer: {pointer.x}, {pointer.y}</p>
+				{/* <p>Eased Pointer: {easedPointer.x}, {easedPointer.y}</p> */}
+			</div>
 		</div>
 	);
 };

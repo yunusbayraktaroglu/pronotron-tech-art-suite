@@ -17,8 +17,14 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-	title: "Pronotron Web Packages | Demos",
+	title: {
+		default: "Pronotron Web Packages",
+		template: '%s | Pronotron Web Packages',
+	},
 	description: "Demo setups for Pronotron Web Packages",
+	authors: [
+		{ name: "Yunus Bayraktaroglu" }
+	],
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode; }> )
@@ -26,10 +32,12 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 	return (
 		<html lang="en">
 			<body className={ `${ geistSans.variable } ${ geistMono.variable } antialiased` }>
-				<header className="container flex space-x-2 p-3 mb-3 border-b">
-					<Link href="/">Home</Link>
-					<Link href="/documents">Documents</Link>
-					<Link href="/github">Github</Link>
+				<header className="container">
+					<nav className="flex flex-row space-x-2 p-spacing-sm">
+						<Link href="/">Home</Link>
+						<Link href="/documents">Documents</Link>
+						<a className="!ml-auto" target="_blank" href="https://github.com/yunusbayraktaroglu/pronotron-web-libraries">Github</a>
+					</nav>
 				</header>
 				<PronotronStatsComponent />
 				{ children }

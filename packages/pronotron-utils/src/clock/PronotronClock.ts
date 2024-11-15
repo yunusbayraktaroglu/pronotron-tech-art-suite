@@ -45,6 +45,9 @@ export class PronotronClock
 		return this._getDelta();
 	}
 
+	/**
+	 * @internal
+	 */
 	private _getDelta()
 	{
 		let diff = 0;

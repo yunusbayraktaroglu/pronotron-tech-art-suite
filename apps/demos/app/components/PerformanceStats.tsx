@@ -11,6 +11,10 @@ export class PronotronStatsPanel
 
 	min = Infinity;
 	max = 0;
+
+	/** O to max limit will be visualized in related graph */
+	maxLimit = 0;
+
 	pixelRatio!: number;
 	table: any;
 
@@ -71,7 +75,7 @@ export class PronotronStatsPanel
 		this.context = context;
 	}
 
-	update( value: number, maxValue: number )
+	update( value: number )
 	{
 		const PR = this.pixelRatio;
 		const { WIDTH, HEIGHT, TEXT_X, TEXT_Y, GRAPH_X, GRAPH_Y, GRAPH_WIDTH, GRAPH_HEIGHT } = this.table;
@@ -92,7 +96,7 @@ export class PronotronStatsPanel
 
 		this.context.fillStyle = this.bg;
 		this.context.globalAlpha = 0.75;
-		this.context.fillRect( GRAPH_X + GRAPH_WIDTH - PR, GRAPH_Y, PR, Math.round( ( 1 - ( value / maxValue ) ) * GRAPH_HEIGHT ) );
+		this.context.fillRect( GRAPH_X + GRAPH_WIDTH - PR, GRAPH_Y, PR, Math.round( ( 1 - ( value / this.maxLimit ) ) * GRAPH_HEIGHT ) );
 	}
 
 	clearCanvas()
@@ -126,8 +130,12 @@ export class PronotronStats
 	{
 		if ( this.ready ) return;
 		this.fps.build();
-		this.ms.build()
-		this.mb.build()
+		this.ms.build();
+		this.mb.build();
+
+		this.fps.maxLimit = 100;
+		this.ms.maxLimit = 2;
+
 		this.ready = true;
 	}
 
@@ -142,11 +150,12 @@ export class PronotronStats
 
 		const time = performance.now();
 
-		this.ms.update( time - this.beginTime, 200 );
+		this.ms.update( time - this.beginTime );
+		this.ms.maxLimit = this.ms.max * 2;
 
 		if ( time >= this.prevTime + 1000 ) {
 
-			this.fps.update( ( this.frames * 1000 ) / ( time - this.prevTime ), 100 );
+			this.fps.update( ( this.frames * 1000 ) / ( time - this.prevTime ) );
 
 			this.prevTime = time;
 			this.frames = 0;
@@ -199,5 +208,11 @@ export function PronotronStatsComponent()
 
 	}, []);
 
-	return <div className="fixed left-2 bottom-2 flex opacity-[1] z-100 space-x-[1px]" ref={ containerRef } />;
+	return (
+		<div 
+			id="performance-stats" 
+			className="fixed flex flex-col left-2 bottom-2 opacity-[1] z-100 space-y-[1px]"
+			ref={ containerRef } 
+		/>
+	)
 }

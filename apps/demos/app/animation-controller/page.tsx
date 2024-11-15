@@ -1,30 +1,108 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { PronotronAnimationController, PronotronClock } from "@pronotron/utils";
-import { PronotronStats, PronotronStatsComponent } from "@/app/components/PerformanceStats";
+import { useEffect, useState, useRef } from "react";
+import { animationController } from "./hooks/PronotronAnimationProvider";
 
-const clock = new PronotronClock();
-const animationController = new PronotronAnimationController( clock, 50 );
-const stats = new PronotronStats();
+type TestScenario = {
+	testCount: number;
+	animationCount: number;
+	timeType: "pausable" | "continious";
+};
 
 export default function AnimationControllerDemoPage()
 {
+	const [ testScenario, setTestScenario ] = useState<TestScenario>({
+		testCount: 0,
+		animationCount: 50,
+		timeType: "pausable"
+	});
+
 	return (
-		<AppTickerProvider>
-			<PronotronStatsComponent stats={ stats } />
-			<p>PronotronAnimationController uses TypedArray to hold animations in flatten typed array and iterates over it with using direct access to memory</p>
-			<p>Adds 50 animation</p>
-			<div className="grid grid-cols-4 gap-3">
-				{ Array.from({ length: 50 }).map(( item, index ) => (
-					<SingleAnimation key={ index } ID={ index } /> 
+		<div className="container">
+			<AnimationStressTestForm runTestScenario={ setTestScenario } />
+			<div className="grid grid-cols-4 gap-3 mt-spacing-base">
+				{ Array.from({ length: testScenario.animationCount }).map(( item, index ) => (
+					<SingleAnimation 
+						key={ `${ testScenario.testCount }_${ index }` } 
+						ID={ index }
+						timeStyle={ testScenario.timeType } 
+					/> 
 				) )}
 			</div>
-		</AppTickerProvider>
+		</div>
 	);
 }
 
-function SingleAnimation({ ID }: { ID: number })
+
+
+
+interface TestFormProps {
+	runTestScenario: ( scenario: TestScenario ) => void
+};
+
+function AnimationStressTestForm({ runTestScenario }: TestFormProps)
+{
+	const testCount = useRef( 0 );
+	const [ testScenario, setTestScenario ] = useState<Omit<TestScenario, "testCount">>({
+		animationCount: 1000,
+		timeType: "pausable",
+	});
+
+	const handleInputChange = ( event: React.ChangeEvent<HTMLInputElement> ) => {
+		const { name, value } = event.target;
+		setTestScenario(( prev ) => ({
+			...prev,
+			[ name ]: Number( value ),
+		}));
+	};
+
+	const handleSelectChange = ( event: React.ChangeEvent<HTMLSelectElement> ) => {
+		const { name, value } = event.target;
+		setTestScenario(( prev ) => ({
+			...prev,
+			[ name ]: value,
+		}));
+	};
+
+	const startTest = () => {
+		testCount.current += 1;
+		runTestScenario({ testCount: testCount.current, ...testScenario });
+	};
+
+	return (
+		<div className="form flex flex-col landscape:flex-row gap-5 bg-slate-200 p-spacing-lg mt-spacing-base rounded-lg">
+			<fieldset>
+				<label htmlFor="animationCount">Animation count</label>
+				<input
+					type="number"
+					min={ 100 }
+					name="animationCount"
+					id="animationCount"
+					value={ testScenario.animationCount }
+					onChange={ handleInputChange }
+				/>
+			</fieldset>
+			<fieldset>
+				<label htmlFor="timeType">Time type</label>
+				<select onChange={ handleSelectChange } name="timeType" id="timeType">
+					<option value="pausable">Pausable</option>
+					<option value="continious">Continious</option>
+				</select>
+			</fieldset>
+
+			<button onClick={ startTest } className="block bg-green-500 hover:bg-green-400 px-4 py-2 rounded-full transition-colors ml-auto">Create Animations</button>
+
+		</div>
+	)
+}
+
+
+
+
+
+
+
+function SingleAnimation({ ID, timeStyle }: { ID: number, timeStyle: "pausable" | "continious" })
 {
 	const [ timeline, setTimeline ] = useState( 0 );
 	const [ state, setState ] = useState( "running" );
@@ -47,87 +125,20 @@ function SingleAnimation({ ID }: { ID: number })
 				}
 				setState( "end" );
 			},
-			timeStyle: "pausable",
+			timeStyle: timeStyle,
 		});
 		return () => animationController.removeAnimation( `animation_${ ID }`, true );
 	}, []);
 
 	return (
 		<div className={ state === "running" ? "p-3 bg-orange-300" : "p-3 bg-green-300" }>
-			<h1>Animation: #{ ID }</h1>
+			<p>Animation: #{ ID }</p>
 			<div className="w-full block bg-slate-900 h-[5px] origin-left" style={{ transform: `translate3d( 0, 0, 0 ) scaleX(${ timeline })`}} />
 		</div>
 	)
 }
 
 
-interface AppTickerContextProps {
-	elapsedTime: number;
-	activeElapsedTime: number;
-	clockDelta: number;
-}
-
-import { createContext, useContext } from "react";
-const AppTickerContext  = createContext<AppTickerContextProps | undefined>( undefined );
 
 
-function AppTickerProvider({ children }: { children: React.ReactNode })
-{
-	const [ clockDelta, setClockDelta ] = useState( 0 );
-	const [ elapsedTime, setElapsedTime ] = useState( 0 );
-	const [ activeElapsedTime, setActiveElapsedTime ] = useState( 0 );
-
-	useEffect(() => {
-
-		const tick = () => {
-			stats.begin();
-			const deltaTime = clock.tick();
-			animationController.tick();
-			setElapsedTime( clock.elapsedTime );
-			setActiveElapsedTime( clock.elapsedPausedTime );
-			setClockDelta( deltaTime );
-			stats.end();
-			requestAnimationFrame( tick );
-		};
-
-		const animationFrameId = requestAnimationFrame( tick );
-
-		const handleVisibilityChange = () => {
-			if ( document.hidden ){
-				clock.pause();
-			} else {
-				clock.continue();
-			}
-		};
-
-		document.addEventListener( 'visibilitychange', handleVisibilityChange );
-
-		return () => {
-			cancelAnimationFrame( animationFrameId );
-			document.removeEventListener( 'visibilitychange', handleVisibilityChange );
-		};
-		
-	}, []);
-
-	return (
-		<AppTickerContext.Provider
-			value={{
-				elapsedTime,
-				activeElapsedTime,
-				clockDelta,
-			}}
-		>
-			{ children }
-		</AppTickerContext.Provider>
-	);
-}
-
-
-export const useAppTicker = () => {
-	const context = useContext( AppTickerContext );
-	if ( ! context ){
-	  	throw new Error( "useAppTicker must be used within an AppTickerProvider" );
-	}
-	return context;
-}
 

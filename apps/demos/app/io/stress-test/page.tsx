@@ -4,8 +4,6 @@ import { useRef, useState } from "react";
 import { IODispatcher } from "../hooks/usePronotronIO";
 import { IODispatchOptions, IONodeOptions } from '@pronotron/io';
 
-import styles from "./form.module.css";
-
 type TestScenario = {
 	testCount: number;
 	inViewport: boolean,
@@ -19,17 +17,19 @@ type TestScenario = {
 };
 
 interface TestFormProps {
-	runTestScenario: ( scenario: any ) => void
+	runTestScenario: ( scenario: TestScenario ) => void
 };
 
 function TestForm({ runTestScenario }: TestFormProps)
 {
 	const testCount = useRef( 0 );
+
+	const [ warning, setWarning ] = useState( "" );
 	const [ testScenario, setTestScenario ] = useState<Omit<TestScenario, "testCount">>({
 		ioCount: 1000,
 		dispatchType: "modify_dom",
 		inViewport: false,
-		topIn: false,
+		topIn: true,
 		topOut: false,
 		bottomIn: false,
 		bottomOut: false,
@@ -64,104 +64,118 @@ function TestForm({ runTestScenario }: TestFormProps)
 	};
 
 	const startTest = () => {
+		const { inViewport, topIn, topOut, bottomIn, bottomOut } = testScenario;
+		if ( ! inViewport && ! topIn && ! topOut && ! bottomIn && ! bottomOut ){
+			setWarning( "Please select at least 1 event" );
+			return;
+		}
 		testCount.current += 1;
 		runTestScenario({ testCount: testCount.current, ...testScenario });
-		console.log( "Starting test with scenario:", testScenario );
-		// You can add more logic here to initiate the test scenario
+		setWarning( "" );
 	};
 
 	return (
-		<div className={ styles.form }>
-			<h1 className="text-2xl mb-4">Test Case:</h1>
-			<fieldset className="flex flex-row gap-3">
-				<fieldset>
-					<label htmlFor="ioCount" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">IO count</label>
-					<input
-						className="p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-base focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-						type="number"
-						min={ 100 }
-						name="ioCount"
-						id="ioCount"
-						value={ testScenario.ioCount }
-						onChange={ handleInputChange }
-					/>
+		<div className="form">
+
+			{ warning && <p className="text-red-500 mb-spacing-sm">{ warning }</p> }
+			
+			
+			<fieldset className="flex flex-col landscape:flex-row justify-between items-start gap-5">
+
+				<fieldset className="flex flex-col landscape:flex-row gap-5">
+
+					<fieldset>
+						<label htmlFor="ioCount">IO count</label>
+						<input
+							type="number"
+							min={ 100 }
+							name="ioCount"
+							id="ioCount"
+							value={ testScenario.ioCount }
+							onChange={ handleInputChange }
+						/>
+					</fieldset>
+
+					<fieldset>
+						<label htmlFor="dispatch-type">Select dispatch type</label>
+						<select onChange={ handleSelectChange } name="dispatchType" id="dispatch-type">
+							<option value="modify_dom">Modify dom</option>
+							<option value="console_log">Console log</option>
+							<option value="never">Never (useful for iteration speed)</option>
+						</select>
+					</fieldset>
+
+					<fieldset>
+						<label htmlFor="fast-forward">Select fast-forward type</label>
+						<select onChange={ handleSelectChange } name="onFastForward" id="fast-forward">
+							<option value="skip_both">Skip both (default)</option>
+							<option value="execute_both">Execute both events</option>
+							<option value="execute_last">Execute last event</option>
+						</select>
+					</fieldset>
+
+					<fieldset>
+						<label>Track events</label>
+						<fieldset className="checkbox">
+							<fieldset>
+								<input
+									type="checkbox"
+									name="inViewport"
+									id="in-viewport"
+									checked={ testScenario.inViewport }
+									onChange={ handleCheckboxChange }
+								/>
+								<label htmlFor="in-viewport">In viewport</label>
+							</fieldset>
+							<fieldset>
+								<input
+									type="checkbox"
+									name="topIn"
+									id="top-in"
+									checked={ testScenario.topIn }
+									onChange={ handleCheckboxChange }
+								/>
+								<label htmlFor="top-in">Top-in</label>
+							</fieldset>
+							<fieldset>
+								<input
+									type="checkbox"
+									name="topOut"
+									id="top-out"
+									checked={ testScenario.topOut }
+									onChange={ handleCheckboxChange }
+								/>
+								<label htmlFor="top-out">Top-out</label>
+							</fieldset>
+							<fieldset>
+								<input
+									type="checkbox"
+									name="bottomIn"
+									id="bottom-in"
+									checked={ testScenario.bottomIn }
+									onChange={ handleCheckboxChange }
+								/>
+								<label htmlFor="bottom-in">Bottom-in</label>
+							</fieldset>
+							<fieldset>
+								<input
+									type="checkbox"
+									name="bottomOut"
+									id="bottom-out"
+									checked={ testScenario.bottomOut }
+									onChange={ handleCheckboxChange }
+								/>
+								<label htmlFor="bottom-out">Bottom-out</label>
+							</fieldset>
+						</fieldset>
+					</fieldset>
+
 				</fieldset>
 
-				<fieldset>
-					<label htmlFor="dispatch-type" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select dispatch type</label>
-					<select onChange={ handleSelectChange } name="dispatchType" id="dispatch-type" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-						<option value="modify_dom">Modify dom</option>
-						<option value="console_log">Console log</option>
-						<option value="never">Never (useful for iteration speed)</option>
-					</select>
-				</fieldset>
-
-				<fieldset>
-					<label htmlFor="fast-forward" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select fast-forward type</label>
-					<select onChange={ handleSelectChange } name="onFastForward" id="fast-forward" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-						<option value="skip_both">Skip both (default)</option>
-						<option value="execute_both">Execute both events</option>
-						<option value="execute_last">Execute last event</option>
-					</select>
-				</fieldset>
-
-				<fieldset>
-					<p>Track events</p>
-					<fieldset className={ styles.checkbox }>
-						<input
-							type="checkbox"
-							name="inViewport"
-							id="in-viewport"
-							checked={ testScenario.inViewport }
-							onChange={ handleCheckboxChange }
-						/>
-						<label htmlFor="in-viewport">In viewport</label>
-					</fieldset>
-					<fieldset className={ styles.checkbox }>
-						<input
-							type="checkbox"
-							name="topIn"
-							id="top-in"
-							checked={ testScenario.topIn }
-							onChange={ handleCheckboxChange }
-						/>
-						<label htmlFor="top-in">Top-in</label>
-					</fieldset>
-					<fieldset className={ styles.checkbox }>
-						<input
-							type="checkbox"
-							name="topOut"
-							id="top-out"
-							checked={ testScenario.topOut }
-							onChange={ handleCheckboxChange }
-						/>
-						<label htmlFor="top-out">Top-out</label>
-					</fieldset>
-					<fieldset className={ styles.checkbox }>
-						<input
-							type="checkbox"
-							name="bottomIn"
-							id="bottom-in"
-							checked={ testScenario.bottomIn }
-							onChange={ handleCheckboxChange }
-						/>
-						<label htmlFor="bottom-in">Bottom-in</label>
-					</fieldset>
-					<fieldset className={ styles.checkbox }>
-						<input
-							type="checkbox"
-							name="bottomOut"
-							id="bottom-out"
-							checked={ testScenario.bottomOut }
-							onChange={ handleCheckboxChange }
-						/>
-						<label htmlFor="bottom-out">Bottom-out</label>
-					</fieldset>
-				</fieldset>
-
+				<button onClick={ startTest } className="block bg-green-500 hover:bg-green-400 px-4 py-2 rounded-full transition-colors">Create IO nodes</button>
 
 			</fieldset>
-			<button onClick={ startTest } className="bg-green-500 hover:bg-green-400 p-3 rounded-full transition-colors">Create IO nodes</button>
+
 		</div>
 	)
 }
@@ -175,11 +189,13 @@ export default function StressTestPage()
 	const [ testScenario, setTestScenario ] = useState<TestScenario | false>( false );
 
 	return (
-		<div className="container py-7">
+		<div className="container mt-spacing-base">
 
-			<TestForm runTestScenario={ setTestScenario } />
+			<div className="bg-slate-200 p-spacing-lg rounded-lg">
+				{ testScenario ? <p className="text-green-800 mb-5">Created { testScenario.ioCount } node. Scroll down to see effects. Check starts for performance.</p> : null}
+				<TestForm runTestScenario={ setTestScenario } />
+			</div>
 
-			<div className="flex h-[30vh]" />
 
 			{ testScenario ? ( 
 				Array.from({ length: testScenario.ioCount }).map(( item, index ) => {
@@ -274,14 +290,14 @@ function emptyDispatcher({ inViewport, topIn, topOut, bottomIn, bottomOut, onFas
 
 function NodManipulator({ index, inViewport, topIn, topOut, bottomIn, bottomOut, onFastForward }: logDispatcherProps )
 {
-	const [ pos, setPos ] = useState( 0 );
+	const [ pos, setPos ] = useState<string | number>( "untracked" );
 	const [ state, setState ] = useState<false | string>( false );
 
 	return (
 		<div className="my-[120vh] text-center">
-			<p>#{ index }, State: { state ? state : null }</p>
+			<p><strong>#{ index }:</strong> Last recorded event: { state ? state : null }</p>
 			<IODispatcher 
-				className={ `bg-green-500 my-5` }
+				className={ `bg-green-500 my-5 py-2` }
 				offset={ 0 }
 				//@ts-expect-error - At least 1 event is required
 				dispatch={{
@@ -293,9 +309,9 @@ function NodManipulator({ index, inViewport, topIn, topOut, bottomIn, bottomOut,
 					onFastForward
 				}}
 			>
-				<p>#{ index }, Normalized Position: { pos }</p>
+				<p>Normalized Position: { pos }</p>
 			</IODispatcher>
-			<p>#{ index }, State: { state ? state : null }</p>
+			<p><strong>#{ index }:</strong> Last recorded event: { state ? state : null }</p>
 		</div>
 	)
 }
