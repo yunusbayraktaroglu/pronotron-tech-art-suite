@@ -4,39 +4,59 @@ import { useEffect, useRef, useState } from "react";
 
 export default function PointerDemoPage()
 {
-	//const { elapsedTime, activeElapsedTime, pointer, pointerDelta, clockDelta, easedPointer } = useAppTicker();
-
-	// useEffect(() => {
-	// 	console.log( "pointer delta changed" );
-	// }, [ pointerDelta ]);
-
-	//console.log( "rerender" );
-
 	return (
 		<AppTickerProvider>
-			<div className="pointer" />
-			<PointerComponent />
-			<div className="container my-spacing-base">
-				<div className="flex flex-col h-[50vh] relative bg-slate-300 holdable" />
+			<PointerView />
+			<div className="bg-black/25 sticky top-0 z-50 py-spacing-sm">
+				<div className="container">
+					<PointerDebugger />
+				</div>
+			</div>
+			<div className="container my-spacing-base flex flex-col gap-3">
+				<div className="flex flex-col items-center justify-center h-[50vh] relative bg-slate-300 p-3">
+					<div data-holded className="holdable flex items-center justify-center bg-slate-500 h-[10vh] w-[10vh]">
+						<div className="pointer-events-none">
+							<p>Holdable</p>
+						</div>
+					</div>
+				</div>
 				<div className="flex flex-col h-[50vh] relative bg-slate-500" />
 			</div>
 		</AppTickerProvider>
 	);
 }
 
-const PointerComponent = () => {
-	const { pointer, easedPointer, elapsedTime, pointerState } = useAppTicker();
-	return (
-		<div className="bg-black/25 sticky top-0 z-50 py-spacing-sm">
-			<div className="container">
-				<p>Pointer State: { pointerState }</p>
-				<p>Pointer: {pointer.x}, {pointer.y}</p>
-				{/* <p>Eased Pointer: {easedPointer.x}, {easedPointer.y}</p> */}
-			</div>
-		</div>
-	);
-};
 
+
+
+function PointerDebugger()
+{
+	const { pointer, pointerDelta, pointerState } = useAppTicker();
+
+	return (
+		<>
+			<p>Pointer State: { pointerState }</p>
+			<p>Position: { pointer.x }, { pointer.y }</p>
+			<p>Delta: { pointerDelta.x }, { pointerDelta.y }</p>
+		</>
+	);
+}
+
+
+
+
+function PointerView()
+{
+	const { pointer, pointerState, pointerTargetInteractable } = useAppTicker();
+
+	return (
+		<div 
+			data-attz={ pointer.x }
+			className={ "pointer " + pointerState + " " + ( pointerTargetInteractable ? "interactable" : "" ) }
+			style={{ "--x": `${ pointer.x }px`, "--y": `${ pointer.y }px` } as React.CSSProperties }
+		/>
+	)
+}
 
 
 
@@ -47,12 +67,9 @@ const PointerComponent = () => {
 
 
 interface AppTickerContextProps {
-	easedPointer: { x: number; y: number };
-	elapsedTime: number;
-	activeElapsedTime: number;
 	pointer: { x: number; y: number };
 	pointerDelta: { x: number; y: number };
-	clockDelta: number;
+	pointerTargetInteractable: boolean;
 	pointerState: string;
 }
 
@@ -62,54 +79,51 @@ const AppTickerContext  = createContext<AppTickerContextProps | undefined>( unde
 
 
 import { PronotronTouch, PronotronMouse } from "@pronotron/pointer";
-import { PronotronAnimationController, PronotronClock } from "@pronotron/utils";
-import { Vector2 } from "@pronotron/pointer/src/core/Vector2";
+import { PronotronAnimationController, PronotronClock, isTouchDevice } from "@pronotron/utils";
 
 function AppTickerProvider({ children }: { children: React.ReactNode })
 {
-	const easedPointer = useRef<V2>( new Vector2( 0, 0 ) );
-
 	const clock = useRef( new PronotronClock() );
 	const animationController = useRef( new PronotronAnimationController( clock.current ) );
-	const pointerController = useRef( new PronotronMouse( window, animationController.current, clock.current ) );
-
-	const [ elapsedTime, setElapsedTime ] = useState( 0 );
-	const [ activeElapsedTime, setActiveElapsedTime ] = useState( 0 );
+	const pointerController = useRef<PronotronMouse | PronotronTouch>( null ! );
 	
 	const [ pointer, setPointer ] = useState({ x: 0, y: 0 });
 	const [ pointerDelta, setPointerDelta ] = useState({ x: 0, y: 0 });
 
 	const [ clockDelta, setClockDelta ] = useState( 0 );
 	const [ pointerState, setPointerState ] = useState( "" );
+	const [ pointerTargetInteractable, setPointerTargetInteractable ] = useState<boolean>( false );
 
 	useEffect(() => {
 
+		const touch = isTouchDevice();
+
+		if ( touch ){
+			pointerController.current = new PronotronTouch( window, animationController.current, clock.current );
+		} else {
+			pointerController.current = new PronotronMouse( window, animationController.current, clock.current );
+		}
+		
 		pointerController.current.startEvents();
+
+		let animationFrameId = 0;
 
 		const tick = () => {
 
 			const deltaTime = clock.current.tick();
 			animationController.current.tick();
 
-			setElapsedTime( clock.current.elapsedTime );
-			setActiveElapsedTime( clock.current.elapsedPausedTime );
-
 			setPointer( pointerController.current.getPosition() );
 			setPointerDelta( pointerController.current.getMovement() );
 			setPointerState( pointerController.current.getCurrentState() );
-
+			setPointerTargetInteractable( pointerController.current.getTargetInteractable() );
 			setClockDelta( deltaTime );
 
-			easedPointer.current = ease( pointerController.current.getPosition(), easedPointer.current, deltaTime );
-
-			document.documentElement.style.setProperty("--x", easedPointer.current.x + "px");
-			document.documentElement.style.setProperty("--y", easedPointer.current.y + "px");
-
-			requestAnimationFrame( tick );
+			animationFrameId = requestAnimationFrame( tick );
 
 		};
 
-		const animationFrameId = requestAnimationFrame( tick );
+		animationFrameId = requestAnimationFrame( tick );
 
 		const handleVisibilityChange = () => {
 			if ( document.hidden ){
@@ -134,16 +148,20 @@ function AppTickerProvider({ children }: { children: React.ReactNode })
 		const holdHandler = ( event: CustomEvent ) => {
 			console.log( "HOLD", event )
 		};
-
+		const holdendHandler = ( event: CustomEvent ) => {
+			console.log( "HOLD-END", event )
+		};
 		const tapHandler = ( event: CustomEvent ) => {
 			console.log( "TAP", event )
 		};
 
 		window.addEventListener( "hold", holdHandler as EventListener );
+		window.addEventListener( "holdend", holdendHandler as EventListener );
 		window.addEventListener( "tap", tapHandler as EventListener );
 
 		return () => {
 			window.removeEventListener( "hold", holdHandler as EventListener );
+			window.removeEventListener( "holdend", holdendHandler as EventListener );
 			window.removeEventListener( "tap", tapHandler as EventListener );
 		}
 
@@ -152,12 +170,9 @@ function AppTickerProvider({ children }: { children: React.ReactNode })
 	return (
 		<AppTickerContext.Provider
 			value={{
-				easedPointer: { x: easedPointer.current.x, y: easedPointer.current.y },
-				elapsedTime,
-				activeElapsedTime,
 				pointer,
 				pointerDelta,
-				clockDelta,
+				pointerTargetInteractable,
 				pointerState
 			}}
 		>
@@ -167,34 +182,12 @@ function AppTickerProvider({ children }: { children: React.ReactNode })
 }
 
 
+
+
 export const useAppTicker = () => {
 	const context = useContext( AppTickerContext );
 	if ( ! context ){
 	  	throw new Error("useAppTicker must be used within an AppTickerProvider");
 	}
 	return context;
-}
-
-
-type V2 = { x: number, y: number };
-
-function ease( target: V2, source: V2, deltaTime: number, speed = 5, eps = 0.001 )
-{
-    const dx = target.x - source.x;
-    const dy = target.y - source.y;
-    const distanceSquared = dx * dx + dy * dy; // Calculate distance squared
-
-    // Snap to target if the distance is less than eps
-    if (distanceSquared < eps * eps) {
-        return { x: target.x, y: target.y };
-    }
-
-    // Calculate easing factor based on deltaTime and speed
-    const factor = 1 - Math.exp(-speed * deltaTime);
-
-    // Calculate the new position directly
-    return {
-        x: source.x + dx * factor,
-        y: source.y + dy * factor,
-    };
 }
