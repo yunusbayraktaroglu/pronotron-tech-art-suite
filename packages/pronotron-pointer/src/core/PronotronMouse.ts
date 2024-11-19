@@ -1,4 +1,4 @@
-import { PointerStates, PronotronPointerBase } from "./PronotronPointerBase";
+import { PronotronPointerBase } from "./PronotronPointerBase";
 
 export class PronotronMouse extends PronotronPointerBase 
 {
@@ -10,54 +10,78 @@ export class PronotronMouse extends PronotronPointerBase
 	 */
 	private _skipMove = false;
 
+	/**
+	 * Activates events for start
+	 */
 	startEvents(): void
 	{
 		super._startEvents();
-		this._target.addEventListener( "pointerdown", this._onStart as EventListener );
-		this._target.addEventListener( "pointermove", this._onMove as EventListener );
 
-		this._target.addEventListener( "dragstart", this._onDragStart as EventListener );
+		this._addEventListeners(
+			[ "pointerdown", this._onPointerStart ],
+			[ "pointermove", this._onPointerMove ],
+			[ "dragstart", this._onDragStart ],
+		);
 	}
 
+	/**
+	 * Clean all related events for disposal
+	 */
 	stopEvents(): void
 	{
-		this._target.removeEventListener( "pointerdown", this._onStart as EventListener );
-		this._target.removeEventListener( "pointermove", this._onMove as EventListener );
-		this._target.removeEventListener( "pointerup", this._onEnd as EventListener );
-		this._target.removeEventListener( "pointercancel", this._onEnd as EventListener );
-
-		this._target.removeEventListener( "dragstart", this._onDragStart as EventListener );
-		this._target.removeEventListener( "dragover", this._onMove as EventListener );
-		this._target.removeEventListener( "dragend", this._onDragEnd as EventListener );
-
 		super._stopEvents();
+
+		this._removeEventListeners(
+			[ "pointerdown", this._onPointerStart ],
+			[ "pointermove", this._onPointerMove ],
+			[ "pointerup", this._onPointerEnd ],
+			[ "pointercancel", this._onPointerEnd ],
+			[ "dragstart", this._onDragStart ],
+			[ "dragover", this._onPointerMove ],
+			[ "dragend", this._onDragEnd ],
+		);
 	}
 
-	_onDragStart( event: MouseEvent ): void
+
+	/**
+	 * Drag events
+	 * @internal
+	 */
+	protected _onDragStart( event: MouseEvent ): void
 	{
-		this._target.addEventListener( "dragover", this._onMove as EventListener );
-		this._target.addEventListener( "dragend", this._onDragEnd as EventListener );
+		this._addEventListeners(
+			[ "dragover", this._onMove ],
+			[ "dragend", this._onDragEnd ],
+		);
 		
 		super._onDragStart( event );
 	}
 
-	_onDragEnd( event: MouseEvent ): void
+	protected _onDragEnd( event: MouseEvent ): void
 	{
-		this._target.removeEventListener( "dragover", this._onMove as EventListener );
-		this._target.removeEventListener( "dragend", this._onDragEnd as EventListener );
+		this._removeEventListeners(
+			[ "dragover", this._onMove ],
+			[ "dragend", this._onDragEnd ],
+		);
 
 		super._onDragEnd( event );
 	}
 
-	_onStart( event: MouseEvent ): void
+	/**
+	 * Pointer events
+	 * @internal
+	 */
+	protected _onPointerStart( event: MouseEvent ): void
 	{
-		this._target.addEventListener( "pointerup", this._onEnd as EventListener );
-		this._target.addEventListener( "pointercancel", this._onEnd as EventListener );
+		this._addEventListeners(
+			[ "pointerup", this._onPointerEnd ],
+			[ "pointercancel", this._onPointerEnd ],
+		);
 
-		super._onStart( event );
+		super._onPointerStart( event );
 	}
 
-	_onEnd( event: MouseEvent ): void
+	protected _onPointerEnd( event: MouseEvent ): void
 	{
 		/**
 		 * Only in mouse,
@@ -66,17 +90,19 @@ export class PronotronMouse extends PronotronPointerBase
 		 */
 		this._skipMove = true;
 
-		this._target.removeEventListener( "pointerup", this._onEnd as EventListener );
-		this._target.removeEventListener( "pointercancel", this._onEnd as EventListener );
+		this._removeEventListeners(
+			[ "pointerup", this._onPointerEnd ],
+			[ "pointercancel", this._onPointerEnd],
+		);
 
-		super._onEnd( event );
+		super._onPointerEnd( event );
 	}
 
-	_onMove( event: MouseEvent ): void
+	protected _onMove( event: MouseEvent ): void
 	{
 		/**
 		 * Only in mouse,
-		 * onMove firing 1 times when onEnd executed, if pointerdown is fired while onMove.
+		 * onMove is firing 1 times when onEnd executed, if pointerdown is fired while onMove.
 		 * Skip onMove caused by onEnd.
 		 */
 		if ( this._skipMove ){
@@ -87,7 +113,7 @@ export class PronotronMouse extends PronotronPointerBase
 		const { x, y } = this._getPointerPosition( event );
 		this._updatePointer( x, y );
 
-		super._onMove( event );
+		super._onPointerMove( event );
     }
 
 	_getPointerPosition( event: MouseEvent ): { x: number; y: number }

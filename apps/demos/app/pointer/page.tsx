@@ -51,7 +51,7 @@ function PointerView()
 
 	return (
 		<div 
-			data-attz={ pointer.x }
+			data-pointer-state={ pointerState }
 			className={ "pointer " + pointerState + " " + ( pointerTargetInteractable ? "interactable" : "" ) }
 			style={{ "--x": `${ pointer.x }px`, "--y": `${ pointer.y }px` } as React.CSSProperties }
 		/>
@@ -99,9 +99,23 @@ function AppTickerProvider({ children }: { children: React.ReactNode })
 		const touch = isTouchDevice();
 
 		if ( touch ){
-			pointerController.current = new PronotronTouch( window, animationController.current, clock.current );
+			pointerController.current = new PronotronTouch( window, animationController.current, clock.current, {
+				targetHoldable: ( target ) => {
+					return target.dataset.holded ? true : false;
+				},
+				targetInteractable: ( target ) => {
+					return target.classList.contains( "holdable" ) || target.tagName === "A";
+				}
+			} );
 		} else {
-			pointerController.current = new PronotronMouse( window, animationController.current, clock.current );
+			pointerController.current = new PronotronMouse( window, animationController.current, clock.current, {
+				targetHoldable: ( target ) => {
+					return target.dataset.holded ? true : false;
+				},
+				targetInteractable: ( target ) => {
+					return target.classList.contains( "holdable" ) || target.tagName === "A";
+				}
+			} );
 		}
 		
 		pointerController.current.startEvents();

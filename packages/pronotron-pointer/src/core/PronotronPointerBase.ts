@@ -1,30 +1,26 @@
 import { Vector2 } from "./Vector2";
+import { PronotronClock, PronotronAnimationController } from "@pronotron/utils";
 
-import { PronotronAnimationController } from "@pronotron/utils";
-import { PronotronClock } from "@pronotron/utils";
+type CustomEvents = "tap" | "hold" | "holdend";
 
 type PointerOptions = {
-	interactables: {
-		links: boolean;
-		buttons: boolean;
-		customClasses: boolean;
-	};
-	idleTreshold: number;
-	interactiveClassname: string;
-	tapThreshold: number;
-	tappableClassname: string;
-	holdThreshold: number;
-	holdableClassname: string;
-	/**
-	 * Above the given delta value, interaction will be "MOVING", to avoid micro movements skip holding events
-	 */
-	movingDeltaLimit: number;
+	tresholds?: {
+		idleTreshold: number;
+		tapThreshold: number;
+		holdThreshold: number;
+		/**
+		 * Above the given delta value, interaction will be "MOVING", to avoid micro movements skip holding events
+		 */
+		movingDeltaLimit: number;
+	}
+
+	targetHoldable: ( target: HTMLElement ) => boolean;
+	targetInteractable: ( target: HTMLElement ) => boolean;
 };
 
 export enum PointerStates {
 	IDLE,
-	TAP,
-	WAITING, // May change to: MOVING, HOLDING, HOLDMOVING
+	WAITING, // May change to: DRAG, MOVING, HOLDING, HOLDMOVING
 	DRAG, // Native drag event
 	MOVING,
 	HOLDING,
@@ -33,45 +29,53 @@ export enum PointerStates {
 
 export abstract class PronotronPointerBase
 {
-	_holdedElement: HTMLElement | null = null;
+	abstract startEvents(): void;
+	abstract stopEvents(): void;
+	abstract _getPointerPosition( event: Event ): { x: number; y: number };
 
-	_currentState: PointerStates = PointerStates.IDLE;
-	_isInteractable = false;
-	
 	_isRunning: boolean = false;
-
-	_pointerStartTime = 0;
-
-	_idleTreshold = 0.5;
-	_tapThreshold = 0.3;
-	_tapClassname = "tapable";
-	_holdThreshold = 0.35;
-	_holdableClassname = "holdable";
-	_movingDeltaLimit = 10.0;
 
 	_target: Window | Document | HTMLElement;
 	_clock: PronotronClock;
 	_animationController: PronotronAnimationController;
 
+	private _currentState: PointerStates = PointerStates.IDLE;
+	private _holdedElement: HTMLElement | null = null;
+	private _isInteractable = false;
+
+	private _pointerStartTime = 0;
+
+	private _idleTreshold = 0.5;
+	private _tapThreshold = 0.3;
+	private _holdThreshold = 0.35;
+	private _movingDeltaLimit = 10.0;
+
 	_pointerStart = new Vector2();
 	_pointerEnd = new Vector2();
 	_pointerDelta = new Vector2();
 	
-	abstract _getPointerPosition( event: Event ): { x: number; y: number };
-	
-	constructor( target: Window | Document | HTMLElement, animationController: PronotronAnimationController, clock: PronotronClock, options?: PointerOptions )
+	/**
+	 * Let user define how to detect interactable and holdable elements
+	 */
+	private _isInteractableFunction: ( target: HTMLElement ) => boolean;
+	private _isHoldableFunction: ( target: HTMLElement ) => boolean;
+
+	constructor( target: Window | Document | HTMLElement, animationController: PronotronAnimationController, clock: PronotronClock, options: PointerOptions )
 	{
 		this._target = target;
 		this._animationController = animationController;
 		this._clock = clock;
 
-		if ( options ){
-			this.setOptions( options );
+		this._isInteractableFunction = options.targetInteractable;
+		this._isHoldableFunction = options.targetHoldable;
+
+		if ( options.tresholds ){
+			this.setOptions( options.tresholds );
 		}
 
-		this._onStart = this._onStart.bind( this );
-		this._onMove = this._onMove.bind( this );
-		this._onEnd = this._onEnd.bind( this );
+		this._onPointerStart = this._onPointerStart.bind( this );
+		this._onPointerMove = this._onPointerMove.bind( this );
+		this._onPointerEnd = this._onPointerEnd.bind( this );
 
 		this._onDragStart = this._onDragStart.bind( this );
 		this._onDragEnd = this._onDragEnd.bind( this );
@@ -101,19 +105,73 @@ export abstract class PronotronPointerBase
 		return this._pointerDelta;
 	}
 
-	setOptions( options: PointerOptions ): void
+	setOptions( tresholds: PointerOptions[ "tresholds" ] ): void
 	{
-		this._idleTreshold = options.idleTreshold;
-		this._tapThreshold = options.tapThreshold;
-		this._holdThreshold = options.holdThreshold;
-		this._movingDeltaLimit = options.movingDeltaLimit;
-		this._tapClassname = options.tappableClassname;
-		this._holdableClassname = options.holdableClassname;
+		this._idleTreshold = tresholds!.idleTreshold;
+		this._tapThreshold = tresholds!.tapThreshold;
+		this._holdThreshold = tresholds!.holdThreshold;
+		this._movingDeltaLimit = tresholds!.movingDeltaLimit;
 	}
+
+
+	/**
+	 * Add event listeners as list to target
+	 * @param events List of events to add target
+	 * @internal
+	 */
+	protected _addEventListeners<E extends Event>( ...events: [ keyof GlobalEventHandlersEventMap, ( event: E ) => void ][] ): void 
+	{
+		events.forEach(([ eventKey, listener ]) => {
+			this._target.addEventListener( eventKey, listener as EventListener );
+		});
+	}
+
+	/**
+	 * Remove events from target
+	 * @param events List of events to remove from target
+	 * @internal
+	 */
+	protected _removeEventListeners<E extends Event>( ...events: [ keyof GlobalEventHandlersEventMap, ( event: E ) => void ][] ): void 
+	{
+		events.forEach(([ eventKey, listener ]) => {
+			this._target.removeEventListener( eventKey, listener as EventListener );
+		});
+	}
+
+	/**
+	 * Dispatches a possible custom event with detail object
+	 * @param customEvent One of possible custom events
+	 * @param detail Custom event detail
+	 * @internal
+	 */
+	protected _dispatchCustomEvent( customEvent: CustomEvents, detail: { [ key: string ]: any } ): void
+	{
+		this._target.dispatchEvent( new CustomEvent( customEvent, { detail } ) );
+	}
+
+	/**
+	 * Used by child classes, after getting pointer x and y by their invidual methods, 
+	 * Updates pointer data values
+	 * @internal
+	 */
+	protected _updatePointer( x: number, y: number ): void
+	{
+		this._pointerEnd.set( x, y );
+		this._pointerDelta.subVectors( this._pointerEnd, this._pointerStart );
+		this._pointerStart.copy( this._pointerEnd );
+	}
+
+
+
 
 	_startEvents(): void 
 	{
+		if ( this._isRunning ){
+			return console.warn( "Already running" );
+		}
+
 		this._isRunning = true;
+		this._currentState = PointerStates.IDLE;
 	}
 
 	_stopEvents(): void
@@ -124,51 +182,53 @@ export abstract class PronotronPointerBase
 
 
 
-
-	_onDragStart( event: Event ): void
+	/**
+	 * While holding select-none class is added that disables drag operation
+	 * Previous may only be: WAITING or MOVING
+	 * @internal
+	 */
+	protected _onDragStart( event: Event ): void
 	{
-		/**
-		 * While holding select-none class is added that disables drag operation
-		 * @remove
-		 */
-		console.log( "drag start" );
-		if ( this._currentState === PointerStates.HOLDING || this._currentState === PointerStates.HOLDMOVING ){
-			event.stopPropagation();
-			event.preventDefault();
-			return;
-		}
 		this._currentState = PointerStates.DRAG;
 	}
 
-	_onDragEnd( event: Event ): void
+	/**
+	 * @internal
+	 */
+	protected _onDragEnd( event: Event ): void
 	{
-		console.log( "drag end" );
-		event.preventDefault();
 		this._currentState = PointerStates.IDLE;
 	}
 
+
+
+	
 	/**
 	 * Interaction started
 	 * 
 	 * Mouse: pointerdown
 	 * Touch: touchstart
+	 * 
+	 * @internal
 	 */
-	_onStart( event: Event ): void
+	protected _onPointerStart( event: Event ): void
 	{
 		this._currentState = PointerStates.WAITING;
 		this._pointerStartTime = this._clock.elapsedTime;
 
+		// Reset pointer delta to calculate movement limit correct in _onMove
 		this._pointerDelta.set( 0, 0 );
 		
-		this._lookTarget( event );
+		// Is pointer current target is interactable
+		this._isInteractable = this._isInteractableFunction( event.target as HTMLElement );
 
-		if ( event.target && this._isTargetHoldable( event.target as HTMLElement ) ){
+		if ( event.target && this._isHoldableFunction( event.target as HTMLElement ) ){
 			this._animationController.addAnimation({
 				id: "HOLD",
 				duration: this._holdThreshold,
 				timeStyle: "continious",
 				onEnd: ( forced ) => {
-					if ( ! forced ){
+					if ( ! forced && this._currentState === PointerStates.WAITING ){
 						this._convertToHold( event );
 					}
 				}
@@ -176,42 +236,43 @@ export abstract class PronotronPointerBase
 		}
 	}
 
-	_onMove( event: Event ): void
+	/**
+	 * Runs after invidual child class updates the pointer position
+	 * 
+	 * @internal
+	 */
+	protected _onPointerMove( event: Event ): void
 	{
-		//event.stopImmediatePropagation();
-
 		switch( this._currentState ){
 
+			// Break switch early if just moving
+			case PointerStates.MOVING: {
+				break;
+			}
+
+			// Native dragover(dragging) is connected to _onMove, we only updating the pointer position
 			case PointerStates.DRAG: {
-				//event.stopImmediatePropagation();
-				event.preventDefault();
 				return;
 			}
 
+			// Disable touch scroll if holding
 			case PointerStates.HOLDMOVING: {
-				/**
-				 * Disable touch scroll if holding
-				 */
-				//event.stopImmediatePropagation();
+				event.stopImmediatePropagation();
 				event.preventDefault();
 				return;
 			}
 
+			// Disable touch scroll if holding
 			case PointerStates.HOLDING: {
-				/**
-				 * Disable touch scroll if holding
-				 */
 				event.stopImmediatePropagation();
 				event.preventDefault();
 				this._currentState = PointerStates.HOLDMOVING;
 				return;
 			}
 
+			// Convert WAITING or IDLE to MOVING if pointer delta is bigger than defined limit
 			case PointerStates.IDLE:
 			case PointerStates.WAITING: {
-				/**
-				 * Convert WAITING to MOVING if pointer delta is bigger than defined limit
-				 */
 				if ( this._pointerDelta.lengthSq() > this._movingDeltaLimit ){
 					this._currentState = PointerStates.MOVING;
 				}
@@ -219,8 +280,10 @@ export abstract class PronotronPointerBase
 
 		}
 
-		this._lookTarget( event );
+		// Moving or Waiting, control if the target is interactable(button, a, custom class)
+		this._isInteractable = this._isInteractableFunction( event.target as HTMLElement );
 
+		// Works like refreshed timeout, but its safe
 		this._animationController.addAnimation({
 			id: "IDLE",
 			duration: this._idleTreshold,
@@ -239,35 +302,34 @@ export abstract class PronotronPointerBase
 	 * 
 	 * Solution: onEnd can only fire, if interaction started (onStart).
 	 * Add a prop to 1 onEnd, in onMove 1, disable it and continue
+	 * 
+	 * @internal
 	 */
-	_onEnd( event: Event )
+	protected _onPointerEnd( event: Event )
 	{
-		console.log( "end runs" );
-
-		// Dragstart event releases pointerdown
-		if ( this._currentState === PointerStates.DRAG ){
-			return;
+		// To be safely release holded element, if screen becomes inactive while an element holded
+		if ( this._holdedElement ){
+			this._currentState = PointerStates.HOLDING;
 		}
 
-		if ( this._holdedElement || this._currentState === PointerStates.HOLDING || this._currentState === PointerStates.HOLDMOVING ){
-			this._target.dispatchEvent( new CustomEvent( "holdend", {
-				detail: {
-					target: this._holdedElement,
-					endTarget: event.target,
-					position: this._pointerStart
-				}
-			} ));
-			this._holdedElement!.dataset.holded = "0";
-			this._holdedElement = null;
-		}
+		switch( this._currentState ){
 
-		else if ( this._currentState === PointerStates.WAITING && this._clock.elapsedTime < this._pointerStartTime + this._tapThreshold ){
-			this._target.dispatchEvent( new CustomEvent( "tap", {
-				detail: {
-					target: event.target,
-					position: this._pointerStart
-				}
-			} ));
+			// Dragstart event releases pointerdown, return early without changing state
+			case PointerStates.DRAG: {
+				return;
+			};
+
+			case PointerStates.HOLDMOVING:
+			case PointerStates.HOLDING: {
+				this._releaseHold( event );
+				break;
+			}
+
+			case PointerStates.WAITING: {
+				this._controlTap( event );
+				break;
+			}
+
 		}
 
 		this._currentState = PointerStates.IDLE;
@@ -277,51 +339,58 @@ export abstract class PronotronPointerBase
 
 
 
-	
-	private _lookTarget( event: Event )
+
+
+	/**
+	 * @internal
+	 */
+	private _controlTap( event: Event ): void
 	{
-		if ( this._isTargetInteractable( event.target as HTMLElement ) ){
-			this._isInteractable = true;
-		} else {
-			this._isInteractable = false;
+		if ( this._clock.elapsedTime < this._pointerStartTime + this._tapThreshold ){
+			this._dispatchCustomEvent( "tap", {
+				target: event.target,
+				position: { x: this._pointerStart.x, y: this._pointerStart.y }
+			} );
 		}
 	}
 
 	/**
-	 * Updates pointer "start", "end", and "delta" between start-end values
 	 * @internal
 	 */
-	protected _updatePointer( x: number, y: number ): void
-	{
-		this._pointerEnd.set( x, y );
-		this._pointerDelta.subVectors( this._pointerEnd, this._pointerStart );
-		this._pointerStart.copy( this._pointerEnd );
-	}
-
-	private _isTargetInteractable( target: HTMLElement ): boolean
-	{
-		return target.classList.contains( "holdable" ) || target.tagName === "A";
-	}
-
-	private _isTargetHoldable( target: HTMLElement ): boolean
-	{
-		return target.dataset.holded ? true : false;
-		return target.classList.contains( "holdable" );
-	}
-	
 	private _convertToHold( event: Event ): void
 	{
-		if ( this._currentState === PointerStates.WAITING ){
-			this._currentState = PointerStates.HOLDING;
-			this._holdedElement = event.target as HTMLElement;
-			//(this._target as Window).getSelection()!.removeAllRanges();
-			( event.target as HTMLElement ).dataset.holded = "1";
-			this._target.dispatchEvent( new CustomEvent( "hold", { 
-				detail: {
-					target: event.target,
-					position: this._pointerStart
-				} 
-			} ));
-		}
+		this._currentState = PointerStates.HOLDING;
+		this._holdedElement = event.target as HTMLElement;
+
+		// Removes the pointer selection if exist
+		// (this._target as Window).getSelection()!.removeAllRanges();
+
+		( event.target as HTMLElement ).dataset.holded = "1";
+
+		this._dispatchCustomEvent( "hold", { 
+			target: event.target,
+			position: { x: this._pointerStart.x, y: this._pointerStart.y }
+		} );
 	}
+
+	/**
+	 * @internal
+	 */
+	private _releaseHold( event: Event ): void
+	{
+		this._dispatchCustomEvent( "holdend", {
+			target: this._holdedElement,
+			endTarget: event.target,
+			position: { x: this._pointerStart.x, y: this._pointerStart.y }
+		} );
+		this._holdedElement!.dataset.holded = "0";
+		this._holdedElement = null;
+	}
+
+
+
+
+
+
+
 }
