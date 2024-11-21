@@ -1,34 +1,27 @@
-# Pronotron Web Libraries
+# Pronotron Tech-Art Suite
 
-Useful libraries to create better websites, without failing performance and web-standards.
+A high-performance TypeScript-based library suite designed to enhance interaction, UI, and UX without compromising web standards. Each package prioritizes minimal bundle sizes and blazing-fast performance, making it a reliable choice for developers focused on immersive, efficient and user-friendly web experiences.
 
-## TODO
-- Manually remove animation with ID
-- Pointer: Wasm for ease CPU intensive work
+### Packages
+
+- `@pronotron/io`: Reliable viewport tracking without missed targets, unlike the default [IntersectionObserver API](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API). Built on @native-control-table, it can safely be used for parallax effects, lazy loading, or tracking when any part of an element enters or exits the screen. Suitable for implementing any custom scrolling application.
+- `@pronotron/pointer`: Tracks mouse and touch pointers with custom states such as holding, tapping, idling, interacting, moving out, and moving in, providing enhanced interaction control.
+- `@pronotron/utils`: A set of helper modules used by other @pronotron packages, which can also be used individually.
+	- @native-control-table: Utilizes [TypedArrays](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray#typedarray_objects) and a given Enum structure to store grouped data in direct-access memory, enabling blazing-fast, secure iterations and modifications.
+	- @clock: Simultaneously tracks two types of time—continuous and pausable. Pausable time stops ticking when the screen is inactive.
+	- @animation-controller: Built on @native-control-table and @clock, it provides per-frame normalized timeline data (ranging from 0 to 1), enabling developers to create any kind of animation.
+
+### Apps
+
+- `demos`: Demonstrations using the packages, including stress tests.
+- `docs`: Documentation on how to use the packages.
+
+### How to contribute?
+
+The packages are loosely coupled, allowing developers to decide how to integrate and leverage their features. The library emphasizes minimal bundle size over extendability, employing aggressive mangling for optimization. From a tech-art perspective, devices vary greatly, so a best-performance approach is essential for seamless integration.
+
+### TODOS
 - IO: Add horizontal check
-
-
-## What's inside?
-
-This Turborepo includes the following:
-
-### Apps and Packages
-
-- `demos`: Demos using packages
-- `docs`: Documents to how to using packages
-- `@pronotron/io`: Custom intersection observer does not misses any target like default IntersectionObserver API
-- `@pronotron/pointer`: Pointer based animations, tap, hold events
-- `@pronotron/utils`: Shared components
-- `@pronotron/tsconfig`: shared `tsconfig.json`s used throughout the monorepo
-- `@pronotron/eslint-config`: ESLint preset
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
 
 ### Useful commands
 
@@ -37,14 +30,6 @@ This Turborepo has some additional tools already setup for you:
 - `yarn lint` - Lint all packages
 - `yarn changeset` - Generate a changeset
 - `yarn clean` - Clean up all `node_modules` and `dist` folders (runs each package's clean script)
-
-### Changing the npm organization scope
-
-The npm organization scope for this design system starter is `@acme`. To change this, it's a bit manual at the moment, but you'll need to do the following:
-
-- Rename folders in `packages/*` to replace `acme` with your desired scope
-- Search and replace `acme` with your desired scope
-- Re-run `yarn install`
 
 ## Versioning and Publishing packages
 

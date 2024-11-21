@@ -2,7 +2,12 @@
 
 import { useState, createContext, useContext } from "react";
 
-const PerformanceStatsContext = createContext<{ isActive: boolean; setIsActive: React.Dispatch<React.SetStateAction<boolean>>; }>( null ! );
+interface IPerformanceStatsContext {
+	isActive: boolean;
+	setIsActive: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const PerformanceStatsContext = createContext<IPerformanceStatsContext>( null ! );
 
 export function PerformanceStatsProvider({ children }: { children: React.ReactNode })
 {

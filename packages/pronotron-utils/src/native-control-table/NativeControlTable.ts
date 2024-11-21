@@ -24,7 +24,7 @@ type NativeTableTypes = Float32Array | Float64Array | Int32Array | Uint8Array | 
  * 	ID,
  * 	DURATION
  * };
- * const table = new NativeControlTable( AnimationData, Float32Array, nodeCountHint );
+ * const table = new NativeControlTable( 2, Float32Array, nodeCountHint );
  * 
  * @example
  * // Iterating over the control table,

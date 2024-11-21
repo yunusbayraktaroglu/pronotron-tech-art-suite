@@ -181,12 +181,7 @@ export class PronotronStats
 	}
 }
 
-
 export const stats = new PronotronStats();
-
-interface PronotronStatsComponentProps {
-	stats: PronotronStats;
-}
 
 export function PronotronStatsComponent()
 {
