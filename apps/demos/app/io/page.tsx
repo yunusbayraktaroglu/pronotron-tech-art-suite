@@ -1,12 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IODispatcher } from "./hooks/usePronotronIO";
+import { usePerformanceStats } from "../hooks/usePerformanceStats";
 
 export default function HomePage()
 {
+	const { setIsActive } = usePerformanceStats();
 	const [ pos, setPos ] = useState<number>( 0 );
 	const [ state, setState ] = useState<false | string>( false );
+
+	useEffect(() => {
+		setIsActive( true );
+	}, []);
 
 	return (
 		<>

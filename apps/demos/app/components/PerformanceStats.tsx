@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-
+import { usePerformanceStats } from "../hooks/usePerformanceStats";
 
 export class PronotronStatsPanel
 {
@@ -191,6 +191,7 @@ interface PronotronStatsComponentProps {
 export function PronotronStatsComponent()
 {
 	const containerRef = useRef<HTMLDivElement>( null ! );
+	const { isActive } = usePerformanceStats();
 
 	useEffect(() => {
 
@@ -211,7 +212,7 @@ export function PronotronStatsComponent()
 	return (
 		<div 
 			id="performance-stats" 
-			className="fixed flex flex-col left-2 bottom-2 opacity-[1] z-100 space-y-[1px]"
+			className={ "fixed flex flex-col left-2 bottom-2 opacity-[1] z-100 space-y-[1px]" + (!isActive ? " hidden" : "") }
 			ref={ containerRef } 
 		/>
 	)

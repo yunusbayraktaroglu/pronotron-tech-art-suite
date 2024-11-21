@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { animationController } from "./hooks/PronotronAnimationProvider";
+import { usePerformanceStats } from "../hooks/usePerformanceStats";
 
 type TestScenario = {
 	testCount: number;
@@ -11,11 +12,16 @@ type TestScenario = {
 
 export default function AnimationControllerDemoPage()
 {
+	const { setIsActive } = usePerformanceStats();
 	const [ testScenario, setTestScenario ] = useState<TestScenario>({
 		testCount: 0,
 		animationCount: 50,
 		timeType: "pausable"
 	});
+
+	useEffect(() => {
+		setIsActive( true );
+	}, []);
 
 	return (
 		<div className="container">

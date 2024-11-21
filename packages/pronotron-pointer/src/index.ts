@@ -1,2 +1,2 @@
-export { PronotronMouse } from "./core/PronotronMouse";
-export { PronotronTouch } from "./core/PronotronTouch";
+export { MouseBase, MouseHoldable } from "./core/Mouse";
+export { TouchBase, TouchHoldable } from "./core/Touch";

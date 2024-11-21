@@ -86,9 +86,14 @@ body {
 	border: none;
 }
 [data-holded="1"] {
+	/**
+		On mobile, while holding, selection is buggy and unavoidable
+		Best way adding no-select to document, when something holded.
+		https://stackoverflow.com/questions/61485693/preventing-tap-and-hold-from-selecting-nearby-text
+	*/
 	border: 5px solid rgb(229, 255, 0);
 	@apply
-	select-none;
+	!select-none;
 }
 
 @layer components {
@@ -135,6 +140,10 @@ body {
 
 	.pointer.MOVING {
 		--scale: 1;
+	}
+
+	.pointer.OUT {
+		--scale: 0;
 	}
 
 	.pointer.WAITING {

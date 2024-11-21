@@ -78,14 +78,14 @@ const AppTickerContext  = createContext<AppTickerContextProps | undefined>( unde
 
 
 
-import { PronotronTouch, PronotronMouse } from "@pronotron/pointer";
+import { TouchBase, TouchHoldable, MouseHoldable, MouseBase } from "@pronotron/pointer";
 import { PronotronAnimationController, PronotronClock, isTouchDevice } from "@pronotron/utils";
 
 function AppTickerProvider({ children }: { children: React.ReactNode })
 {
 	const clock = useRef( new PronotronClock() );
 	const animationController = useRef( new PronotronAnimationController( clock.current ) );
-	const pointerController = useRef<PronotronMouse | PronotronTouch>( null ! );
+	const pointerController = useRef<TouchHoldable | TouchBase | MouseHoldable | MouseBase>( null ! );
 	
 	const [ pointer, setPointer ] = useState({ x: 0, y: 0 });
 	const [ pointerDelta, setPointerDelta ] = useState({ x: 0, y: 0 });
@@ -98,25 +98,38 @@ function AppTickerProvider({ children }: { children: React.ReactNode })
 
 		const touch = isTouchDevice();
 
-		if ( touch ){
-			pointerController.current = new PronotronTouch( window, animationController.current, clock.current, {
-				targetHoldable: ( target ) => {
-					return target.dataset.holded ? true : false;
-				},
-				targetInteractable: ( target ) => {
-					return target.classList.contains( "holdable" ) || target.tagName === "A";
-				}
-			} );
-		} else {
-			pointerController.current = new PronotronMouse( window, animationController.current, clock.current, {
-				targetHoldable: ( target ) => {
-					return target.dataset.holded ? true : false;
-				},
-				targetInteractable: ( target ) => {
-					return target.classList.contains( "holdable" ) || target.tagName === "A";
-				}
-			} );
-		}
+		// if ( touch ){
+		// 	pointerController.current = new PronotronTouch( window, animationController.current, clock.current, {
+		// 		targetHoldable: ( target ) => {
+		// 			return target.dataset.holded ? true : false;
+		// 		},
+		// 		targetInteractable: ( target ) => {
+		// 			return target.classList.contains( "holdable" ) || target.tagName === "A";
+		// 		}
+		// 	} );
+		// } else {
+		// 	pointerController.current = new PronotronMouse( window, animationController.current, clock.current, {
+		// 		targetHoldable: ( target ) => {
+		// 			return target.dataset.holded ? true : false;
+		// 		},
+		// 		targetInteractable: ( target ) => {
+		// 			return target.classList.contains( "holdable" ) || target.tagName === "A";
+		// 		}
+		// 	} );
+		// }
+
+		pointerController.current = new MouseHoldable({
+			target: window.document.body,
+			animationController: animationController.current,
+			clock: clock.current,
+			isInteractable: ( target ) => {
+				return target.classList.contains( "holdable" ) || target.tagName === "A";
+			},
+			holdTreshold: 0.35,
+			isHoldable: ( target ) => {
+				return target.dataset.holded ? true : false;
+			}
+		});
 		
 		pointerController.current.startEvents();
 
@@ -169,14 +182,14 @@ function AppTickerProvider({ children }: { children: React.ReactNode })
 			console.log( "TAP", event )
 		};
 
-		window.addEventListener( "hold", holdHandler as EventListener );
-		window.addEventListener( "holdend", holdendHandler as EventListener );
-		window.addEventListener( "tap", tapHandler as EventListener );
+		window.document.body.addEventListener( "hold", holdHandler as EventListener );
+		window.document.body.addEventListener( "holdend", holdendHandler as EventListener );
+		window.document.body.addEventListener( "tap", tapHandler as EventListener );
 
 		return () => {
-			window.removeEventListener( "hold", holdHandler as EventListener );
-			window.removeEventListener( "holdend", holdendHandler as EventListener );
-			window.removeEventListener( "tap", tapHandler as EventListener );
+			window.document.body.removeEventListener( "hold", holdHandler as EventListener );
+			window.document.body.removeEventListener( "holdend", holdendHandler as EventListener );
+			window.document.body.removeEventListener( "tap", tapHandler as EventListener );
 		}
 
 	}, []);

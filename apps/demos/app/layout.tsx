@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import Link from "next/link";
+
+import { PerformanceStatsProvider, usePerformanceStats } from "./hooks/usePerformanceStats";
 import { PronotronStatsComponent } from "./components/PerformanceStats";
 
 import "./globals.css";
@@ -39,8 +41,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 						<a className="!ml-auto" target="_blank" href="https://github.com/yunusbayraktaroglu/pronotron-web-libraries">Github</a>
 					</nav>
 				</header>
-				<PronotronStatsComponent />
-				{ children }
+				<PerformanceStatsProvider>
+					<PronotronStatsComponent />
+					{ children }
+				</PerformanceStatsProvider>
 			</body>
 		</html>
 	);
