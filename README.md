@@ -1,6 +1,6 @@
 # Pronotron Tech-Art Suite
 
-A high-performance TypeScript-based library suite designed to enhance interaction, UI, and UX without compromising web standards. Each package prioritizes minimal bundle sizes and blazing-fast performance, making it a reliable choice for developers focused on immersive, efficient and user-friendly web experiences.
+A high-performance TypeScript-based suite designed to enhance interaction, UI, and UX without compromising web standards. Each package prioritizes minimal bundle size and blazing-fast performance, making it a reliable choice for developers focused on immersive, efficient and user-friendly web experiences.
 
 ### Packages
 
@@ -21,5 +21,5 @@ A high-performance TypeScript-based library suite designed to enhance interactio
 The packages are loosely coupled, allowing developers to decide how to integrate and leverage their features. The library emphasizes minimal bundle size over extendability, employing aggressive mangling for optimization. From a tech-art perspective, devices vary greatly, so a best-performance approach is essential for seamless integration.
 
 <div align="right">
-  <sub>Created by <a href="https://www.linkedin.com/in/yunusbayraktaroglu/">Yunus Bayraktaroglu</a> with ❤️</sub>
+	<sub>Created by <a href="https://www.linkedin.com/in/yunusbayraktaroglu/">Yunus Bayraktaroglu</a> with ❤️</sub>
 </div>
