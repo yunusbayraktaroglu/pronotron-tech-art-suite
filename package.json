@@ -1,5 +1,7 @@
 {
-	"name": "pronotron-web-libraries",
+	"name": "pronotron-tech-art-suite",
+	"description": "A high-performance TypeScript-based suite designed to enhance interaction, UI, and UX without compromising web standards.",
+	"author": "Yunus Bayraktaroglu",
 	"private": true,
 	"license": "MIT",
 	"scripts": {
