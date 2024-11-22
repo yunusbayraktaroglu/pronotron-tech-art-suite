@@ -1,6 +1,6 @@
 {
 	"name": "@pronotron/utils",
-	"version": "0.0.1-beta.3",
+	"version": "0.0.1-beta.4",
 	"description": "A set of helper modules used by other @pronotron packages, which can also be used individually.",
 	"author": "Yunus Bayraktaroglu <yunus.bayraktaroglu@gmail.com>",
 	"main": "./dist/index.js",
@@ -14,7 +14,7 @@
 	"scripts": {
 		"build": "tsup src/index.tsx --format esm,cjs --dts --external react --minify terser",
 		"dev": "tsup src/index.tsx --format esm,cjs --watch --dts --external react",
-		"lint": "eslint --fix \"src/**/*.ts*\"",
+		"lint": "eslint \"src/**/*.ts*\"",
 		"clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
 	},
 	"devDependencies": {

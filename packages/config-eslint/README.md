@@ -1,3 +1,3 @@
-# `@turbo/eslint-config`
+# `@pronotron/config-eslint`
 
 Collection of internal eslint configurations.

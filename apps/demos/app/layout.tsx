@@ -20,10 +20,10 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
 	title: {
-		default: "Pronotron Web Packages",
-		template: '%s | Pronotron Web Packages',
+		default: "Pronotron Tech-Art Suite",
+		template: '%s | Pronotron Tech-Art Suite',
 	},
-	description: "Demo setups for Pronotron Web Packages",
+	description: "Demo setups for Pronotron Tech-Art Suite",
 	authors: [
 		{ name: "Yunus Bayraktaroglu" }
 	],

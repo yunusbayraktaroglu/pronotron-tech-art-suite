@@ -4,16 +4,13 @@
   "initialVersions": {
     "@pronotron/demos": "0.0.0",
     "@pronotron/docs": "0.0.0",
-    "@pronotron/eslint-config": "0.0.0",
-    "@pronotron/tsconfig": "0.0.0",
+    "@pronotron/config-eslint": "0.0.0",
+    "@pronotron/config-ts": "0.0.0",
     "@pronotron/io": "0.0.0",
     "@pronotron/pointer": "0.0.0",
     "@pronotron/utils": "0.0.0"
   },
   "changesets": [
-    "forty-months-act",
-    "many-cars-hammer",
-    "mighty-seals-reflect",
-    "old-ladybugs-hear"
+    "fifty-camels-serve"
   ]
 }
