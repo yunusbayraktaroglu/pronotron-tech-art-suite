@@ -1,3 +1,2 @@
-export * from './core/PronotronIOController';
-export * from './hooks/usePronotronIO';
-export * from './components/PronotronIODispatcher';
+export { PronotronIOVertical } from "./core/PronotronIOVertical";
+export type { IODispatchOptions, IONodeOptions } from "../types/global";

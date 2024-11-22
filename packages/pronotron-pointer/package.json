@@ -1,0 +1,35 @@
+{
+	"name": "@pronotron/pointer",
+	"version": "0.0.1-beta.4",
+	"description": "Tracks mouse and touch pointers with custom states such as holding, tapping, idling, interacting, moving out, and moving in, providing enhanced interaction control.",
+	"author": "Yunus Bayraktaroglu <yunus.bayraktaroglu@gmail.com>",
+	"main": "./dist/index.js",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.ts",
+	"sideEffects": false,
+	"license": "MIT",
+	"files": [
+		"dist/**"
+	],
+	"keywords": [
+		"pointer",
+		"interaction"
+	],
+	"scripts": {
+		"build": "tsup src/index.ts --format esm,cjs --dts --minify terser",
+		"dev": "tsup src/index.ts --format esm,cjs --watch --dts",
+		"lint": "eslint \"src/**/*.ts*\"",
+		"clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+	},
+	"devDependencies": {
+		"@pronotron/config-ts": "*",
+		"@pronotron/config-eslint": "*",
+		"eslint": "^8.57.0",
+		"terser": "^5.33.0",
+		"tsup": "^8.0.2",
+		"typescript": "^5.3.3"
+	},
+	"dependencies": {
+		"@pronotron/utils": "0.0.1-beta.4"
+	}
+}

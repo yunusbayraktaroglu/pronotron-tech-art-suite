@@ -1,109 +1,48 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { PronotronIODispatcher, PronotronIOController, throttle } from "@pronotron/io";
+import { useEffect, useState } from "react";
+import { IODispatcher } from "./hooks/usePronotronIO";
+import { usePerformanceStats } from "../hooks/usePerformanceStats";
 
-
-export default function Home()
+export default function HomePage()
 {
-	const isMounted = useRef( false );
-
-	const [ bg, setBg ] = useState( "bg-slate-400" );
-	const [ scrollDirection, setScrollDirection ] = useState<"down" | "up">( "down" );
-
-	useEffect(() => {
-		//console.log( scrollDirection );
-	}, [ scrollDirection ])
-
+	const { setIsActive } = usePerformanceStats();
+	const [ pos, setPos ] = useState<number>( 0 );
+	const [ state, setState ] = useState<false | string>( false );
 
 	useEffect(() => {
-
-		if ( ! isMounted.current ){
-			isMounted.current = true;
-			return;
-		}
-
-		const IO = PronotronIOController.getInstance();
-
-		IO.setViewport({
-			screenHeight: window.innerHeight,
-			totalPageHeight: document.documentElement.scrollHeight
-		});
-
-		const scroll = () => {
-			IO.handleScroll( window.scrollY )
-			setScrollDirection( IO.direction );
-		};
-		const resize = () => {
-			IO._lastScrollY = 0;
-			IO.setViewport({
-				screenHeight: window.innerHeight,
-				totalPageHeight: document.documentElement.scrollHeight
-			});
-			IO.handleScroll( window.scrollY );
-			setScrollDirection( IO.direction );
-		};
-
-		// Execute manual scroll for jumpy start scrollY values
-		scroll();
-
-		const onScroll = throttle( scroll, 0, { leading: false, trailing: true } );
-		const onResize = throttle( resize, 500, { leading: false, trailing: true } );
-
-		window.addEventListener( 'scroll', scroll );
-		window.addEventListener( 'resize', onResize );
-
-		//console.log( IO );
-		
+		setIsActive( true );
 	}, []);
 
-
 	return (
-		<div className={ bg }>
-
-			<h1>IO Testing Page</h1>
-			<div className="flex h-[90vh]">
-				<PronotronIODispatcher
-					className="absolute block min-h-[2px] w-full touch-none pointer-events-none select-none bg-red-500"
-					dispatch={{
-						"top-in": () => console.log( "top-in 1" ),
-						"top-out": () => console.log( "top-out 1" ),
-					}} 
-				/>
+		<>
+			<div className="container text-center my-spacing-base">
+				<h2 className="italic text-slate-300">Scroll down...</h2>
 			</div>
-			<div className="flex h-[50vh]" />
-			<div className="flex h-[20vh]">
-				<PronotronIODispatcher 
-					className="absolute block min-h-[2px] w-full touch-none pointer-events-none select-none bg-red-500"
+			<div className="my-[120vh] text-center">
+				<p>Last recorded event: { state ? state : null }</p>
+				<IODispatcher 
+					className='py-spacing-lg my-spacing-base border-b border-t border-black'
+					style={{ backgroundColor: `rgba( 0, 255, 0, ${ Math.abs( pos ) })` }}
+					offset={ 0 }
 					dispatch={{
-						retry: 1,
-						"bottom-in": () => console.log( "bottom-in 2 once" ),
-					}} 
-				/>
+						onTopIn: () => setState( "Top-in" ),
+						onTopOut: () => setState( "Top-out" ),
+						onBottomIn: () => setState( "Bottom-in" ),
+						onBottomOut: () => setState( "Bottom-out" ),
+						onInViewport: ( normalizedPosition: number ) => {
+							setPos( normalizedPosition );
+						},
+						//onFastForward: "execute_both"
+					}}
+				>
+					<p>Normalized Position: { pos }</p>
+				</IODispatcher>
+				<p>Last recorded event: { state ? state : null }</p>
 			</div>
-			<div className="flex h-[70vh]" />
-			<div className="flex h-[20vh]">
-				<PronotronIODispatcher 
-					className="absolute block min-h-[2px] w-full touch-none pointer-events-none select-none bg-red-500"
-					dispatch={{
-						"bottom-in": () => console.log( "bottom-in 3" ),
-						"bottom-out": () => console.log( "bottom-out 3" )
-					}} 
-				/>
+			<div className="container text-center my-spacing-base">
+				<h2 className="italic text-slate-300">Scroll up...</h2>
 			</div>
-			<div className="flex h-[70vh]" />
-			<div className="flex h-[20vh]">
-				<PronotronIODispatcher 
-					className="absolute block min-h-[2px] w-full touch-none pointer-events-none select-none bg-red-500"
-					dispatch={{
-						"bottom-in": () => console.log( "bottom-in 4" ),
-						"bottom-out": () => console.log( "bottom-out 4" )
-					}} 
-				/>
-			</div>
-			<div className="flex h-[70vh]" />
-		</div>
-	);
+		</>
+	)
 }
-
-

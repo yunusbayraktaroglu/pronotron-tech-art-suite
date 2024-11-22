@@ -2,26 +2,212 @@
 @tailwind components;
 @tailwind utilities;
 
+/**
+	Create content width
+
+	We are avoiding min(), max(), clamp() to support old devices. Normally using following is easier 
+
+	--width: min( 75%, 1650px );
+
+	This approach uses media queries to set --width to 1650px when the viewport is wider than 2200px (which is 75% of 2200px). 
+	You can adjust the 2200px to match the exact breakpoint where 1650px should be used instead of 75%.
+*/
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+	--background: #ffffff;
+	--foreground: #171717;
+	--width: 90vw;
+	/** 
+		To be able to discard scrollbar width, we use % 
+	*/
+	--content-outside-width: calc( ( 100% - var( --width ) ) / 2 );
+	/** 
+		To be able to use as spacing units (height, margin, ...) value, we use VW 
+	*/
+	--spacing-base: calc( ( 100vw - var( --width ) ) / 2 );
+	/** 
+		Spacing variations 
+	*/
+	--spacing-xs: calc( 0.25 * var( --spacing-base ) );
+	--spacing-sm: calc( 0.5 * var( --spacing-base ) );
+	--spacing-lg: calc( 1.5 * var( --spacing-base ) );
+	--spacing-xl: calc( 3 * var( --spacing-base ) );
+	--spacing-2xl: calc( 4 * var( --spacing-base ) );
+	--spacing-3xl: calc( 5 * var( --spacing-base ) );
+}
+@media ( orientation: landscape ){
+    :root {
+        --width: 75vw;
+		--spacing-base: 2rem;
+    }
+}
+@media ( min-width: 2200px ){
+    :root {
+        --width: 1650px;
+    }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+	background: var( --background );
+	color: var( --foreground );
+	font-family: Arial, Helvetica, sans-serif;
+	cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23000000" width="6px" height="6px" viewBox="0 0 6 6"><circle cx="3" cy="3" r="2.5"/></svg>') 3 3, auto;
 }
 
+
+/**
+	----------------------------------------------------------------------
+	BASE STYLES
+	----------------------------------------------------------------------
+*/
+@layer base {
+
+	h1 {
+		@apply text-3xl;
+	}
+	h2 {
+		@apply text-2xl;
+	}
+	h3 {
+		@apply text-xl;
+	}
+	h4 {
+		@apply text-lg;
+	}
+
+}
+
+.holded {
+	@apply
+	select-none;
+}
+[data-holded="0"] {
+	border: none;
+}
+[data-holded="1"] {
+	/**
+		On mobile, while holding, selection is buggy and unavoidable
+		Best way adding no-select to document, when something holded.
+		https://stackoverflow.com/questions/61485693/preventing-tap-and-hold-from-selecting-nearby-text
+	*/
+	border: 5px solid rgb(229, 255, 0);
+	@apply
+	!select-none;
+}
+
+@layer components {
+
+	.container {
+		@apply
+		w-[var(--width)]
+		max-w-[var(--width)]
+		mx-auto
+	}
+
+	@keyframes pulse-bg {
+		0% {
+			background-color: rgba( 255, 0, 0, 1 );
+		}
+		50% {
+			background-color: rgba( 255, 0, 0, 0 );
+		}
+		100% {
+			background-color: rgba( 255, 0, 0, 1 );
+		}
+	}
+
+	.pointer {
+		--cursor-size: max( 18px, calc( 100vw / 60 ) );
+		--cursor-half-size: calc( var( --cursor-size ) / 2 );
+		--scale: 1.5;
+		--transition-duration: 0.4s;
+		position: fixed;
+		left: 0;
+		top: 0;
+		background-color: transparent;
+		border: 1px solid #FF0000;
+		border-radius: 50%;
+		height: var( --cursor-size );
+		width: var( --cursor-size );
+		transform: translate3d( calc( var( --x ) - var( --cursor-half-size ) ), calc( var( --y ) - var( --cursor-half-size ) ), 0 ) scale( var( --scale ) );
+		pointer-events: none;
+		touch-action: none;
+		user-select: none;
+		z-index: 9999;
+		transition: transform var( --transition-duration ) cubic-bezier( 0.22, 1, 0.36, 1 );
+	}
+
+	.pointer.MOVING {
+		--scale: 1;
+	}
+
+	.pointer.OUT {
+		--scale: 0;
+	}
+
+	.pointer.WAITING {
+		--scale: 2;
+		animation: pulse-bg 1.5s infinite;
+	}
+
+	.pointer.HOLDING,
+	.pointer.HOLDMOVING {
+		background-color: #FF0000;
+		--scale: 1;
+	}
+
+	.pointer.HOLDMOVING {
+		border-color: aqua;
+	}
+
+	.pointer.interactable {
+		animation: pulse-bg 1.5s infinite;
+		--transition-duration: 1s;
+	}
+
+
+}
+
+
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+
+	.text-balance {
+		text-wrap: balance;
+	}
+	.form label {
+		@apply
+		block mb-2 text-base font-medium text-gray-900 dark:text-white
+	}
+	
+	.form .checkbox {
+		@apply
+		flex flex-col mb-1
+	}
+	
+	.form .checkbox > fieldset {
+		@apply
+		flex
+	}
+	
+	.form .checkbox label {
+		@apply
+		ms-1 text-base font-medium text-gray-900 dark:text-gray-300 whitespace-nowrap
+	}
+	
+	.form input[ type=checkbox ] {
+		@apply
+		w-6 h-6 border border-gray-300 rounded bg-gray-50 focus:ring-blue-300
+	}
+	
+	.form input[ type=number ] {
+		@apply
+		p-2 text-base text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 leading-none
+	}
+	
+	.form select {
+		@apply
+		block text-base bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full p-2
+	}
+	
 }

@@ -1,6 +1,7 @@
 {
 	"name": "pronotron-web-libraries",
 	"private": true,
+	"license": "MIT",
 	"scripts": {
 		"build": "turbo build",
 		"dev": "turbo dev",
@@ -9,7 +10,7 @@
 		"format": "prettier --write \"**/*.{ts,tsx,md}\"",
 		"changeset": "changeset",
 		"version-packages": "changeset version",
-		"release": "turbo build --filter=@pronotron/io && changeset publish"
+		"release": "turbo build --filter=./packages/* && changeset publish"
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.27.1",
