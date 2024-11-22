@@ -2,6 +2,8 @@
 
 A high-performance TypeScript-based suite designed to enhance interaction, UI, and UX without compromising web standards. Each package prioritizes minimal bundle size and blazing-fast performance, making it a reliable choice for developers focused on immersive, efficient and user-friendly web experiences.
 
+<pre>npm i <a href="https://www.npmjs.com/package/@pronotron/io">@pronotron/io</a> <a href="https://www.npmjs.com/package/@pronotron/pointer">@pronotron/pointer</a> <a href="https://www.npmjs.com/package/@pronotron/utils">@pronotron/utils</a></pre>
+
 ### Packages
 
 - `@pronotron/io`: Reliable viewport tracking without missed targets, unlike the default [IntersectionObserver API](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API). Built on **NativeControlTable**, it can safely be used for parallax effects, lazy loading, or tracking when any part of an element enters or exits the screen. Suitable for implementing any custom scrolling application.
