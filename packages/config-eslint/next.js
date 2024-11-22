@@ -1,13 +1,13 @@
-const { resolve } = require("node:path");
+const { resolve } = require( "node:path" );
 
-const project = resolve(process.cwd(), "tsconfig.json");
+const project = resolve( process.cwd(), "tsconfig.json" );
 
 /** @type {import("eslint").Linter.Config} */
 module.exports = {
 	extends: [
 		"eslint:recommended",
 		"prettier",
-		require.resolve("@vercel/style-guide/eslint/next"),
+		require.resolve( "@vercel/style-guide/eslint/next" ),
 		"turbo",
 	],
 	globals: {
@@ -17,7 +17,7 @@ module.exports = {
 	env: {
 		node: true,
 	},
-	plugins: ["only-warn"],
+	plugins: [ "only-warn" ],
 	settings: {
 		"import/resolver": {
 			typescript: {

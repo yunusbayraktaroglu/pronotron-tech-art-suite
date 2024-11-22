@@ -25,7 +25,7 @@ type AnimationOption = {
 	 * - continious: Time continues to progress even when the screen is unfocused.
 	 */
 	timeStyle: "pausable" | "continious",
-} & ({
+} & ( {
 	/**
 	 * Can be used as a callback for when the animation ends, with two time styles available.
 	 * @param forced Is animation forcibly finished. (With using removeAnimation())
@@ -34,7 +34,7 @@ type AnimationOption = {
 	onRender?: ( currentTime: number, startTime: number, duration: number ) => void;
 } | {
 	onRender: ( currentTime: number, startTime: number, duration: number ) => void;
-});
+} );
 
 /**
  * 1. Generates an internalID number that points given client animationID
@@ -98,8 +98,8 @@ export class PronotronAnimationController
 			[ AnimationData.STARTTIME ]: now,
 			[ AnimationData.ENDTIME ]: now + animationOption.duration,
 			[ AnimationData.RENDERABLE ]: animationOption.onRender ? 1 : 0,
-			[ AnimationData.TIMESTYLE] : animationOption.timeStyle === "continious" ? 1 : 0,
-		});
+			[ AnimationData.TIMESTYLE ]: animationOption.timeStyle === "continious" ? 1 : 0,
+		} );
 		this._animationOptionIDtoInternalID.set( animationOption.id, animationInternalID );
 		this._animationInternalIDsPool.consumeID( animationInternalID );
 		this._animationReferences[ animationInternalID ] = animationOption;
@@ -172,7 +172,8 @@ export class PronotronAnimationController
 	/**
 	 * @returns Total active animation count 
 	 */
-	getAnimationCount(): number {
+	getAnimationCount(): number 
+	{
 		return this._controlTable.usedSlots;
 	}
 

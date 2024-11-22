@@ -1,7 +1,7 @@
 import { PointerBase, CommonDependencies } from "./PointerBase";
 import { PointerHoldable, PointerHoldableDependencies } from "./PointerHoldable";
 
-type Constructor<T = {}> = new (...args: any[]) => T;
+type Constructor<T = object> = new (...args: any[]) => T;
 
 /** @internal */
 function Touch<TBase extends Constructor<PointerBase<any>>>( Base: TBase )

@@ -24,7 +24,7 @@ const onResize = () => {
 /**
  * TIP: It's better to use with a throttle function and RequestAnimationFrame API to optimize 
  */
-window.addEventListener( 'scroll', scroll, { passive: true } );
+window.addEventListener( 'scroll', onScroll, { passive: true } );
 
 /**
  * (x) window.addEventListener( 'resize', onResize );
@@ -47,11 +47,14 @@ const element = document.getElementByID( "test" );
 
 const nodeID = pronotronIO.addNode({
 	ref: element,
-	dispatch={
+	dispatch: {
 		onTopIn: () => console.log( "Top-in" ),
 		onTopOut: () => console.log( "Top-out" ),
 		onBottomIn: () => console.log( "Bottom-in" ),
-		onBottomOut: () => console.log( "Bottom-out" ),
+		onBottomOut: {
+			retry: 3,
+			dispatch: () => console.log( "Bottom-out" ),
+		},
 		// Returns -1 to +1 normalized position
 		onInViewport: ( normalizedPosition: number ) => {
 			console.log( normalizedPosition );

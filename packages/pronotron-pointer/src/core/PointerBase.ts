@@ -172,7 +172,7 @@ export class PointerBase<T extends string> extends EventUtils<T>
 	/**
 	 * @internal
 	 */
-	_onPointerEnd( event: Event )
+	_onPointerEnd( _event: Event )
 	{
 		this._currentState = PointerStates.IDLE;
 	}

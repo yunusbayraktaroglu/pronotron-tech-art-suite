@@ -35,7 +35,7 @@ export abstract class EventUtils<T extends string>
 	 * @param detail Custom event detail
 	 * @internal
 	 */
-	_dispatchCustomEvent( customEvent: T, detail: { [ key: string ]: any } ): void
+	_dispatchCustomEvent( customEvent: T, detail: Object ): void
 	{
 		this._target.dispatchEvent( new CustomEvent( customEvent, { detail } ) );
 	}

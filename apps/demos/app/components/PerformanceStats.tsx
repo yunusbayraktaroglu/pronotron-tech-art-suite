@@ -207,7 +207,7 @@ export function PronotronStatsComponent()
 	return (
 		<div 
 			id="performance-stats" 
-			className={ "fixed flex flex-col left-2 bottom-2 opacity-[1] z-100 space-y-[1px]" + (!isActive ? " hidden" : "") }
+			className={ "fixed flex flex-col left-2 bottom-2 opacity-[1] z-100 space-y-[1px]" + ( !isActive ? " hidden" : "" ) }
 			ref={ containerRef } 
 		/>
 	)

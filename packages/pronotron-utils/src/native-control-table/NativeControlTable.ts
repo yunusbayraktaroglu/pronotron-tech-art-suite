@@ -211,7 +211,7 @@ export class NativeControlTable<EnumType extends Record<string | number, string 
 		const newMaxSlots = this._maxSlots * 2;
 
 		// Create new table with increased size and copy old table onto it
-		const newControlTable = new ( this.table.constructor as { new ( length: number ): NativeTableTypes })( newMaxSlots * this.stride );
+		const newControlTable = new ( this.table.constructor as { new ( length: number ): NativeTableTypes } )( newMaxSlots * this.stride );
 		newControlTable.set( this.table );
 
 		// Update references and max slots

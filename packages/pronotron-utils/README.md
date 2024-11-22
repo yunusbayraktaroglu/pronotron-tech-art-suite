@@ -1,7 +1,7 @@
 # @pronotron/utils
 
-Helper packages used by other @pronotron packages.
+A set of helper modules used by other @pronotron packages, which can also be used individually.
 
-- **Clock**: Tracks two types of time—continuous and pausable at the same time. Pausable time stops ticking when the screen is inactive.
-- **NativeControlTable**: Uses [TypedArrays](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray#typedarray_objects) and a given Enum structure to store grouped data in direct-access memory. This enables blazing-fast, secure iterations and modifications.
-- **AnimationController**: Built on **NativeControlTable** and **Clock**. It provides, per frame, three types of timeline data normalized between 0 and 1, sufficient to create any kind of animation on the client side.
+- **NativeControlTable**: Utilizes [TypedArrays](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray#typedarray_objects) and a given Enum structure to store grouped data in direct-access memory, enabling blazing-fast, secure iterations and modifications.
+- **Clock**: Simultaneously tracks two types of time—continuous and pausable. Pausable time stops ticking when the screen is inactive.
+- **AnimationController**: Built on **NativeControlTable** and @clock, it provides per-frame normalized timeline data (ranging from 0 to 1), enabling developers to create any kind of animation.

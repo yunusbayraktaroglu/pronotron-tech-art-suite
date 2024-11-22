@@ -1,7 +1,7 @@
 {
 	"name": "@pronotron/pointer",
 	"version": "0.0.1-beta.3",
-	"description": "Tracks mouse and touch pointers, with custom events like holding and tapping for enhanced interaction control.",
+	"description": "Tracks mouse and touch pointers with custom states such as holding, tapping, idling, interacting, moving out, and moving in, providing enhanced interaction control.",
 	"author": "Yunus Bayraktaroglu <yunus.bayraktaroglu@gmail.com>",
 	"main": "./dist/index.js",
 	"module": "./dist/index.mjs",
@@ -16,21 +16,18 @@
 		"interaction"
 	],
 	"scripts": {
-		"build": "tsup src/index.ts --format esm,cjs --dts --external react --minify terser",
-		"dev": "tsup src/index.ts --format esm,cjs --watch --dts --external react",
+		"build": "tsup src/index.ts --format esm,cjs --dts --minify terser",
+		"dev": "tsup src/index.ts --format esm,cjs --watch --dts",
 		"lint": "eslint \"src/**/*.ts*\"",
 		"clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
 	},
 	"devDependencies": {
-		"@pronotron/eslint-config": "*",
-		"@pronotron/tsconfig": "*",
-		"@types/react": "^18.2.61",
-		"@types/react-dom": "^18.2.19",
+		"@pronotron/config-ts": "*",
+		"@pronotron/config-eslint": "*",
 		"eslint": "^8.57.0",
 		"terser": "^5.33.0",
 		"tsup": "^8.0.2",
-		"typescript": "^5.3.3",
-		"react": "^18.2.0"
+		"typescript": "^5.3.3"
 	},
 	"dependencies": {
 		"@pronotron/utils": "0.0.1-beta.3"
