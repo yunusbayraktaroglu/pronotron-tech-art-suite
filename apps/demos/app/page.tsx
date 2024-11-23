@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect } from "react";
 import { usePerformanceStats } from "./hooks/usePerformanceStats";
 
-export default function Home()
+export default function HomePage()
 {
 	const { setIsActive } = usePerformanceStats();
 	
@@ -13,43 +13,53 @@ export default function Home()
 	}, []);
 
 	return (
-		<div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-
-			<main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-				<div className="flex gap-4 items-center flex-col sm:flex-row">
-					<Link
-						className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
+		<>
+			<main className="container min-h-screen flex flex-col justify-center">
+				<div className="mb-spacing-lg space-y-spacing-xs">
+					<h1 className="text-4xl">Pronotron Tech-Art Suite</h1>
+					<p>A high-performance TypeScript-based suite designed to enhance interaction, UI, and UX without compromising web standards.</p>
+				</div>
+				<div className="grid grid-cols-2 landscape:grid-cols-3 gap-spacing-sm">
+					<PackageCard 
+						name="Pronotron IO"
+						description="Reliable viewport tracking without missed targets, unlike the default IntersectionObserver API."
 						href="/io"
-					>
-						Pronotron IO
-					</Link>
-					<Link
-						className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
+					/>
+					<PackageCard 
+						name="Pronotron Pointer"
+						description="Tracks mouse and touch pointers with custom states such as holding, tapping, idling, interacting, moving out, and moving in, providing enhanced interaction control."
 						href="/pointer"
-					>
-						Pronotron Pointer
-					</Link>
-					<Link
-						className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
+					/>
+					<PackageCard 
+						name="Pronotron Animator"
+						description="Built on NativeControlTable and Clock, it provides per-frame normalized timeline data (ranging from 0 to 1), enabling developers to create any kind of animation."
 						href="/animation-controller"
-					>
-						Pronotron Animation Controller
-					</Link>
-					<a
-						className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-						href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						Read our docs
-					</a>
+					/>
 				</div>
 			</main>
+			<footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">By Yunus Bayraktaroglu</footer>
+		</>
+	)
 
-			<footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
+}
 
-			</footer>
 
-		</div>
-	);
+interface PackageCardProps extends React.ComponentProps<typeof Link> {
+	name: string;
+	description: string;
+};
+
+function PackageCard({ name, description, ...linkProps }: PackageCardProps )
+{
+	return (
+		<Link 
+			className="flex justify-center rounded-lg transition-colors border border-slate-400 bg-slate-700 hover:bg-slate-600 text-white text-sm landscape:text-base p-spacing-base"
+			{ ...linkProps }
+		>
+			<div className="flex flex-col space-y-spacing-xs">
+				<h2 className="text-2xl">{ name }</h2>
+				<p>{ description }</p>
+			</div>
+		</Link>
+	)
 }

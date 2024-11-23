@@ -1,17 +1,12 @@
 "use client";
 
-import { createContext, useEffect, useState, useContext } from 'react';
+import { createContext, useEffect, useState, useContext, useMemo } from 'react';
 import { usePathname } from 'next/navigation'
+import { PronotronIOVertical } from "@pronotron/io";
 import throttle from "lodash.throttle";
 
-import { PronotronIOVertical } from "@pronotron/io";
 import { stats } from "@/app/components/PerformanceStats";
 
-export const pronotronIO = new PronotronIOVertical();
-
-/**
- * CONTEXT
- */
 interface PronotronIOContextType {
 	io: PronotronIOVertical;
 	scrollDirection: "up" | "down";
@@ -38,6 +33,7 @@ export function usePronotronIOContext<T>( selector: ( context: PronotronIOContex
  */
 export function PronotronIOProvider({ children }: { children: React.ReactNode })
 {
+	const pronotronIO = useMemo(() => new PronotronIOVertical(), [])
 	const pathname = usePathname();
 	const [ scrollDirection, setScrollDirection ] = useState<"down" | "up">( "down" );
 
@@ -64,16 +60,16 @@ export function PronotronIOProvider({ children }: { children: React.ReactNode })
 
 	useEffect(() => {
 
-		let needsCheck = false;
+		let needsTick = false;
 		let animationFrameId = 0;
 
 		const scrollTicker = () => {
-			needsCheck = true;
+			needsTick = true;
 		};
 		const scroll = () => {
 			pronotronIO.handleScroll( window.scrollY )
 			setScrollDirection( pronotronIO.direction );
-			needsCheck = false;
+			needsTick = false;
 		};
 		const resize = () => {
 			pronotronIO.setViewport( window.innerHeight, document.documentElement.scrollHeight );
@@ -87,7 +83,7 @@ export function PronotronIOProvider({ children }: { children: React.ReactNode })
 
 		const tick = () => {
 			stats.begin();
-			if ( needsCheck ){
+			if ( needsTick ){
 				scroll();
 			}
 			stats.end();

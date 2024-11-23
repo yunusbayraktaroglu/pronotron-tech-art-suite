@@ -1,8 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { IODispatchOptions } from '@pronotron/io';
 import { IODispatcher } from "../hooks/usePronotronIO";
-import { IODispatchOptions, IONodeOptions } from '@pronotron/io';
 
 type TestScenario = {
 	testCount: number;
@@ -15,6 +15,71 @@ type TestScenario = {
 	dispatchType: "modify_dom" | "console_log" | "never",
 	onFastForward: IODispatchOptions[ "onFastForward" ],
 };
+
+export default function StressTestPage()
+{
+	const [ testScenario, setTestScenario ] = useState<TestScenario | false>( false );
+
+	return (
+		<div className="container mt-spacing-base">
+
+			<div className="bg-slate-200 p-spacing-lg rounded-lg">
+				{ testScenario ? (
+					<p className="text-green-800 mb-5">Created { testScenario.ioCount } node. Scroll down to see effects. Check starts for performance.</p>
+				) : null}
+				<TestForm runTestScenario={ setTestScenario } />
+			</div>
+
+			{ testScenario ? ( 
+				Array.from({ length: testScenario.ioCount }).map(( item, index ) => {
+
+					const { dispatchType, inViewport, topIn, topOut, bottomIn, bottomOut, onFastForward } = testScenario;
+
+					switch( dispatchType ){
+						case "modify_dom": 
+							return (
+								<DomManipulator 
+									key={ `${ testScenario.testCount }_${ index }` }
+									index={ index } 
+									inViewport={ inViewport }
+									topIn={ topIn } 
+									topOut={ topOut }
+									bottomIn={ bottomIn } 
+									bottomOut={ bottomOut }
+									onFastForward={ onFastForward } 
+								/>
+							)
+						case "console_log": 
+							return (
+								<IODispatcher
+									key={ `${ testScenario.testCount }_${ index }` }
+									className={ `bg-green-500 my-[120vh]` }
+									offset={ 0 }
+									//@ts-expect-error - At least 1 event is required
+									dispatch={ logDispatcher({ index, inViewport, topIn, topOut, bottomIn, bottomOut, onFastForward }) }
+								>
+									<p className="text-center">{ index }</p>
+								</IODispatcher>
+							)
+						case "never": 
+							return (
+								<IODispatcher 
+									key={ `${ testScenario.testCount }_${ index }` }
+									className={ `bg-green-500 my-[120vh]` }
+									offset={ 0 }
+									//@ts-expect-error - At least 1 event is required
+									dispatch={ emptyDispatcher({ inViewport, topIn, topOut, bottomIn, bottomOut, onFastForward }) }
+								>
+									<p className="text-center">{ index }</p>
+								</IODispatcher>
+							);
+					}
+				}) 
+			) : null }
+
+		</div>
+	);
+}
 
 interface TestFormProps {
 	runTestScenario: ( scenario: TestScenario ) => void
@@ -78,7 +143,6 @@ function TestForm({ runTestScenario }: TestFormProps)
 		<div className="form">
 
 			{ warning && <p className="text-red-500 mb-spacing-sm">{ warning }</p> }
-			
 			
 			<fieldset className="flex flex-col landscape:flex-row justify-between items-start gap-5">
 
@@ -180,78 +244,6 @@ function TestForm({ runTestScenario }: TestFormProps)
 	)
 }
 
-
-
-
-
-export default function StressTestPage()
-{
-	const [ testScenario, setTestScenario ] = useState<TestScenario | false>( false );
-
-	return (
-		<div className="container mt-spacing-base">
-
-			<div className="bg-slate-200 p-spacing-lg rounded-lg">
-				{ testScenario ? <p className="text-green-800 mb-5">Created { testScenario.ioCount } node. Scroll down to see effects. Check starts for performance.</p> : null}
-				<TestForm runTestScenario={ setTestScenario } />
-			</div>
-
-
-			{ testScenario ? ( 
-				Array.from({ length: testScenario.ioCount }).map(( item, index ) => {
-
-					const { dispatchType, inViewport, topIn, topOut, bottomIn, bottomOut, onFastForward } = testScenario;
-
-					switch( dispatchType ){
-						case "modify_dom": 
-							return (
-								<NodManipulator 
-									key={ `${ testScenario.testCount }_${ index }` }
-									index={ index } 
-									inViewport={ inViewport }
-									topIn={ topIn } 
-									topOut={ topOut }
-									bottomIn={ bottomIn } 
-									bottomOut={ bottomOut }
-									onFastForward={ onFastForward } 
-								/>
-							)
-						case "console_log": 
-							return (
-								<IODispatcher
-									key={ `${ testScenario.testCount }_${ index }` }
-									className={ `bg-green-500 my-[120vh]` }
-									offset={ 0 }
-									//@ts-expect-error - At least 1 event is required
-									dispatch={ logDispatcher({ index, inViewport, topIn, topOut, bottomIn, bottomOut, onFastForward }) }
-								>
-									<p className="text-center">{ index }</p>
-								</IODispatcher>
-							)
-						case "never": 
-							return (
-								<IODispatcher 
-									key={ `${ testScenario.testCount }_${ index }` }
-									className={ `bg-green-500 my-[120vh]` }
-									offset={ 0 }
-									//@ts-expect-error - At least 1 event is required
-									dispatch={ emptyDispatcher({ inViewport, topIn, topOut, bottomIn, bottomOut, onFastForward }) }
-								>
-									<p className="text-center">{ index }</p>
-								</IODispatcher>
-							);
-					}
-				}) 
-			) : null }
-
-		</div>
-	);
-}
-
-
-
-
-
 interface logDispatcherProps {
 	index: number,
 	inViewport: boolean;
@@ -286,9 +278,7 @@ function emptyDispatcher({ inViewport, topIn, topOut, bottomIn, bottomOut, onFas
 	}
 }
 
-
-
-function NodManipulator({ index, inViewport, topIn, topOut, bottomIn, bottomOut, onFastForward }: logDispatcherProps )
+function DomManipulator({ index, inViewport, topIn, topOut, bottomIn, bottomOut, onFastForward }: logDispatcherProps )
 {
 	const [ pos, setPos ] = useState<string | number>( "untracked" );
 	const [ state, setState ] = useState<false | string>( false );

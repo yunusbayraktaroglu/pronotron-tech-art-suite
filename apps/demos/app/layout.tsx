@@ -1,11 +1,12 @@
+import "./globals.css";
+
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import Link from "next/link";
 
-import { PerformanceStatsProvider, usePerformanceStats } from "./hooks/usePerformanceStats";
+import { PerformanceStatsProvider } from "./hooks/usePerformanceStats";
 import { PronotronStatsComponent } from "./components/PerformanceStats";
-
-import "./globals.css";
+import { SiteSVG, GithubIcon } from "./components/SiteSVG";
 
 const geistSans = localFont({
 	src: "./fonts/GeistVF.woff",
@@ -25,7 +26,10 @@ export const metadata: Metadata = {
 	},
 	description: "Demo setups for Pronotron Tech-Art Suite",
 	authors: [
-		{ name: "Yunus Bayraktaroglu" }
+		{ 
+			name: "Yunus Bayraktaroglu",
+			url: "https://www.linkedin.com/in/yunusbayraktaroglu",
+		}
 	],
 };
 
@@ -34,11 +38,14 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 	return (
 		<html lang="en">
 			<body className={ `${ geistSans.variable } ${ geistMono.variable } antialiased` }>
+				<SiteSVG />
 				<header className="container">
-					<nav className="flex flex-row space-x-2 p-spacing-sm">
-						<Link href="/">Home</Link>
-						<Link href="/documents">Documents</Link>
-						<a className="!ml-auto" target="_blank" href="https://github.com/yunusbayraktaroglu/pronotron-web-libraries">Github</a>
+					<nav className="flex flex-row -mx-spacing-sm">
+						<Link href="/" className="p-spacing-sm hover:underline">Home</Link>
+						<Link href="/documents" className="p-spacing-sm hover:underline">Documents</Link>
+						<a className="ml-auto flex flex-row align-center p-spacing-sm" target="_blank" href="https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite">
+							Github<GithubIcon fill="black" stroke="none" className="ml-1" />
+						</a>
 					</nav>
 				</header>
 				<PerformanceStatsProvider>

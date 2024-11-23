@@ -6,7 +6,7 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
 {
 	return (
 		<div className="flex flex-col my-spacing-base container">
-
+			<h2 className="italic text-slate-400 text-center my-spacing-lg">See console...</h2>
 			<IODispatcher 
 				className='bg-blue-500 py-[50px] flex flex-col'
 				offset={ 0 }
@@ -18,8 +18,9 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
 					onInViewport: ( normalizedPosition: number ) => {
 						console.log( "Static node #0 in viewport", normalizedPosition );
 					},
-					//onFastForward: "execute_both"
+					onFastForward: "execute_both"
 				}}
+				onRemoveNode={() => console.log( "Static IO node removed" )}
 			>
 				<p className="text-center">Static node #0</p>
 			</IODispatcher>
@@ -37,8 +38,9 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
 					onInViewport: ( normalizedPosition: number ) => {
 						console.log( "Static node #1 in viewport", normalizedPosition );
 					},
-					//onFastForward: "execute_both"
+					onFastForward: "execute_both"
 				}}
+				onRemoveNode={() => console.log( "Static IO node removed" )}
 			>
 				<p  className="text-center">Static node #1</p>
 			</IODispatcher>

@@ -1,18 +1,20 @@
 "use client";
 
-import React from "react";
+import { useMemo } from "react";
 import { IODispatcher } from "../../hooks/usePronotronIO";
 
-const colors = [
-	"bg-red-500",
-	"bg-orange-500",
-	"bg-purple-500",
-	"bg-green-500",
-	"bg-teal-500"
-];
-
-export default function SharedPageOne()
+export default function SharedNodePageOne()
 {
+	const colors = useMemo(() => {
+		return [
+			"bg-red-500",
+			"bg-orange-500",
+			"bg-purple-500",
+			"bg-green-500",
+			"bg-teal-500"
+		];
+	}, []);
+
 	return Array.from({ length: 10 }).map(( item, index ) => (
 		<IODispatcher 
 			key={ index }
@@ -26,11 +28,11 @@ export default function SharedPageOne()
 				onInViewport: ( normalizedPosition: number ) => {
 					console.log( `#${ index } In Viewport`, normalizedPosition );
 				},
-				//onFastForward: "execute_both"
+				onFastForward: "execute_both"
 			}}
+			onRemoveNode={() => console.log( "IO Node removed" )}
 		>
 			<p className="text-center">Node: #{ index }</p>
 		</IODispatcher>
-			
-	))
+	));
 }

@@ -18,8 +18,8 @@ export type CommonDependencies = {
 	target: PossibleTarget;
 	animationController: PronotronAnimationController;
 	clock: PronotronClock;
-	idleTreshold?: number;
-	movingDeltaLimit?: number;
+	idleTreshold: number;
+	movingDeltaLimit: number;
 	isInteractable: ( target: HTMLElement ) => boolean;
 };
 
@@ -54,7 +54,7 @@ export class PointerBase<T extends string> extends EventUtils<T>
 	/** @internal */
 	_isInteractable: ( target: HTMLElement ) => boolean;
 
-	constructor({ target, animationController, clock, isInteractable }: CommonDependencies)
+	constructor({ target, animationController, clock, isInteractable, idleTreshold, movingDeltaLimit }: CommonDependencies)
 	{
 		super();
 
@@ -63,7 +63,9 @@ export class PointerBase<T extends string> extends EventUtils<T>
 		this._clock = clock;
 
 		this._isInteractable = isInteractable;
-
+		this._idleTreshold = idleTreshold;
+		this._movingDeltaLimit = movingDeltaLimit;
+		
 		this._onPointerStart = this._onPointerStart.bind( this );
 		this._onPointerMove = this._onPointerMove.bind( this );
 		this._onPointerEnd = this._onPointerEnd.bind( this );
