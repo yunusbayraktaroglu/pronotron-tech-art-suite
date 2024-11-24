@@ -1,17 +1,13 @@
 "use client";
 
-import { createContext, useEffect, useState, useContext } from 'react';
+import { createContext, useEffect, useState, useContext, useMemo } from 'react';
 import { usePathname } from 'next/navigation'
+import { PronotronIOVertical } from "@pronotron/io";
+import { ResizeObserver as Polyfill } from '@juggle/resize-observer';
 import throttle from "lodash.throttle";
 
-import { PronotronIOVertical } from "@pronotron/io";
 import { stats } from "@/app/components/PerformanceStats";
 
-export const pronotronIO = new PronotronIOVertical();
-
-/**
- * CONTEXT
- */
 interface PronotronIOContextType {
 	io: PronotronIOVertical;
 	scrollDirection: "up" | "down";
@@ -38,6 +34,7 @@ export function usePronotronIOContext<T>( selector: ( context: PronotronIOContex
  */
 export function PronotronIOProvider({ children }: { children: React.ReactNode })
 {
+	const pronotronIO = useMemo(() => new PronotronIOVertical(), [])
 	const pathname = usePathname();
 	const [ scrollDirection, setScrollDirection ] = useState<"down" | "up">( "down" );
 
@@ -64,16 +61,16 @@ export function PronotronIOProvider({ children }: { children: React.ReactNode })
 
 	useEffect(() => {
 
-		let needsCheck = false;
+		let needsTick = false;
 		let animationFrameId = 0;
 
 		const scrollTicker = () => {
-			needsCheck = true;
+			needsTick = true;
 		};
 		const scroll = () => {
 			pronotronIO.handleScroll( window.scrollY )
 			setScrollDirection( pronotronIO.direction );
-			needsCheck = false;
+			needsTick = false;
 		};
 		const resize = () => {
 			pronotronIO.setViewport( window.innerHeight, document.documentElement.scrollHeight );
@@ -87,7 +84,7 @@ export function PronotronIOProvider({ children }: { children: React.ReactNode })
 
 		const tick = () => {
 			stats.begin();
-			if ( needsCheck ){
+			if ( needsTick ){
 				scroll();
 			}
 			stats.end();
@@ -104,8 +101,8 @@ export function PronotronIOProvider({ children }: { children: React.ReactNode })
 		 * - Do not use window.resize event, it's firing every scroll in mobile devices because of topbar behavior.
 		 * - Use ResizeObserverPolyfill from '@juggle/resize-observer' to support old devices.
 		 */
-		const ResizeObserver = window.ResizeObserver;
-		const ro = new ResizeObserver(( entries, observer ) => {
+		const ResizeObserver = window.ResizeObserver || Polyfill;
+		const ro = new ResizeObserver(() => {
 			onResize();
 		});
 		ro.observe( document.body ); // Watch dimension changes on body

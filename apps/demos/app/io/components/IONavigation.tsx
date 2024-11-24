@@ -7,24 +7,25 @@ import Link from "next/link";
 export function IONavigation()
 {
 	const pathname = usePathname();
+	
 	const navItems = useMemo(() => [
-		{ href: "/io", label: "Mixed" },
-		{ href: "/io/shared/page-1", label: "Page 1" },
-		{ href: "/io/shared/page-2", label: "Page 2" },
+		{ href: "/io", label: "Single Node" },
+		{ href: "/io/shared/page-1", label: "Page 1 (Sharing IO nodes)" },
+		{ href: "/io/shared/page-2", label: "Page 2 (Sharing IO nodes)" },
 		{ href: "/io/stress-test", label: "Stress Test" },
 	], []);
 
 	return (
 		<>
-			<nav className="flex flex-row items-center space-x-1">
+			<nav className="flex flex-row flex-wrap items-center gap-spacing-xs">
 				{ navItems.map( item => {
-					const color = item.href !== pathname ? "bg-blue-600 hover:bg-blue-700" : "bg-green-600 hover:bg-green-700"	
+					const color = item.href !== pathname ? "bg-slate-400 hover:bg-slate-500" : "bg-blue-600 hover:bg-blue-700"	
 					return (
 						<Link
 							scroll={ false }
 							key={ item.href } 
 							href={ item.href } 
-							className={ `text-white py-2 px-4 leading-none rounded-full transition-colors ${ color }` }
+							className={ `text-white text-sm py-3 px-5 leading-none rounded-full transition-colors ${ color }` }
 						>{ item.label }</Link>
 					)
 				}) }

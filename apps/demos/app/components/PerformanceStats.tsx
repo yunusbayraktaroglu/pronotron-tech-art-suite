@@ -30,7 +30,8 @@ export class PronotronStatsPanel
 
 	build()
 	{
-		const PR = Math.round( window.devicePixelRatio || 1 );
+		//const PR = Math.round( window.devicePixelRatio || 1 );
+		const PR = 1;
 		this.pixelRatio = PR;
 		this.table = {
 			FONTSIZE: 9 * PR,
@@ -207,7 +208,7 @@ export function PronotronStatsComponent()
 	return (
 		<div 
 			id="performance-stats" 
-			className={ "fixed flex flex-col left-2 bottom-2 opacity-[1] z-100 space-y-[1px]" + ( !isActive ? " hidden" : "" ) }
+			className={ "fixed flex flex-col left-2 bottom-2 opacity-[1] z-[999] space-y-[1px]" + ( ! isActive ? " hidden" : "" ) }
 			ref={ containerRef } 
 		/>
 	)
