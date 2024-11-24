@@ -236,7 +236,7 @@ function TestForm({ runTestScenario }: TestFormProps)
 
 				</fieldset>
 
-				<button onClick={ startTest } className="block bg-green-500 hover:bg-green-400 px-4 py-2 rounded-full transition-colors">Create IO nodes</button>
+				<button onClick={ startTest } className="block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full transition-colors">Create IO nodes</button>
 
 			</fieldset>
 

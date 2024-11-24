@@ -16,7 +16,7 @@ interface AnimatorContextProps {
 
 const AnimatorContext  = createContext<AnimatorContextProps | undefined>( undefined );
 
-export function PronotronAnimationControllerProvider({ children }: { children: React.ReactNode })
+export function PronotronAnimatorProvider({ children }: { children: React.ReactNode })
 {
 	const [ clockDelta, setClockDelta ] = useState( 0 );
 	const [ elapsedTime, setElapsedTime ] = useState( 0 );

@@ -43,7 +43,7 @@ function SingleDispatcher()
 					onInViewport: ( normalizedPosition: number ) => {
 						setPos( normalizedPosition );
 					},
-					//onFastForward: "execute_both"
+					onFastForward: "execute_both"
 				}}
 				onRemoveNode={() => console.log( "IO Node removed" )}
 			>

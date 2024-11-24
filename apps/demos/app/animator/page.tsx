@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { animationController } from "./hooks/PronotronAnimationProvider";
+import { animationController } from "./hooks/PronotronAnimatorProvider";
 import { usePerformanceStats } from "../hooks/usePerformanceStats";
 
 type TestScenario = {
@@ -26,7 +26,7 @@ export default function AnimatorDemoPage()
 	return (
 		<div className="container">
 			<AnimationStressTestForm runTestScenario={ setTestScenario } />
-			<div className="grid grid-cols-4 gap-3 mt-spacing-base">
+			<div className="grid grid-cols-3 landscape:grid-cols-4 gap-spacing-xs my-spacing-base">
 				{ Array.from({ length: testScenario.animationCount }).map(( item, index ) => (
 					<SingleAnimation 
 						key={ `${ testScenario.testCount }_${ index }` } 
@@ -73,7 +73,7 @@ function AnimationStressTestForm({ runTestScenario }: TestFormProps)
 	};
 
 	return (
-		<div className="form flex flex-col landscape:flex-row gap-5 bg-slate-200 p-spacing-lg mt-spacing-base rounded-lg">
+		<div className="form flex flex-col landscape:flex-row items-start gap-5 bg-slate-200 p-spacing-lg mt-spacing-base rounded-lg">
 			<fieldset>
 				<label htmlFor="animationCount">Animation count</label>
 				<input
@@ -93,7 +93,7 @@ function AnimationStressTestForm({ runTestScenario }: TestFormProps)
 				</select>
 			</fieldset>
 
-			<button onClick={ startTest } className="block bg-green-500 hover:bg-green-400 px-4 py-2 rounded-full transition-colors ml-auto">Create Animations</button>
+			<button onClick={ startTest } className="block text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-full transition-colors landscape:ml-auto">Create Animations</button>
 
 		</div>
 	)
@@ -108,7 +108,7 @@ function SingleAnimation({ ID, timeStyle }: { ID: number, timeStyle: "pausable" 
 	useEffect(() => {
 		animationController.addAnimation({
 			id: `animation_${ ID }`,
-			duration: ( 4 + ID ) / 20,
+			duration: ( 10 + ID ) / 10,
 			onRender: ( currentTime, startTime, duration ) => {
 				const timeline = ( currentTime - startTime ) / duration;
 				setTimeline( Math.min( timeline, 1.0 ) );
@@ -134,7 +134,7 @@ function SingleAnimation({ ID, timeStyle }: { ID: number, timeStyle: "pausable" 
 
 	return (
 		<div className={ state === "running" ? "p-3 bg-orange-300" : "p-3 bg-green-300" }>
-			<p>Animation: #{ ID }</p>
+			<p className="text-sm">Animation: #{ ID }</p>
 			<div className="w-full block bg-slate-900 h-[5px] origin-left" style={{ transform: `translate3d( 0, 0, 0 ) scaleX(${ timeline })`}} />
 		</div>
 	)

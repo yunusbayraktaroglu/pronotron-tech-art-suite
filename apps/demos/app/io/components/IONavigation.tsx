@@ -17,7 +17,7 @@ export function IONavigation()
 
 	return (
 		<>
-			<nav className="flex flex-row items-center space-x-1">
+			<nav className="flex flex-row flex-wrap items-center gap-spacing-xs">
 				{ navItems.map( item => {
 					const color = item.href !== pathname ? "bg-slate-400 hover:bg-slate-500" : "bg-blue-600 hover:bg-blue-700"	
 					return (

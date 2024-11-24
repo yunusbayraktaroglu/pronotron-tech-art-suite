@@ -10,6 +10,7 @@
 		"clean": "rm -rf .turbo && rm -rf node_modules && rm -rf .next"
 	},
 	"dependencies": {
+		"@juggle/resize-observer": "^3.4.0",
 		"@pronotron/io": "0.0.1-beta.4",
 		"@pronotron/pointer": "0.0.1-beta.4",
 		"lodash.throttle": "^4.1.1",
@@ -18,9 +19,9 @@
 		"react-dom": "^18"
 	},
 	"devDependencies": {
-		"@pronotron/config-ts": "*",
-		"@pronotron/config-eslint": "*",
 		"@next/eslint-plugin-next": "^14.1.1",
+		"@pronotron/config-eslint": "*",
+		"@pronotron/config-ts": "*",
 		"@types/lodash.throttle": "^4.1.9",
 		"@types/node": "^20.11.24",
 		"@types/react": "^18.2.61",

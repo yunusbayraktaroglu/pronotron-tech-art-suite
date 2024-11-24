@@ -3,6 +3,7 @@
 import { createContext, useEffect, useState, useContext, useMemo } from 'react';
 import { usePathname } from 'next/navigation'
 import { PronotronIOVertical } from "@pronotron/io";
+import { ResizeObserver as Polyfill } from '@juggle/resize-observer';
 import throttle from "lodash.throttle";
 
 import { stats } from "@/app/components/PerformanceStats";
@@ -100,8 +101,8 @@ export function PronotronIOProvider({ children }: { children: React.ReactNode })
 		 * - Do not use window.resize event, it's firing every scroll in mobile devices because of topbar behavior.
 		 * - Use ResizeObserverPolyfill from '@juggle/resize-observer' to support old devices.
 		 */
-		const ResizeObserver = window.ResizeObserver;
-		const ro = new ResizeObserver(( entries, observer ) => {
+		const ResizeObserver = window.ResizeObserver || Polyfill;
+		const ro = new ResizeObserver(() => {
 			onResize();
 		});
 		ro.observe( document.body ); // Watch dimension changes on body

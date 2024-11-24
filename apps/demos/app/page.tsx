@@ -16,7 +16,7 @@ export default function HomePage()
 		<>
 			<main className="container min-h-screen flex flex-col justify-center">
 				<div className="mb-spacing-lg space-y-spacing-xs">
-					<h1 className="text-4xl">Pronotron Tech-Art Suite</h1>
+					<h1 className="text-3xl">Pronotron Tech-Art Suite</h1>
 					<p>A high-performance TypeScript-based suite designed to enhance interaction, UI, and UX without compromising web standards.</p>
 				</div>
 				<div className="grid grid-cols-2 landscape:grid-cols-3 gap-spacing-sm">
@@ -33,11 +33,10 @@ export default function HomePage()
 					<PackageCard 
 						name="Pronotron Animator"
 						description="Built on NativeControlTable and Clock, it provides per-frame normalized timeline data (ranging from 0 to 1), enabling developers to create any kind of animation."
-						href="/animation-controller"
+						href="/animator"
 					/>
 				</div>
 			</main>
-			<footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">By Yunus Bayraktaroglu</footer>
 		</>
 	)
 
@@ -53,12 +52,12 @@ function PackageCard({ name, description, ...linkProps }: PackageCardProps )
 {
 	return (
 		<Link 
-			className="flex justify-center rounded-lg transition-colors border border-slate-400 bg-slate-700 hover:bg-slate-600 text-white text-sm landscape:text-base p-spacing-base"
+			className="flex justify-center rounded-lg transition-colors bg-slate-700 hover:bg-slate-600 text-white p-spacing-base"
 			{ ...linkProps }
 		>
 			<div className="flex flex-col space-y-spacing-xs">
-				<h2 className="text-2xl">{ name }</h2>
-				<p>{ description }</p>
+				<h2 className="text-xl">{ name }</h2>
+				<p className="text-sm">{ description }</p>
 			</div>
 		</Link>
 	)
