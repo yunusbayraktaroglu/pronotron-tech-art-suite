@@ -7,7 +7,14 @@ import { PronotronAnimationController, PronotronClock, isTouchDevice } from "@pr
 export const pointerSettings = {
 	idleTreshold: 0.6,
 	movingDeltaLimit: 10,
-	holdTreshold: 0.35
+	/**
+	 * To avoid IOS mignifier appearing with long press, 
+	 * .holding class must be added to document before 0.125 seconds.
+	 * 
+	 * @todo
+	 * Add another state as "mayhold" for that treshold
+	 */
+	holdTreshold: 0.11
 };
 
 interface PointerContextProps {
@@ -107,9 +114,16 @@ export function PronotronPointerProvider({ children }: { children: React.ReactNo
 	useEffect(() => {
 
 		const holdHandler = ( event: CustomEvent ) => {
+			/**
+				On mobile, while holding, selection is buggy and unavoidable
+				Best way adding no-select to document, when something holded.
+				https://stackoverflow.com/questions/61485693/preventing-tap-and-hold-from-selecting-nearby-text
+			*/
+			document.documentElement.classList.add( "holding" );
 			console.log( "HOLD", event )
 		};
 		const holdendHandler = ( event: CustomEvent ) => {
+			document.documentElement.classList.remove( "holding" );
 			console.log( "HOLD-END", event )
 		};
 		const tapHandler = ( event: CustomEvent ) => {

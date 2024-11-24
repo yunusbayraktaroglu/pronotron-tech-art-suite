@@ -7,16 +7,16 @@ import { usePerformanceStats } from "../hooks/usePerformanceStats";
 type TestScenario = {
 	testCount: number;
 	animationCount: number;
-	timeType: "pausable" | "continious";
+	timeStyle: "pausable" | "continious";
 };
 
-export default function AnimationControllerDemoPage()
+export default function AnimatorDemoPage()
 {
 	const { setIsActive } = usePerformanceStats();
 	const [ testScenario, setTestScenario ] = useState<TestScenario>({
 		testCount: 0,
 		animationCount: 50,
-		timeType: "pausable"
+		timeStyle: "pausable"
 	});
 
 	useEffect(() => {
@@ -31,16 +31,13 @@ export default function AnimationControllerDemoPage()
 					<SingleAnimation 
 						key={ `${ testScenario.testCount }_${ index }` } 
 						ID={ index }
-						timeStyle={ testScenario.timeType } 
+						timeStyle={ testScenario.timeStyle } 
 					/> 
 				) )}
 			</div>
 		</div>
 	);
 }
-
-
-
 
 interface TestFormProps {
 	runTestScenario: ( scenario: TestScenario ) => void
@@ -51,7 +48,7 @@ function AnimationStressTestForm({ runTestScenario }: TestFormProps)
 	const testCount = useRef( 0 );
 	const [ testScenario, setTestScenario ] = useState<Omit<TestScenario, "testCount">>({
 		animationCount: 1000,
-		timeType: "pausable",
+		timeStyle: "pausable",
 	});
 
 	const handleInputChange = ( event: React.ChangeEvent<HTMLInputElement> ) => {
@@ -89,8 +86,8 @@ function AnimationStressTestForm({ runTestScenario }: TestFormProps)
 				/>
 			</fieldset>
 			<fieldset>
-				<label htmlFor="timeType">Time type</label>
-				<select onChange={ handleSelectChange } name="timeType" id="timeType">
+				<label htmlFor="timeStyle">Time style</label>
+				<select onChange={ handleSelectChange } name="timeStyle" id="timeStyle">
 					<option value="pausable">Pausable</option>
 					<option value="continious">Continious</option>
 				</select>
@@ -102,39 +99,38 @@ function AnimationStressTestForm({ runTestScenario }: TestFormProps)
 	)
 }
 
-
-
-
-
-
-
 function SingleAnimation({ ID, timeStyle }: { ID: number, timeStyle: "pausable" | "continious" })
 {
 	const [ timeline, setTimeline ] = useState( 0 );
-	const [ state, setState ] = useState( "running" );
+	const [ state, setState ] = useState( "waiting" );
+	const [ hasEndedNaturally, setHasEndedNaturally ] = useState( false );
 
 	useEffect(() => {
-		setState( "running" );
 		animationController.addAnimation({
 			id: `animation_${ ID }`,
-			duration: 4.125 + ( ID + 1 ) / 20,
+			duration: ( 4 + ID ) / 20,
 			onRender: ( currentTime, startTime, duration ) => {
 				const timeline = ( currentTime - startTime ) / duration;
 				setTimeline( Math.min( timeline, 1.0 ) );
 			},
 			onEnd: ( forced ) => {
-				if ( forced ){
-					console.log( "forcibly finished" )
-				}
-				if ( animationController.getAnimationCount() < 2 ){
-					console.log( animationController );
-				}
-				setState( "end" );
+				if ( ! forced ){
+					setState( "end" );
+					setHasEndedNaturally( true );
+				} 
 			},
 			timeStyle: timeStyle,
 		});
-		return () => animationController.removeAnimation( `animation_${ ID }`, true );
+		setState( "running" );
 	}, []);
+
+	useEffect(() => {
+		return () => {
+			if ( ! hasEndedNaturally && state === "running" ){
+				animationController.removeAnimation( `animation_${ ID }`, true );
+			}
+		}
+	}, [ hasEndedNaturally ]);
 
 	return (
 		<div className={ state === "running" ? "p-3 bg-orange-300" : "p-3 bg-green-300" }>
@@ -143,8 +139,3 @@ function SingleAnimation({ ID, timeStyle }: { ID: number, timeStyle: "pausable" 
 		</div>
 	)
 }
-
-
-
-
-

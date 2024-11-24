@@ -52,7 +52,10 @@ body {
 	background: var( --background );
 	color: var( --foreground );
 	font-family: Arial, Helvetica, sans-serif;
-	cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23000000" width="6px" height="6px" viewBox="0 0 6 6"><circle cx="3" cy="3" r="2.5"/></svg>') 3 3, auto;
+}
+
+body.custom-cursor * {
+	cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23000000" width="6px" height="6px" viewBox="0 0 6 6"><circle cx="3" cy="3" r="2.5"/></svg>') 3 3, auto !important;
 }
 
 
@@ -78,21 +81,30 @@ body {
 
 }
 
-.holded {
-	@apply
-	select-none;
+/** 
+	Holding treshold might be smaller than IOS magnifier appear treshold, to following CSS disable magnifier
+*/
+.holding {
+    user-select: none !important; /* supported by Chrome and Opera */
+   -webkit-user-select: none !important; /* Safari */
+   -khtml-user-select: none !important; /* Konqueror HTML */
+   -moz-user-select: none !important; /* Firefox */
+   -ms-user-select: none !important; /* Internet Explorer/Edge */
+   -webkit-touch-callout: none !important;
+   -webkit-user-callout: none !important;
+   -webkit-user-drag: none !important;
+   -webkit-user-modify: none !important;
+   -webkit-highlight: none !important;
+   -webkit-text-size-adjust: none !important;
+}
+
+[data-holded] {
 }
 [data-holded="0"] {
 }
 [data-holded="1"] {
-	/**
-		On mobile, while holding, selection is buggy and unavoidable
-		Best way adding no-select to document, when something holded.
-		https://stackoverflow.com/questions/61485693/preventing-tap-and-hold-from-selecting-nearby-text
-	*/
+	pointer-events: none;
 	background-color: black;
-	@apply
-	!select-none;
 }
 
 @layer components {
@@ -117,7 +129,7 @@ body {
 	}
 
 	.pointer {
-		--cursor-size: max( 20px, calc( 100vw / 30 ) );
+		--cursor-size: max( 25px, calc( 100vw / 40 ) );
 		--cursor-half-size: calc( var( --cursor-size ) / 2 );
 		--scale: 1;
 		--transition-duration: 0.4s;
@@ -125,8 +137,7 @@ body {
 		left: 0;
 		top: 0;
 		background-color: transparent;
-		border: 2px solid black;
-		outline: 2px solid white;
+		border: 1px solid black;
 		border-radius: 50%;
 		height: var( --cursor-size );
 		width: var( --cursor-size );
@@ -138,30 +149,30 @@ body {
 		transition: transform var( --transition-duration ) cubic-bezier( 0.22, 1, 0.36, 1 );
 	}
 
-	.pointer[data-state="MOVING"] {
+	.pointer[ data-state="MOVING" ] {
 		--scale: 1.25;
 	}
 
-	.pointer[data-state="OUT"] {
+	.pointer[ data-state="OUT" ] {
 		--scale: 0;
 	}
 
-	.pointer[data-state="WAITING"] {
+	.pointer[ data-state="WAITING" ] {
 		--scale: 0.75;
 		animation: pulse-bg 1.5s infinite;
 	}
 
-	.pointer[data-state="HOLDING"],
-	.pointer[data-state="HOLDMOVING"] {
-		background-color: #FF0000;
+	.pointer[ data-state="HOLDING" ],
+	.pointer[ data-state="HOLDMOVING" ] {
+		background-color: rgba( 255, 255, 255, 0.5 );
 		--scale: 1.25;
 	}
 
-	.pointer[data-state="HOLDMOVING"] {
-		border-color: aqua;
+	.pointer[ data-state="HOLDMOVING" ] {
+		border-color: rgba( 168, 85, 247, 1.0 );
 	}
 
-	.pointer[data-interactable="true"] {
+	.pointer[ data-interactable="true" ] {
 		animation: pulse-bg 1.5s infinite;
 		--transition-duration: 1s;
 	}

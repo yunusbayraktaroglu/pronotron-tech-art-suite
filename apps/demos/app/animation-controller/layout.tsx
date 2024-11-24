@@ -10,14 +10,10 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
 {
 	return (
 		<div className="flex flex-col">
-			<div className="flex flex-col py-10 bg-slate-200">
-				<div className="container">
-					<h1 className="text-3xl mb-2">Pronotron Animation Controller Demo</h1>
-					<p className="text-xl">Pronotron Animation Controller is an ultra tiny module, uses a single flatten <a className="underline" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray#typedarray_objects" target="_blank" rel="noopener noreferrer">TypedArray</a> to hold/update the data of the animations. Tracks 2 types of time to stop ticking if screen is not focused. Iteration over TypedArray helps lower-level access to memory.</p>
-					<div className="my-3">
-						<p className="text-sm">onRender(): currentTime, startTime, duration which can be used to create every kind of animation.</p>
-						<p className="text-sm">onEnd(): runs when animation end.</p>
-					</div>
+			<div className="flex flex-col py-spacing-lg bg-slate-200">
+				<div className="container space-y-spacing-sm">
+					<h1 className="text-3xl">Pronotron Pointer Demo</h1>
+					<p className="text-xl">Built on @pronotron/utils NativeControlTable and Clock, it provides per-frame normalized timeline data (ranging from 0 to 1), enabling developers to create any kind of animation.</p>
 				</div>
 			</div>
 			<PronotronAnimationControllerProvider>

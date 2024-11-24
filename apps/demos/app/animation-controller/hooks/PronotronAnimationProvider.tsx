@@ -8,13 +8,13 @@ import { stats } from "@/app/components/PerformanceStats";
 const clock = new PronotronClock();
 export const animationController = new PronotronAnimationController( clock, 50 );
 
-interface AppTickerContextProps {
+interface AnimatorContextProps {
 	elapsedTime: number;
 	activeElapsedTime: number;
 	clockDelta: number;
 }
 
-const AppTickerContext  = createContext<AppTickerContextProps | undefined>( undefined );
+const AnimatorContext  = createContext<AnimatorContextProps | undefined>( undefined );
 
 export function PronotronAnimationControllerProvider({ children }: { children: React.ReactNode })
 {
@@ -58,7 +58,7 @@ export function PronotronAnimationControllerProvider({ children }: { children: R
 	}, []);
 
 	return (
-		<AppTickerContext.Provider
+		<AnimatorContext.Provider
 			value={{
 				elapsedTime,
 				activeElapsedTime,
@@ -66,13 +66,13 @@ export function PronotronAnimationControllerProvider({ children }: { children: R
 			}}
 		>
 			{ children }
-		</AppTickerContext.Provider>
+		</AnimatorContext.Provider>
 	);
 }
 
 
 export const useAppTicker = () => {
-	const context = useContext( AppTickerContext );
+	const context = useContext( AnimatorContext );
 	if ( ! context ){
 	  	throw new Error( "useAppTicker must be used within an AppTickerProvider" );
 	}

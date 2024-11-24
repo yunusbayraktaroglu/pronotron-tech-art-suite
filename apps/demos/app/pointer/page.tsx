@@ -5,6 +5,13 @@ import { PronotronPointerProvider, usePointerContext, pointerSettings } from "./
 
 export default function PointerDemoPage()
 {
+	useEffect(() => {
+		document.body.classList.add( "custom-cursor" );
+		return () => {
+			document.body.classList.remove( "custom-cursor" );
+		}
+	}, []);
+
 	return (
 		<>
 			<PronotronPointerProvider>
@@ -40,12 +47,6 @@ export default function PointerDemoPage()
 function PointerDebugger()
 {
 	const { pointer, pointerDelta, pointerState, pointerTargetInteractable } = usePointerContext();
-
-	useEffect(() => {
-		if ( pointerState === "HOLDING" ){
-			window.document.body.classList.add( "holding" );
-		}
-	}, [ pointerState ]);
 
 	return (
 		<>
