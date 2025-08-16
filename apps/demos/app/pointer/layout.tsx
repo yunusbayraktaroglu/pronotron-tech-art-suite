@@ -12,7 +12,7 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
 			<div className="flex flex-col py-spacing-lg bg-slate-200">
 				<div className="container space-y-spacing-sm">
 					<h1 className="text-2xl">Pronotron Pointer Demo</h1>
-					<p className="text-base">Pronotron pointer Tracks mouse and touch pointers with custom states such as holding, tapping, idling, interacting, moving out, and moving in, providing enhanced interaction control.</p>
+					<p className="text-base">Tracks mouse and touch interactions with custom states such as holding, tapping, idling, interacting, moving out, and moving in, enabling enhanced interaction control.</p>
 				</div>
 			</div>
 			{ children }

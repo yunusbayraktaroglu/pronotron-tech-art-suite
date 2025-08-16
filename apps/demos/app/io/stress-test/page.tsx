@@ -21,7 +21,7 @@ export default function StressTestPage()
 	const [ testScenario, setTestScenario ] = useState<TestScenario | false>( false );
 
 	return (
-		<div className="container mt-spacing-base">
+		<div className="container mb-spacing-3xl">
 
 			<div className="bg-slate-200 p-spacing-lg rounded-lg">
 				{ testScenario ? (
@@ -93,11 +93,11 @@ function TestForm({ runTestScenario }: TestFormProps)
 	const [ testScenario, setTestScenario ] = useState<Omit<TestScenario, "testCount">>({
 		ioCount: 1000,
 		dispatchType: "modify_dom",
-		inViewport: false,
+		inViewport: true,
 		topIn: true,
-		topOut: false,
-		bottomIn: false,
-		bottomOut: false,
+		topOut: true,
+		bottomIn: true,
+		bottomOut: true,
 		onFastForward: "skip_both",
 	});
 
@@ -149,7 +149,7 @@ function TestForm({ runTestScenario }: TestFormProps)
 				<fieldset className="flex flex-col landscape:flex-row gap-5">
 
 					<fieldset>
-						<label htmlFor="ioCount">IO count</label>
+						<label htmlFor="ioCount">IO Node count</label>
 						<input
 							type="number"
 							min={ 100 }
@@ -161,7 +161,7 @@ function TestForm({ runTestScenario }: TestFormProps)
 					</fieldset>
 
 					<fieldset>
-						<label htmlFor="dispatch-type">Select dispatch type</label>
+						<label htmlFor="dispatch-type">Dispatch type</label>
 						<select onChange={ handleSelectChange } name="dispatchType" id="dispatch-type">
 							<option value="modify_dom">Modify dom</option>
 							<option value="console_log">Console log</option>
@@ -170,7 +170,7 @@ function TestForm({ runTestScenario }: TestFormProps)
 					</fieldset>
 
 					<fieldset>
-						<label htmlFor="fast-forward">Select fast-forward type</label>
+						<label htmlFor="fast-forward">Fast-forward behavior</label>
 						<select onChange={ handleSelectChange } name="onFastForward" id="fast-forward">
 							<option value="skip_both">Skip both (default)</option>
 							<option value="execute_both">Execute both events</option>
@@ -280,7 +280,7 @@ function emptyDispatcher({ inViewport, topIn, topOut, bottomIn, bottomOut, onFas
 
 function DomManipulator({ index, inViewport, topIn, topOut, bottomIn, bottomOut, onFastForward }: logDispatcherProps )
 {
-	const [ pos, setPos ] = useState<string | number>( "untracked" );
+	const [ pos, setPos ] = useState<number>( 0 );
 	const [ state, setState ] = useState<false | string>( false );
 
 	return (
@@ -299,7 +299,7 @@ function DomManipulator({ index, inViewport, topIn, topOut, bottomIn, bottomOut,
 					onFastForward
 				}}
 			>
-				<p>Normalized Position: { pos }</p>
+				<p>Normalized Position: { pos.toFixed( 2 ) }</p>
 			</IODispatcher>
 			<p><strong>#{ index }:</strong> Last recorded event: { state ? state : null }</p>
 		</div>

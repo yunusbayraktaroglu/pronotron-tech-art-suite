@@ -24,7 +24,7 @@ export default function SharedNodePageOne()
 				onTopIn: () => console.log( `#${ index } Top-in` ),
 				onTopOut: () => console.log( `#${ index } Top-out` ),
 				onBottomOut: () => console.log( `#${ index } Bottom-out` ),
-				onBottomIn: () => console.log( `#${ index } Bottomin` ),
+				onBottomIn: () => console.log( `#${ index } Bottom-in` ),
 				onInViewport: ( normalizedPosition: number ) => {
 					console.log( `#${ index } In Viewport`, normalizedPosition );
 				},

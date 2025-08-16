@@ -1,17 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { IODispatcher } from "./hooks/usePronotronIO";
-import { usePerformanceStats } from "../hooks/usePerformanceStats";
 
 export default function HomePage()
 {
-	const { setIsActive } = usePerformanceStats();
-
-	useEffect(() => {
-		setIsActive( true );
-	}, []);
-
 	return (
 		<>
 			<h2 className="italic text-slate-400 text-center">Scroll down...</h2>
@@ -29,10 +22,10 @@ function SingleDispatcher()
 	const [ state, setState ] = useState<false | string>( false );
 
 	return ( 
-		<div className="container border-l border-r border-black">
-			<p>Last recorded event: { state ? state : null }</p>
+		<div className="container border-l-2 border-r-2 border-black border-dashed">
+			<p className="text-sm">Last recorded event: { state ? state : null }</p>
 			<IODispatcher 
-				className='py-spacing-lg my-spacing-base border-b border-t border-black'
+				className='py-spacing-lg my-spacing-base border-b border-t border-slate-500'
 				style={{ backgroundColor: `rgba( 0, 255, 0, ${ Math.abs( pos ) })` }}
 				offset={ 0 }
 				dispatch={{
@@ -47,9 +40,9 @@ function SingleDispatcher()
 				}}
 				onRemoveNode={() => console.log( "IO Node removed" )}
 			>
-				<p>Normalized Position: { pos }</p>
+				<p className="text-sm">Normalized Position: { pos.toFixed( 2 ) }</p>
 			</IODispatcher>
-			<p>Last recorded event: { state ? state : null }</p>
+			<p className="text-sm">Last recorded event: { state ? state : null }</p>
 		</div>
 	)
 }
