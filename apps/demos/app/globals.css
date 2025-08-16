@@ -188,7 +188,7 @@ body.custom-cursor * {
 	}
 	.form label {
 		@apply
-		block mb-2 text-base font-medium text-gray-900 dark:text-white
+		block mb-2 text-sm font-medium text-gray-900
 	}
 	
 	.form .checkbox {
@@ -203,7 +203,7 @@ body.custom-cursor * {
 	
 	.form .checkbox label {
 		@apply
-		ms-1 text-base font-medium text-gray-900 dark:text-gray-300 whitespace-nowrap
+		ms-1 text-base font-medium text-gray-900 whitespace-nowrap
 	}
 	
 	.form input[ type=checkbox ] {

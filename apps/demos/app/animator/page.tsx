@@ -132,9 +132,11 @@ function SingleAnimation({ ID, timeStyle }: { ID: number, timeStyle: "pausable" 
 		}
 	}, [ hasEndedNaturally ]);
 
+	const colorClass = state === "running" ? "p-3 bg-orange-300" : "p-3 bg-green-300";
+
 	return (
-		<div className={ state === "running" ? "p-3 bg-orange-300" : "p-3 bg-green-300" }>
-			<p className="text-sm">Animation: #{ ID }</p>
+		<div className={ colorClass }>
+			<p className="text-xs">Animation: #{ ID }</p>
 			<div className="w-full block bg-slate-900 h-[5px] origin-left" style={{ transform: `translate3d( 0, 0, 0 ) scaleX(${ timeline })`}} />
 		</div>
 	)

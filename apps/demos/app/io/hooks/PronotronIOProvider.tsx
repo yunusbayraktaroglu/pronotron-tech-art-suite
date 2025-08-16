@@ -7,6 +7,7 @@ import { ResizeObserver as Polyfill } from '@juggle/resize-observer';
 import throttle from "lodash.throttle";
 
 import { stats } from "@/app/components/PerformanceStats";
+import { usePerformanceStats } from "@/app/hooks/usePerformanceStats";
 
 interface PronotronIOContextType {
 	io: PronotronIOVertical;
@@ -37,6 +38,7 @@ export function PronotronIOProvider({ children }: { children: React.ReactNode })
 	const pronotronIO = useMemo(() => new PronotronIOVertical(), [])
 	const pathname = usePathname();
 	const [ scrollDirection, setScrollDirection ] = useState<"down" | "up">( "down" );
+	const { setIsActive } = usePerformanceStats();
 
 	useEffect(() => {
 		/**
@@ -60,6 +62,9 @@ export function PronotronIOProvider({ children }: { children: React.ReactNode })
 	}, [ pathname ]);
 
 	useEffect(() => {
+
+		// Activate performance stats
+		setIsActive( true );
 
 		let needsTick = false;
 		let animationFrameId = 0;

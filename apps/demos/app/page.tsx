@@ -16,7 +16,7 @@ export default function HomePage()
 		<>
 			<main className="container min-h-screen flex flex-col justify-center">
 				<div className="mb-spacing-lg space-y-spacing-xs">
-					<h1 className="text-3xl">Pronotron Tech-Art Suite</h1>
+					<h1 className="text-3xl">Pronotron <span className="whitespace-nowrap">Tech-Art</span> Suite</h1>
 					<p>A high-performance TypeScript-based suite designed to enhance interaction, UI, and UX without compromising web standards.</p>
 				</div>
 				<div className="grid grid-cols-2 landscape:grid-cols-3 gap-spacing-sm">
