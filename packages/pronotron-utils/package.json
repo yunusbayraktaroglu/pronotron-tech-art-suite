@@ -1,6 +1,6 @@
 {
 	"name": "@pronotron/utils",
-	"version": "0.0.1-beta.4",
+	"version": "0.0.1-beta.5",
 	"description": "A set of helper modules used by other @pronotron packages, which can also be used individually.",
 	"author": "Yunus Bayraktaroglu <yunus.bayraktaroglu@gmail.com>",
 	"main": "./dist/index.js",

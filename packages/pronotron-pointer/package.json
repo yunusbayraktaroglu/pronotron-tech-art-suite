@@ -1,6 +1,6 @@
 {
 	"name": "@pronotron/pointer",
-	"version": "0.0.1-beta.4",
+	"version": "0.0.1-beta.5",
 	"description": "Tracks mouse and touch pointers with custom states such as holding, tapping, idling, interacting, moving out, and moving in, providing enhanced interaction control.",
 	"author": "Yunus Bayraktaroglu <yunus.bayraktaroglu@gmail.com>",
 	"main": "./dist/index.js",
@@ -39,6 +39,6 @@
 		"typescript": "^5.3.3"
 	},
 	"dependencies": {
-		"@pronotron/utils": "0.0.1-beta.4"
+		"@pronotron/utils": "0.0.1-beta.5"
 	}
 }
