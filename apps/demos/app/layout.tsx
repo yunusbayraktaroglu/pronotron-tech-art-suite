@@ -21,7 +21,7 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
 	title: {
-		default: "Pronotron Tech-Art Suite",
+		default: "Homepage | Pronotron Tech-Art Suite",
 		template: '%s | Pronotron Tech-Art Suite',
 	},
 	description: "Demo setups for Pronotron Tech-Art Suite",
@@ -40,10 +40,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 			<body className={ `${ geistSans.variable } ${ geistMono.variable } antialiased` }>
 				<SiteSVG />
 				<header className="container">
-					<nav className="flex flex-row -mx-spacing-sm my-spacing-sm landscape:my-spacing-xs">
+					<nav className="flex flex-row -mx-spacing-sm">
 						<Link href="/" className="p-spacing-sm hover:underline">Home</Link>
 						<a className="ml-auto flex flex-row align-center p-spacing-sm text-slate-500 fill-slate-500 hover:fill-black hover:text-black transition-colors" target="_blank" href="https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite">
-							Github<GithubIcon fill="inherit" stroke="none" className="ml-1" />
+							Github <GithubIcon fill="inherit" stroke="none" className="ml-1" />
 						</a>
 					</nav>
 				</header>

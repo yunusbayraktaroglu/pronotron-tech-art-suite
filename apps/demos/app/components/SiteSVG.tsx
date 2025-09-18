@@ -24,6 +24,14 @@ export function SiteSVG() {
 				<symbol id="comment_icon">
 					<path d="M7 8H17M7 11H17M7 14H11M3 18V6C3 4.89543 3.89543 4 5 4H19C20.1046 4 21 4.89543 21 6V16C21 17.1046 20.1046 18 19 18H7.66667C7.23393 18 6.81286 18.1404 6.46667 18.4L3 21V18Z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"/>
 				</symbol>
+				<symbol id="expand_icon">
+					<g>
+						<polyline points="3 17.3 3 21 6.7 21"></polyline>
+						<line x1="10" x2="3.8" y1="14" y2="20.2"></line>
+						<line x1="14" x2="20.2" y1="10" y2="3.8"></line>
+						<polyline points="21 6.7 21 3 17.3 3"></polyline>
+					</g>
+				</symbol>
 			</defs>
 		</svg>
 	)
@@ -70,6 +78,15 @@ export function CloseIcon( props: React.ComponentProps<"svg"> )
 	return (
 		<svg width="24" height="24" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round" { ...props }>
 			<use href="#close_icon" /> 
+		</svg>
+	)
+}
+
+export function ExpandIcon( props: React.ComponentProps<"svg"> )
+{
+	return (
+		<svg width="24" height="24" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round" { ...props }>
+			<use href="#expand_icon" /> 
 		</svg>
 	)
 }

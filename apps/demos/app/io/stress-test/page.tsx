@@ -1,19 +1,19 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { IODispatchOptions } from '@pronotron/io';
-import { IODispatcher } from "../hooks/usePronotronIO";
+import { IOVerticalOptions } from '@pronotron/io';
+import { IODispatcher } from "../components/IODispatcher";
 
 type TestScenario = {
 	testCount: number;
 	inViewport: boolean,
 	ioCount: number;
-	topIn: boolean;
-	topOut: boolean;
-	bottomIn: boolean;
-	bottomOut: boolean;
+	topEnter: boolean;
+	topExit: boolean;
+	bottomEnter: boolean;
+	bottomExit: boolean;
 	dispatchType: "modify_dom" | "console_log" | "never",
-	onFastForward: IODispatchOptions[ "onFastForward" ],
+	onFastForward: IOVerticalOptions[ "dispatch" ][ "onFastForward" ],
 };
 
 export default function StressTestPage()
@@ -33,7 +33,7 @@ export default function StressTestPage()
 			{ testScenario ? ( 
 				Array.from({ length: testScenario.ioCount }).map(( item, index ) => {
 
-					const { dispatchType, inViewport, topIn, topOut, bottomIn, bottomOut, onFastForward } = testScenario;
+					const { dispatchType, inViewport, topEnter, topExit, bottomEnter, bottomExit, onFastForward } = testScenario;
 
 					switch( dispatchType ){
 						case "modify_dom": 
@@ -42,10 +42,10 @@ export default function StressTestPage()
 									key={ `${ testScenario.testCount }_${ index }` }
 									index={ index } 
 									inViewport={ inViewport }
-									topIn={ topIn } 
-									topOut={ topOut }
-									bottomIn={ bottomIn } 
-									bottomOut={ bottomOut }
+									topEnter={ topEnter } 
+									topExit={ topExit }
+									bottomEnter={ bottomEnter } 
+									bottomExit={ bottomExit }
 									onFastForward={ onFastForward } 
 								/>
 							)
@@ -56,7 +56,7 @@ export default function StressTestPage()
 									className={ `bg-green-500 my-[120vh]` }
 									offset={ 0 }
 									//@ts-expect-error - At least 1 event is required
-									dispatch={ logDispatcher({ index, inViewport, topIn, topOut, bottomIn, bottomOut, onFastForward }) }
+									dispatch={ logDispatcher({ index, inViewport, topEnter, topExit, bottomEnter, bottomExit, onFastForward }) }
 								>
 									<p className="text-center">{ index }</p>
 								</IODispatcher>
@@ -68,7 +68,7 @@ export default function StressTestPage()
 									className={ `bg-green-500 my-[120vh]` }
 									offset={ 0 }
 									//@ts-expect-error - At least 1 event is required
-									dispatch={ emptyDispatcher({ inViewport, topIn, topOut, bottomIn, bottomOut, onFastForward }) }
+									dispatch={ emptyDispatcher({ inViewport, topEnter, topExit, bottomEnter, bottomExit, onFastForward }) }
 								>
 									<p className="text-center">{ index }</p>
 								</IODispatcher>
@@ -94,10 +94,10 @@ function TestForm({ runTestScenario }: TestFormProps)
 		ioCount: 1000,
 		dispatchType: "modify_dom",
 		inViewport: true,
-		topIn: true,
-		topOut: true,
-		bottomIn: true,
-		bottomOut: true,
+		topEnter: true,
+		topExit: true,
+		bottomEnter: true,
+		bottomExit: true,
 		onFastForward: "skip_both",
 	});
 
@@ -129,8 +129,8 @@ function TestForm({ runTestScenario }: TestFormProps)
 	};
 
 	const startTest = () => {
-		const { inViewport, topIn, topOut, bottomIn, bottomOut } = testScenario;
-		if ( ! inViewport && ! topIn && ! topOut && ! bottomIn && ! bottomOut ){
+		const { inViewport, topEnter, topExit, bottomEnter, bottomExit } = testScenario;
+		if ( ! inViewport && ! topEnter && ! topExit && ! bottomEnter && ! bottomExit ){
 			setWarning( "Please select at least 1 event" );
 			return;
 		}
@@ -146,11 +146,12 @@ function TestForm({ runTestScenario }: TestFormProps)
 			
 			<fieldset className="flex flex-col landscape:flex-row justify-between items-start gap-5">
 
-				<fieldset className="flex flex-col landscape:flex-row gap-5">
+				<fieldset className="grid grid-rows-1 grid-cols-1 landscape:grid-cols-4 landscape:grid-rows-1 gap-5">
 
 					<fieldset>
 						<label htmlFor="ioCount">IO Node count</label>
 						<input
+							className="w-full"
 							type="number"
 							min={ 100 }
 							name="ioCount"
@@ -162,7 +163,7 @@ function TestForm({ runTestScenario }: TestFormProps)
 
 					<fieldset>
 						<label htmlFor="dispatch-type">Dispatch type</label>
-						<select onChange={ handleSelectChange } name="dispatchType" id="dispatch-type">
+						<select onChange={ handleSelectChange } name="dispatchType" id="dispatch-type" className="w-full">
 							<option value="modify_dom">Modify dom</option>
 							<option value="console_log">Console log</option>
 							<option value="never">Never (useful for iteration speed)</option>
@@ -171,7 +172,7 @@ function TestForm({ runTestScenario }: TestFormProps)
 
 					<fieldset>
 						<label htmlFor="fast-forward">Fast-forward behavior</label>
-						<select onChange={ handleSelectChange } name="onFastForward" id="fast-forward">
+						<select onChange={ handleSelectChange } name="onFastForward" id="fast-forward" className="w-full">
 							<option value="skip_both">Skip both (default)</option>
 							<option value="execute_both">Execute both events</option>
 							<option value="execute_last">Execute last event</option>
@@ -194,42 +195,42 @@ function TestForm({ runTestScenario }: TestFormProps)
 							<fieldset>
 								<input
 									type="checkbox"
-									name="topIn"
-									id="top-in"
-									checked={ testScenario.topIn }
+									name="topEnter"
+									id="top-enter"
+									checked={ testScenario.topEnter }
 									onChange={ handleCheckboxChange }
 								/>
-								<label htmlFor="top-in">Top-in</label>
+								<label htmlFor="top-enter">Top-enter</label>
 							</fieldset>
 							<fieldset>
 								<input
 									type="checkbox"
-									name="topOut"
-									id="top-out"
-									checked={ testScenario.topOut }
+									name="topExit"
+									id="top-exit"
+									checked={ testScenario.topExit }
 									onChange={ handleCheckboxChange }
 								/>
-								<label htmlFor="top-out">Top-out</label>
+								<label htmlFor="top-exit">Top-exit</label>
 							</fieldset>
 							<fieldset>
 								<input
 									type="checkbox"
-									name="bottomIn"
-									id="bottom-in"
-									checked={ testScenario.bottomIn }
+									name="bottomEnter"
+									id="bottom-enter"
+									checked={ testScenario.bottomEnter }
 									onChange={ handleCheckboxChange }
 								/>
-								<label htmlFor="bottom-in">Bottom-in</label>
+								<label htmlFor="bottom-enter">Bottom-enter</label>
 							</fieldset>
 							<fieldset>
 								<input
 									type="checkbox"
-									name="bottomOut"
-									id="bottom-out"
-									checked={ testScenario.bottomOut }
+									name="bottomExit"
+									id="bottom-exit"
+									checked={ testScenario.bottomExit }
 									onChange={ handleCheckboxChange }
 								/>
-								<label htmlFor="bottom-out">Bottom-out</label>
+								<label htmlFor="bottom-exit">Bottom-exit</label>
 							</fieldset>
 						</fieldset>
 					</fieldset>
@@ -247,38 +248,38 @@ function TestForm({ runTestScenario }: TestFormProps)
 interface logDispatcherProps {
 	index: number,
 	inViewport: boolean;
-	topIn: boolean;
-	topOut: boolean;
-	bottomIn: boolean;
-	bottomOut: boolean;
-	onFastForward: IODispatchOptions[ "onFastForward" ];
+	topEnter: boolean;
+	topExit: boolean;
+	bottomEnter: boolean;
+	bottomExit: boolean;
+	onFastForward: IOVerticalOptions[ "dispatch" ][ "onFastForward" ],
 }
 
-function logDispatcher({ index, inViewport, topIn, topOut, bottomIn, bottomOut, onFastForward }: logDispatcherProps )
+function logDispatcher({ index, inViewport, topEnter, topExit, bottomEnter, bottomExit, onFastForward }: logDispatcherProps )
 {
 	return {
 		...( inViewport && { onInViewport: ( normalizedPosition: number ) => console.log( `${ index }: Normalized position: ${ normalizedPosition }` ) } ),
-		...( topIn && { onTopIn: () => console.log( `${ index }: top-in` ) } ),
-		...( topOut && { onTopOut: () => console.log( `${ index }: top-out` ) } ),
-		...( bottomIn && { onBottomIn: () => console.log( `${ index }: bottom-in` ) } ),
-		...( bottomOut && { onBottomOut: () => console.log( `${ index }: bottom-out` ) } ),
+		...( topEnter && { onTopEnter: () => console.log( `${ index }: top-enter` ) } ),
+		...( topExit && { onTopExit: () => console.log( `${ index }: top-exit` ) } ),
+		...( bottomEnter && { onBottomEnter: () => console.log( `${ index }: bottom-enter` ) } ),
+		...( bottomExit && { onBottomExit: () => console.log( `${ index }: bottom-exit` ) } ),
 		onFastForward
 	}
 }
 
-function emptyDispatcher({ inViewport, topIn, topOut, bottomIn, bottomOut, onFastForward }: logDispatcherProps )
+function emptyDispatcher({ inViewport, topEnter, topExit, bottomEnter, bottomExit, onFastForward }: logDispatcherProps )
 {
 	return {
 		...( inViewport && { onInViewport: () => {} } ),
-		...( topIn && { onTopIn: () => {} } ),
-		...( topOut && { onTopOut: () => {} } ),
-		...( bottomIn && { onBottomIn: () => {} } ),
-		...( bottomOut && { onBottomOut: () => {} } ),
+		...( topEnter && { onTopEnter: () => {} } ),
+		...( topExit && { onTopExit: () => {} } ),
+		...( bottomEnter && { onBottomEnter: () => {} } ),
+		...( bottomExit && { onBottomExit: () => {} } ),
 		onFastForward
 	}
 }
 
-function DomManipulator({ index, inViewport, topIn, topOut, bottomIn, bottomOut, onFastForward }: logDispatcherProps )
+function DomManipulator({ index, inViewport, topEnter, topExit, bottomEnter, bottomExit, onFastForward }: logDispatcherProps )
 {
 	const [ pos, setPos ] = useState<number>( 0 );
 	const [ state, setState ] = useState<false | string>( false );
@@ -292,10 +293,10 @@ function DomManipulator({ index, inViewport, topIn, topOut, bottomIn, bottomOut,
 				//@ts-expect-error - At least 1 event is required
 				dispatch={{
 					...( inViewport === true && { onInViewport: ( normalizedPosition: number ) => setPos( normalizedPosition ) } ),
-					...( topIn === true && { onTopIn: () => setState( "Top-in" ) } ),
-					...( topOut === true && { onTopOut: () => setState( "Top-out" ) } ),
-					...( bottomIn === true && { onBottomIn: () => setState( "Bottom-in" ) } ),
-					...( bottomOut === true && { onBottomOut: () => setState( "Bottom-out" ) } ),
+					...( topEnter === true && { onTopEnter: () => setState( "Top-enter" ) } ),
+					...( topExit === true && { onTopExit: () => setState( "Top-exit" ) } ),
+					...( bottomEnter === true && { onBottomEnter: () => setState( "Bottom-enter" ) } ),
+					...( bottomExit === true && { onBottomExit: () => setState( "Bottom-exit" ) } ),
 					onFastForward
 				}}
 			>
