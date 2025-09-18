@@ -133,19 +133,29 @@ body.custom-cursor * {
 		--cursor-half-size: calc( var( --cursor-size ) / 2 );
 		--scale: 1;
 		--transition-duration: 0.4s;
+		--background-color: transparent;
+		--border-color: black;
+		--animation: none;
+		background-color: transparent;
 		position: fixed;
 		left: 0;
 		top: 0;
-		background-color: transparent;
-		border: 1px solid black;
-		border-radius: 50%;
-		height: var( --cursor-size );
-		width: var( --cursor-size );
-		transform: translate3d( calc( var( --x ) - var( --cursor-half-size ) ), calc( var( --y ) - var( --cursor-half-size ) ), 0 ) scale( var( --scale ) );
+		transform: translate3d( calc( var( --x ) - var( --cursor-half-size ) ), calc( var( --y ) - var( --cursor-half-size ) ), 0 );
 		pointer-events: none;
 		touch-action: none;
 		user-select: none;
 		z-index: 9999;
+	}
+
+	.pointer-inside {
+		animation: var( --animation );
+		background-color: var( --background-color );
+		border: 1px solid var( --border-color );
+		overflow: hidden;
+		border-radius: 50%;
+		height: var( --cursor-size );
+		width: var( --cursor-size );
+		transform: scale( var( --scale ) );
 		transition: transform var( --transition-duration ) cubic-bezier( 0.22, 1, 0.36, 1 );
 	}
 
@@ -159,21 +169,21 @@ body.custom-cursor * {
 
 	.pointer[ data-state="PENDING" ] {
 		--scale: 0.75;
-		animation: pulse-bg 1.5s infinite;
+		--animation: pulse-bg 1.5s infinite;
 	}
 
 	.pointer[ data-state="HOLDING" ],
 	.pointer[ data-state="HOLD_DRAGGING" ] {
-		background-color: rgba( 255, 255, 255, 0.5 );
+		--background-color: rgba( 255, 255, 255, 0.5 );
 		--scale: 1.25;
 	}
 
 	.pointer[ data-state="HOLD_DRAGGING" ] {
-		border-color: rgba( 168, 85, 247, 1.0 );
+		--border-color: rgba( 168, 85, 247, 1.0 );
 	}
 
 	.pointer[ data-interactable="true" ] {
-		animation: pulse-bg 1.5s infinite;
+		--animation: pulse-bg 1.5s infinite;
 		--transition-duration: 1s;
 	}
 
