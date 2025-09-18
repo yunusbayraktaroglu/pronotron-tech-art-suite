@@ -1,24 +1,33 @@
 # @pronotron/pointer
 
+[![NPM Package][npm]][npm-url]
+[![Build Size][build-size]][build-size-url]
+
 Tracks mouse and touch pointers with custom states such as holding, tapping, idling, interacting, moving out, and moving in, providing enhanced interaction control.
 
 ### Setup
 ```typescript
-import { TouchBase, TouchHoldable, MouseHoldable, MouseBase } from "@pronotron/pointer";
+import { MouseController, TouchController } from "@pronotron/pointer";
 import { PronotronAnimationController, PronotronClock, isTouchDevice } from "@pronotron/utils";
 
 const clock = new PronotronClock();
 const animationController = new PronotronAnimationController( clock );
 
-const pointerController = new MouseHoldable({
+/**
+ * Or create a touch controller if
+ * isTouchDevice(); 
+ */
+const pointerController = new MouseController({
 	target: window.document.body,
 	clock: clock,
 	animationController: animationController,
+	idleThreshold: 0.5,
+	tapThreshold: 0.25,
+	holdThreshold: 0.75,
+	movingDeltaLimit: 10,
 	isInteractable: ( target: HTMLElement ) => {
 		return target.classList.contains( "holdable" ) || target.tagName === "A";
 	},
-	idleTreshold: 0.5,
-	holdTreshold: 0.35,
 	isHoldable: ( target: HTMLElement ) => {
 		return target.dataset.holdable ? true : false;
 	}
@@ -39,7 +48,7 @@ window.document.body.addEventListener( "holdend", holdendHandler as EventListene
 window.document.body.addEventListener( "tap", tapHandler as EventListener );
 ```
 
-### Running
+### Usage
 
 ```typescript
 pointerController.startEvents();
@@ -51,13 +60,21 @@ function tick()
 	const deltaTime = clock.tick();
 	animationController.tick();
 
-	setPointer( pointerController.getPosition() );
-	setPointerDelta( pointerController.getMovement() );
-	setPointerState( pointerController.getCurrentState() );
-	setPointerTargetInteractable( pointerController.getTargetInteractable() );
+	const pointerPosition = pointerController.getPosition();
+	const pointerDelta = pointerController.getDelta();
+	const pointerState = pointerController.getState();
+	const isPointerTargetInteractable = pointerController.getTargetInteractable();    
 
 	animationFrameId = requestAnimationFrame( tick );
 };
 
 animationFrameId = requestAnimationFrame( tick );
+
+// Dispose
+// pointerController.stopEvents();
 ```
+
+[npm]: https://img.shields.io/npm/v/@pronotron/pointer
+[npm-url]: https://www.npmjs.com/package/@pronotron/pointer
+[build-size]: https://badgen.net/bundlephobia/minzip/@pronotron/pointer
+[build-size-url]: https://bundlephobia.com/result?p=@pronotron/pointer

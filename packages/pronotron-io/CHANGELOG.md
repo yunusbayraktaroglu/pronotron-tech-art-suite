@@ -1,5 +1,16 @@
 # @pronotron/io
 
+## 0.0.1-beta.5
+
+### Patch Changes
+
+- Added clear and concise descriptions for all public and private methods.
+- Documented parameters, return values, and behavior.
+- Updated logic to a position-based approach for improved performance.
+- Both directions (vertical and horizontal) are now supported.
+- Updated dependencies
+  - @pronotron/utils@0.0.1-beta.5
+
 ## 0.0.1-beta.4
 
 ### Patch Changes

@@ -1,138 +1,274 @@
 import { NativeControlTable, IDPool } from "@pronotron/utils";
 import { 
-	PronotronNodeRef,
+	PronotronIONodeRef,
+	PronotronIONodeID,
 	IONodeOptions,
-	PronotronNodeID,
 	FastForwardOptions
 } from "../../types/global";
 
-export enum IONodeData {
-	TrackTopIn,
-	TrackTopOut,
-	TrackBottomIn,
-	TrackBottomOut,
+/**
+ * IONode data is stored in a flattened NativeArray.
+ * This enum defines the index of each IONode property in the stride.
+ */
+export enum IONodeStrideIndex
+{
+	/**
+	 * Internal ID of IONode.
+	 */
+	ID,
+	/**
+	 * Absolute start position of the IONode.
+	 */
+	StartPosition,
+	/**
+	 * Absolute end position of the IONode.
+	 */
+	EndPosition,
+	/**
+	 * 1 or 0 – Whether the node is currently inside the viewport.
+	 */
 	InViewport,
-	NodeStart,
-	NodeEnd,
-	NodeID,
-	OnViewportEvent,
-	OnTopInEvent,
-	OnTopOutEvent,
-	OnBottomInEvent,
-	OnBottomOutEvent,
+	/**
+	 * Stores the last known position of the IONode. Points to {@link IONodePosition}
+	 */
+	LastPosition,
+	/**
+	 * 1 or 0 – Whether the node has an event handler for in-viewport.
+	 */
+	HasInViewportEvent,
+	/**
+	 * 1 or 0 – Whether the node has an event handler for entering the viewport from {@link IONodePosition.InNegativeArea}
+	 */
+	HasNegativeEnterEvent,
+	/**
+	 * 1 or 0 – Whether the node has an event handler for leaving the viewport into {@link IONodePosition.InNegativeArea}
+	 */
+	HasNegativeExitEvent,
+	/**
+	 * 1 or 0 – Whether the node has an event handler for entering the viewport from {@link IONodePosition.InPositiveArea}
+	 */
+	HasPositiveEnterEvent,
+	/**
+	 * 1 or 0 – Whether the node has an event handler for leaving the viewport into {@link IONodePosition.InPositiveArea}
+	 */
+	HasPositiveExitEvent,
+	/**
+	 * Stores the {@link FastForwardStrategy} option for this node.
+	 */
 	OnFastForward
 };
-const nodeDataSize = 14;
 
-export enum FastForwardData {
+/**
+ * Calculating IONodeData size with code, causes to make it constant. 
+ * The size of IONode data is fixed.
+ */
+const IO_NODE_DATA_SIZE = 11;
+
+/**
+ * Jumpy scroll might cause an element "fast forward", 
+ * eg: first "bottom-enter" following with "top-exit" in the same loop without being visible.
+ * Possible strategies for handling fast-forward cases.
+ */
+export enum FastForwardStrategy
+{
 	SkipBoth,
 	ExecuteBoth,
 	ExecuteLast
 };
 
-export abstract class PronotronIOBase
+/**
+ * Logical areas for positioning elements relative to the viewport.
+ *
+ * Vertical:
+ *   NEGATIVE AREA
+ *   -----------------
+ *   VIEWPORT
+ *   -----------------
+ *   POSITIVE AREA
+ *
+ * Horizontal:
+ *   NEGATIVE AREA | VIEWPORT | POSITIVE AREA
+ */
+export enum IONodePosition
 {
-	/** @internal */
-	abstract handleScroll( scrollY: number ): void;
-
 	/**
-	 * We need to get a value from client to use as KEY, 
-	 * to avoid duplicate and to be able to respond remove requests.
+	 * Initial position before calculating bounds.
+	 */
+	NotReady,
+	/**
+	 * Element is located in the negative area (before the viewport).
+	 */
+	InNegativeArea,
+	/**
+	 * Element is currently inside the viewport.
+	 */
+	InViewport,
+	/**
+	 * Element is located in the positive area (after the viewport).
+	 */
+	InPositiveArea
+};
+
+export abstract class PronotronIOBase<TEvents extends string>
+{
+	/**
 	 * @internal
 	 */
-	protected _nodeReferences: Map<PronotronNodeRef, PronotronNodeID> = new Map();
-	
+	abstract handleScroll( scrollValue: number ): void;
+
 	/**
-	 * PronotronIO node object with id's.
+	 * Current scroll direction (based on the last scroll value).
+	 */
+	abstract direction: string;
+
+	/**
+	 * Human readable event names
 	 * @internal
 	 */
-	protected _nodes: Map<PronotronNodeID, IONodeOptions> = new Map();
-
-	/** @internal */
-	protected _lastScrollY = 0;
-
-	/** @internal */
-	protected _viewport: undefined | {
-		_screenHeight: number,
-		_totalPageHeight: number,
-		_totalPossibleScroll: number, // _totalPageHeight - _screenHeight
+	abstract readonly _eventNames: {
+		_negativeEnterEvent: TEvents;
+		_negativeExitEvent: TEvents;
+		_positiveEnterEvent: TEvents;
+		_positiveExitEvent: TEvents;
 	};
 
 	/**
-	 * High frequency access interleaved typed array
-	 * Uint16: 0 to 65535 for long scroll values
-	 * Uint32: 0 to 4294967295 for very long scroll values
+	 * Human readable scroll direction names
 	 * @internal
 	 */
-	protected _controlTable: NativeControlTable<typeof IONodeData>;
+	abstract readonly _scrollDirectionNames: {
+		_negative: string;
+		_positive: string;
+	};
 
-	/** @internal */
+	/**
+	 * Used to populate {@link IONodeStrideIndex.NodeID}
+	 * @internal
+	 */
 	private _idPool: IDPool;
 
-	/** @internal */
+	/**
+	 * Whether integers (rounded values) are used instead of floating-point numbers.
+	 * Changes the control table data model.
+	 * @internal
+	 */
 	private _useRounded: boolean;
 
 	/**
+	 * High frequency access interleaved typed array
+	 * @internal
+	 */
+	protected _controlTable: NativeControlTable<IONodeStrideIndex>;
+
+	/**
+	 * Maps client-provided node references to internal node IDs.
+	 * Used to prevent duplicates and allow removal by reference.
+	 * @internal
+	 */
+	protected _nodeReferences: Map<PronotronIONodeRef, PronotronIONodeID> = new Map();
+	
+	/**
+	 * IONode internal id to passed options
+	 * @internal
+	 */
+	protected _nodes: Map<PronotronIONodeID, IONodeOptions<TEvents>> = new Map();
+
+	/**
+	 * Points to last applied scroll value
+	 * @internal
+	 */
+	protected _lastScrollValue = 0;
+
+	/**
+	 * Start position of the layout
+	 * @internal
+	 */
+	protected _viewportStart = 0;
+
+	/**
+	 * End position of the layout
+	 * @internal
+	 */
+	protected _viewportEnd = 0;
+
+	/**
+	 * Updated once before each handleScroll loop {@link _viewportStart} + {@link _lastScrollValue}
+	 * @internal
+	 */
+	protected _actualViewportStart = 0;
+
+	/**
+	 * Updated once before each handleScroll loop {@link _viewportEnd} + {@link _lastScrollValue}
+	 * @internal
+	 */
+	protected _actualViewportEnd = 0;
+
+	/**
+	 * Used in onViewport() position normalization.
+	 * Calculated with {@link _viewportEnd} - {@link _viewportStart}
+	 * @internal
+	 */
+	protected _viewportSize = 0;
+ 
+	/**
+	 * Used to determine the typed array size. If greater than 65535, a 32-bit model is used.
+	 * @internal
+	 */
+	protected _totalPageHeight = 0;
+
+	/**
 	 * @param nodeCountHint To populate fixed typed array length, will be expanded if needed
-	 * @param useRounded Uses integers instead of floating numbers, changes table data model
+	 * @param useRounded Whether integers are used instead of floating-point numbers. Default is true.
 	 */
 	constructor( nodeCountHint = 20, useRounded = true )
 	{
 		this._useRounded = useRounded;
 
 		/**
-		 * Start with Uint16Array, if totalPageHeight > 65535, it will be converted into Uint32Array below
+		 * Initially uses Uint16Array. If {@link _totalPageHeight} > 65535,
+		 * the control table is converted into Uint32Array (see {@link _expandTableIfNeeded}).
 		 */
-		this._controlTable =  new NativeControlTable( nodeDataSize, useRounded ? Uint16Array : Float32Array, nodeCountHint );
+		this._controlTable =  new NativeControlTable( IO_NODE_DATA_SIZE, useRounded ? Uint16Array : Float32Array, nodeCountHint );
 		this._idPool = new IDPool( nodeCountHint );
 	}
 
 	/**
-	 * Creates a tracking node.
+	 * Creates an IONode.
 	 * 
-	 * @param nodeOptions IO node creation options
-	 * @returns false if error, node instance id if success
+	 * @param newNodeOptions IONode creation options
+	 * @returns false if error, IONode internal id if success
 	 */
-	addNode( newNodeOptions: IONodeOptions ): false | PronotronNodeID
+	addNode( newNodeOptions: IONodeOptions<TEvents> ): PronotronIONodeID | false 
 	{
 		if ( ! this._nodeReferences.has( newNodeOptions.ref ) ){
 
 			const internalID = this._idPool.getID();
 
-			/**
-			 * In interleaved controlTable array we could only know PronotronIONode.id
-			 * 
-			 * - Use _nodeReferences as avoid duplicate and removal only
-			 * - Use _nodes to find passed nodeData
-			 */
 			this._nodeReferences.set( newNodeOptions.ref, internalID );
 			this._nodes.set( internalID, newNodeOptions );
 
 			const fastForwardOption = this._getFastForwardOption( newNodeOptions.dispatch.onFastForward );
 
-			// Add all properties as placeholder
+			// Add all data as placeholder
 			this._controlTable.addSlot( internalID, {
-				[ IONodeData.NodeID ]: internalID,
-				[ IONodeData.NodeStart ]: 0,
-				[ IONodeData.NodeEnd ]: 0,
-				[ IONodeData.TrackTopIn ]: 0,
-				[ IONodeData.TrackTopOut ]: 0,
-				[ IONodeData.TrackBottomIn ]: 0,
-				[ IONodeData.TrackBottomOut ]: 0,
-				[ IONodeData.InViewport ]: 0,
-				[ IONodeData.OnViewportEvent ]: newNodeOptions.dispatch.onInViewport ? 1 : 0,
-				[ IONodeData.OnTopInEvent ]: newNodeOptions.dispatch.onTopIn ? 1 : 0,
-				[ IONodeData.OnTopOutEvent ]: newNodeOptions.dispatch.onTopOut ? 1 : 0,
-				[ IONodeData.OnBottomInEvent ]: newNodeOptions.dispatch.onBottomIn ? 1 : 0,
-				[ IONodeData.OnBottomOutEvent ]: newNodeOptions.dispatch.onBottomOut ? 1 : 0,
-				[ IONodeData.OnFastForward ]: fastForwardOption
+				[ IONodeStrideIndex.ID ]: internalID,
+				[ IONodeStrideIndex.StartPosition ]: 0,
+				[ IONodeStrideIndex.EndPosition ]: 0,
+				[ IONodeStrideIndex.InViewport ]: 0,
+				[ IONodeStrideIndex.LastPosition ]: IONodePosition.NotReady,
+				[ IONodeStrideIndex.HasInViewportEvent ]: newNodeOptions.dispatch.onInViewport ? 1 : 0,
+				[ IONodeStrideIndex.HasNegativeEnterEvent ]: newNodeOptions.dispatch[ this._eventNames._negativeEnterEvent ] ? 1 : 0,
+				[ IONodeStrideIndex.HasNegativeExitEvent ]: newNodeOptions.dispatch[ this._eventNames._negativeExitEvent ] ? 1 : 0,
+				[ IONodeStrideIndex.HasPositiveEnterEvent ]: newNodeOptions.dispatch[ this._eventNames._positiveEnterEvent ] ? 1 : 0,
+				[ IONodeStrideIndex.HasPositiveExitEvent ]: newNodeOptions.dispatch[ this._eventNames._positiveExitEvent ] ? 1 : 0,
+				[ IONodeStrideIndex.OnFastForward ]: fastForwardOption
 			});
 
-			// Element might be added while app is running. Calculate bounds
-			this._setElementBounds( internalID, newNodeOptions );
-
-			// Consume internal ID
+			// IONode has been created successfully, consume ID
 			this._idPool.consumeID( internalID );
+
+			// IONode might be added while app is running. Calculate bounds
+			this._updateNodeBounds( internalID, newNodeOptions );
 
 			return internalID;
 
@@ -143,88 +279,92 @@ export abstract class PronotronIOBase
 	}
 
 	/**
-	 * Removes IONode by ref
+	 * Removes an IONode by its ref {@link PronotronIONodeRef}
 	 * 
-	 * @param existingNodeRef Node reference passed while executing addNode()
+	 * @param existingNodeRef Reference passed while executing addNode()
 	 */
-	removeNode( existingNodeRef: Element ): void
+	removeNode( existingNodeRef: PronotronIONodeRef ): void
 	{	
 		const nodeID = this._nodeReferences.get( existingNodeRef );
 
-		if ( nodeID === undefined ){
-			console.warn( `Node is not found in the list.`, existingNodeRef );
-		} else {
+		if ( nodeID !== undefined ){
 			this._removeNodeByIds([ nodeID ]);
+		} else {
+			console.warn( `IONode is not found in the list.`, existingNodeRef );
 		}
 	}
 
 	/**
-	 * Updates inline viewport properties and performs the following:
+	 * Modifies the last scroll value
 	 * 
-	 * - Recalculates the Y position of each node
-	 * - Resets each node's tracking events as if we are at Y = 0
-	 * 
-	 * @param screenHeight Visible screen height
-	 * @param totalPageHeight Total page height including unvisible area to calculate total scroll value
+	 * @param scrollValue Scroll value
 	 */
-	setViewport( screenHeight: number, totalPageHeight: number ): void
+	setLastScroll( scrollValue: number ): void 
 	{
-		this._viewport = {
-			_screenHeight: screenHeight,
-			_totalPageHeight: totalPageHeight,
-			_totalPossibleScroll: totalPageHeight - screenHeight
-		};
-
-		// Convert controlTable to Uint32Array if it's not enough
-		if ( this._useRounded && this._viewport._totalPageHeight > 65535 && this._controlTable.table.constructor !== Uint32Array ){
-			const newControlTable = Uint32Array.from( this._controlTable.table );
-			this._controlTable.table = newControlTable;
-		}
-
-		this._nodes.forEach(( nodeSettings, nodeID ) => this._setElementBounds( nodeID, nodeSettings ));
+		this._lastScrollValue = scrollValue;
 	}
 
 	/**
+	 * Bulk updates all IONode positions.
+	 * Should be executed when the layout changes, e.g.:
+	 * - Screen resize
+	 * - Resizing in-page elements (accordion, etc.)
+	 *
+	 * @param maximumValue - Maximum possible position (e.g., `document.documentElement.scrollHeight`).
+	 */
+	updatePositions( maximumValue: number )
+	{
+		this._totalPageHeight = maximumValue;
+		this._expandTableIfNeeded();
+
+		this._nodes.forEach(( nodeSettings, nodeID ) => this._updateNodeBounds( nodeID, nodeSettings ));
+	}
+
+	/**
+	 * Updates viewport layout data used in calculations.
+	 * Should be called on:
+	 * - Mobile viewport changes (status bar collapse/expand)
+	 * - Pinch-zoom changes
+	 * - Screen or in-page resizes
+	 *
+	 * @param start - Start position of the viewport.
+	 * @param end - End position of the viewport.
+	 */
+	updateViewportLayout( start: number, end: number )
+	{
+		if ( end <= start ){
+			console.warn( "Tracking area must be bigger than 0 units" );
+		}
+
+		this._viewportStart = start;
+		this._viewportEnd = end;
+		this._viewportSize = end - start; 
+	}
+
+	/**
+	 * Calculates current position of an IONode.
+	 * 
+	 * @param nodeStart IONode start position
+	 * @param nodeEnd IONode end position
 	 * @internal
 	 */
-	private _getFastForwardOption( option?: FastForwardOptions )
+	protected _calculatePosition( nodeStart: number, nodeEnd: number ): Exclude<IONodePosition, IONodePosition.NotReady>
 	{
-		switch( option ){
-			case "skip_both": return FastForwardData.SkipBoth;
-			case "execute_both": return FastForwardData.ExecuteBoth;
-			case "execute_last": return FastForwardData.ExecuteLast;
-			default: return FastForwardData.SkipBoth;
+		if ( nodeEnd < this._actualViewportStart ){
+			return IONodePosition.InNegativeArea;
 		}
+
+		if ( nodeStart > this._actualViewportEnd ){
+			return IONodePosition.InPositiveArea;
+		}
+
+		return IONodePosition.InViewport;
 	}
 
 	/**
-	 * @internal
-	 */
-	private _setElementBounds( nodeID: number, nodeSettings: IONodeOptions )
-	{
-		const { start, end } = nodeSettings.getBounds();
-		const elementOffset = nodeSettings.offset ? nodeSettings.offset : 0;
-		
-		const nodeStart = this._useRounded ? Math.round( start - elementOffset ) : start - elementOffset;
-		const nodeEnd = this._useRounded ? Math.round( end + elementOffset ) : end + elementOffset;
-		const isInViewport = ( this._viewport && nodeStart < this._viewport._screenHeight ) ? 1 : 0;
-
-		// Only "top-out" and "bottom-in" are possible at the start (y = zero)
-		this._controlTable.modifySlotByID( nodeID, {
-			[ IONodeData.NodeStart ]: nodeStart,
-			[ IONodeData.NodeEnd ]: nodeEnd,
-			[ IONodeData.InViewport ]: isInViewport,
-			[ IONodeData.TrackTopIn ]: 0,
-			[ IONodeData.TrackTopOut ]: isInViewport ? 1 : 0,
-			[ IONodeData.TrackBottomIn ]: isInViewport ? 0 : 1,
-			[ IONodeData.TrackBottomOut ]: 0,
-		} );
-	}
-
-	/**
-	 * Removes tracking nodes by their internal id's.
-	 * 
-	 * @param nodeIDs Previosly created Node id
+	 * Removes IONodes by their internal IDs.
+	 *
+	 * @param nodeIDs - Internal node IDs previously assigned.
 	 * @internal
 	 */
 	protected _removeNodeByIds( nodeIDs: number[] ): void
@@ -242,6 +382,71 @@ export abstract class PronotronIOBase
 				nodeSettings.onRemoveNode();
 			}
 
+		}
+	}
+
+	/**
+	 * Updates the bounds of the node using the client-provided method.
+	 *
+	 * @param nodeID - Internal node ID.
+	 * @param nodeSettings - Node creation options.
+	 * @internal
+	 */
+	private _updateNodeBounds( nodeID: number, nodeSettings: IONodeOptions<TEvents> ): void
+	{
+		const { start, end } = nodeSettings.getBounds();
+		const elementOffset = nodeSettings.offset || 0;
+		
+		const nodeStart = this._useRounded ? Math.round( start - elementOffset ) : start - elementOffset;
+		const nodeEnd = this._useRounded ? Math.round( end + elementOffset ) : end + elementOffset;
+
+		this._controlTable.modifySlotByID( nodeID, {
+			[ IONodeStrideIndex.StartPosition ]: nodeStart,
+			[ IONodeStrideIndex.EndPosition ]: nodeEnd
+		} );
+	}
+
+	/**
+	 * Resolves the {@link FastForwardStrategy} from its human-readable option.
+	 *
+	 * @param option - Human-readable fast-forward option.
+	 * @returns The corresponding {@link FastForwardStrategy}.
+	 * @internal
+	 */
+	private _getFastForwardOption( option?: FastForwardOptions ): FastForwardStrategy
+	{
+		switch( option )
+		{
+			case "skip_both": return FastForwardStrategy.SkipBoth;
+			case "execute_both": return FastForwardStrategy.ExecuteBoth;
+			case "execute_last": return FastForwardStrategy.ExecuteLast;
+			default: return FastForwardStrategy.SkipBoth;
+		}
+	}
+
+	/**
+	 * Precomputes the actual viewport bounds before each scroll loop
+	 * for performance reasons.
+	 *
+	 * @internal
+	 */
+	protected _updateActualIntersection()
+	{
+		this._actualViewportStart = this._viewportStart + this._lastScrollValue;  
+		this._actualViewportEnd = this._viewportEnd + this._lastScrollValue;  
+	}
+
+	/**
+	 * Expands {@link _controlTable} to Uint32Array
+	 * if using unsigned integers and 16-bit capacity is exceeded.
+	 *
+	 * @internal
+	 */
+	private _expandTableIfNeeded(): void
+	{
+		if ( this._useRounded && this._totalPageHeight > 65535 && this._controlTable.table.constructor !== Uint32Array ){
+			const newControlTable = Uint32Array.from( this._controlTable.table );
+			this._controlTable.table = newControlTable;
 		}
 	}
 

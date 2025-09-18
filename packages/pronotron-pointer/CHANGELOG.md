@@ -1,5 +1,14 @@
 # @pronotron/io
 
+## 0.0.1-beta.5
+
+### Patch Changes
+
+- Added clear, concise descriptions for all public and private methods.
+- Documented parameters, return values, and behavior.
+- Updated dependencies
+  - @pronotron/utils@0.0.1-beta.5
+
 ## 0.0.1-beta.4
 
 ### Patch Changes

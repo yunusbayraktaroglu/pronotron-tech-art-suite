@@ -65,6 +65,7 @@ export class PronotronClock
 
 }
 
-function now() {
+function now()
+{
 	return performance.now();
 }

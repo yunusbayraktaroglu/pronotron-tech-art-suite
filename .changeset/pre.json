@@ -11,6 +11,7 @@
     "@pronotron/utils": "0.0.0"
   },
   "changesets": [
+    "empty-stingrays-heal",
     "fifty-camels-serve"
   ]
 }

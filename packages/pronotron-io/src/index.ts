@@ -1,2 +1,2 @@
-export { PronotronIOVertical } from "./core/PronotronIOVertical";
-export type { IODispatchOptions, IONodeOptions } from "../types/global";
+export { PronotronIOVerticalObserver, type IOVerticalOptions } from "./core/PronotronIOVertical";
+export { PronotronIOHorizontalObserver, type IOHorizontalOptions } from "./core/PronotronIOHorizontal";

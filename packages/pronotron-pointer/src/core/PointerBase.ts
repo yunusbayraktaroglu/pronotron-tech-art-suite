@@ -1,60 +1,173 @@
 import { PronotronClock, PronotronAnimationController } from "@pronotron/utils";
-import { EventUtils } from "./EventUtils";
-import { Vector2 } from "./Vector2";
+import { EventUtils } from "./helpers/EventUtils";
+import { Vector2 } from "./helpers/Vector2";
 
-export enum PointerStates {
+/**
+ * High-level pointer state machine.
+ */
+export enum PointerState
+{
+	/**
+	 * No active pointer contact/action
+	 */
 	IDLE,
-	WAITING, // May change to: DRAG, MOVING, HOLDING, HOLDMOVING
-	DRAG, // Native drag event
+	/**
+	 * Pointer is down and awaiting gesture detection
+	 */         
+	PENDING,
+	/**
+	 * Native hold&drag operation in progress
+	 */
+	DRAGGING,
+	/**
+	 * User is moving pointer (not a drag payload)
+	 */
 	MOVING,
+	/**
+	 * Long-press with little/no movement on a holdable element
+	 */
 	HOLDING,
-	HOLDMOVING,
-	OUT,
+	/**
+	 * Long-press + movement (holding while moving)
+	 */
+	HOLD_DRAGGING,
+	/**
+	 * Pointer left the target element or viewport
+	 */
+	OUTSIDE,
 };
 
+/**
+ * Elements or globals that can receive pointer events.
+ */
 export type PossibleTarget = Window | Document | HTMLElement;
 
-export type CommonDependencies = {
+export type PointerBaseDependencies = {
+	/**
+	 * DOM node or global object that pointer listeners attach to.
+	 */
 	target: PossibleTarget;
+	/**
+	 * Central animation scheduler for idle timers.
+	 */
 	animationController: PronotronAnimationController;
+	/**
+	 * Shared clock used to measure elapsed time for taps/holds.
+	 */
 	clock: PronotronClock;
-	idleTreshold: number;
+	/**
+	 * Seconds of inactivity before auto-transition to IDLE.
+	 * @default 0.5 sec.
+	 */
+	idleThreshold: number;
+	/**
+	 * Seconds of tap event.
+	 * @default 0.25 sec.
+	 */
+	tapThreshold: number;
+	/**
+	 * Minimum squared-pixel distance required to treat
+	 * movement as a true drag rather than micro-jitter.
+	 * @default 10
+	 */
 	movingDeltaLimit: number;
+	/**
+	 * Should return true if the element under the pointer
+	 * should be considered “interactive” (e.g. buttons, links).
+	 * Method provided by user.
+	 * 
+	 * @param target Current event target
+	 */
 	isInteractable: ( target: HTMLElement ) => boolean;
 };
 
-export class PointerBase<T extends string> extends EventUtils<T>
+/**
+ * Base class for pointer input (mouse/touch) that normalizes
+ * state transitions (idle, waiting, moving, holding) and
+ * emits high-level events like "tap".
+ */
+export class PointerBase<T extends string> extends EventUtils<T | "tap">
 {
-	/** @internal */
+	/**
+	 * True while event listeners are active
+	 * @internal
+	 */
 	_isRunning: boolean = false;
 
 	/** @internal */
-	_target: PossibleTarget;
-	/** @internal */
 	_clock: PronotronClock;
+
 	/** @internal */
 	_animationController: PronotronAnimationController;
 
-	/** @internal */
-	_currentState = PointerStates.IDLE;
+	/**
+	 * Pointer events target
+	 * @internal
+	 */
+	_target: PossibleTarget;
+	
+	/**
+	 * Defines current pointer state
+	 * @internal
+	 */
+	_currentState: PointerState = PointerState.IDLE;
 
-	/** @internal */
-	_pointerStart = new Vector2();
-	/** @internal */
-	_pointerEnd = new Vector2();
-	/** @internal */
-	_pointerDelta = new Vector2();
+	/**
+	 * Start position of the pointer
+	 * @internal
+	 */
+	readonly _pointerStart = new Vector2();
+	/**
+	 * End position of the pointer
+	 * @internal
+	 */
+	readonly _pointerEnd = new Vector2();
+	/**
+	 * Pointer delta calculated with pointer _pointerEnd - pointerStart
+	 * @internal
+	 */
+	readonly _pointerDelta = new Vector2();
 
-	/** @internal */
-	_idleTreshold = 0.5;
-	/** @internal */
+	/**
+	 * Timeout for the IDLE transition
+	 * @internal
+	 */
+	private _idleThreshold = 0.5;
+	/**
+	 * Timeout for the TAP event
+	 * @internal
+	 */
+	private _tapThreshold = 0.25;
+	/**
+	 * Pixel limit to convert IDLE to MOVING, helps to keep state on micro movements
+	 * @internal
+	 */
 	_movingDeltaLimit = 10.0;
-	/** @internal */
-	_canInteract = false;
-	/** @internal */
-	_isInteractable: ( target: HTMLElement ) => boolean;
 
-	constructor({ target, animationController, clock, isInteractable, idleTreshold, movingDeltaLimit }: CommonDependencies)
+	/**
+	 * Start time of the pointer, to calculate a TAP
+	 * @internal
+	 */
+	private _pointerStartTime = 0;
+
+	/**
+	 * Defines if the current event target is interactable,
+	 * Updated pointer start and pointer move
+	 * @internal
+	 */
+	_canInteract = false;
+
+	/**
+	 * Should return true if the element under the pointer
+	 * should be considered “interactive” (e.g. buttons, links).
+	 * Method provided by user.
+	 * 
+	 * @param target Current event target
+	 * @internal
+	 */
+	private _isInteractable: ( target: HTMLElement ) => boolean;
+
+	constructor({ target, animationController, clock, idleThreshold, tapThreshold, movingDeltaLimit, isInteractable }: PointerBaseDependencies)
 	{
 		super();
 
@@ -62,68 +175,57 @@ export class PointerBase<T extends string> extends EventUtils<T>
 		this._animationController = animationController;
 		this._clock = clock;
 
-		this._isInteractable = isInteractable;
-		this._idleTreshold = idleTreshold;
+		this._idleThreshold = idleThreshold;
+		this._tapThreshold = tapThreshold;
 		this._movingDeltaLimit = movingDeltaLimit;
-		
-		this._onPointerStart = this._onPointerStart.bind( this );
-		this._onPointerMove = this._onPointerMove.bind( this );
-		this._onPointerEnd = this._onPointerEnd.bind( this );
-	}
-
-	getCurrentState(): string
-	{
-		return PointerStates[ this._currentState ];
-	}
-
-	getTargetInteractable(): boolean
-	{
-		return this._canInteract;
-	}
-
-	getPosition(): { x: number; y: number; }
-	{
-		/**
-		 * PointerEnd is always equal to PointerStart. But PointerStart might be different than PointerEnd.
-		 * Return PointerStart.
-		 */
-		return this._pointerStart;
-	}
-
-	getMovement(): { x: number; y: number; }
-	{
-		return this._pointerDelta;
-	}
-
-	/** @internal */
-	_startEvents(): void 
-	{
-		if ( this._isRunning ){
-			return console.warn( "Already running" );
-		}
-
-		this._isRunning = true;
-		this._currentState = PointerStates.IDLE;
-	}
-
-	/** @internal */
-	_stopEvents(): void
-	{
-		this._isRunning = false;
-		this._currentState = PointerStates.IDLE;
+		this._isInteractable = isInteractable;
 	}
 
 	/**
-	 * Interaction started
+	 * Initializes pointer tracking and sets the state to `IDLE`.
+	 * Call once when attaching listeners.
+	 * Warns and returns early if already running.
 	 * 
-	 * Mouse: pointerdown
-	 * Touch: touchstart
+	 * @internal
+	 */
+	_startEvents(): boolean
+	{
+		if ( this._isRunning ){
+			console.warn( "Already running" );
+			return false;
+		}
+
+		this._isRunning = true;
+		this._currentState = PointerState.IDLE;
+		return true;
+	}
+
+	/**
+	 * Stops pointer tracking and forces the state back to `IDLE`.
+	 * Call when removing listeners or disposing the instance.
 	 * 
+	 * @internal
+	 */
+	_stopEvents(): void
+	{
+		this._isRunning = false;
+		this._currentState = PointerState.IDLE;
+	}
+
+	/**
+	 * Handles native `pointerdown`/`touchstart`.
+	 * Resets movement delta, records the press timestamp,
+	 * and sets the state to `WAITING` while gesture detection begins.
+	 * 
+	 * @param event Current Event 
 	 * @internal
 	 */
 	_onPointerStart( event: Event ): void
 	{
-		this._currentState = PointerStates.WAITING;
+		// Pending for transition
+		this._currentState = PointerState.PENDING;
+
+		this._pointerStartTime = this._clock.elapsedTime;
 
 		// Reset pointer delta to calculate movement limit correct in _onMove
 		this._pointerDelta._set( 0, 0 );
@@ -133,55 +235,71 @@ export class PointerBase<T extends string> extends EventUtils<T>
 	}
 
 	/**
-	 * Runs after invidual child class updates the pointer position
+	 * Handles native `pointermove`/`touchmove`.
+	 * - Promotes state from `IDLE` or `WAITING` to `MOVING` once movement exceeds `movingDeltaLimit`.
+	 * - Refreshes the idle timer so the state only reverts to `IDLE` after the pointer truly stops moving.
 	 * 
+	 * @param event Current Event 
 	 * @internal
 	 */
 	_onPointerMove( event: Event ): void
 	{
 		switch( this._currentState )
 		{
-			// Break switch early if just moving
-			case PointerStates.MOVING: {
-				break;
-			}
-
 			// Convert WAITING or IDLE to MOVING if pointer delta is bigger than defined limit
-			case PointerStates.IDLE:
-			case PointerStates.WAITING: {
+			case PointerState.IDLE:
+			case PointerState.PENDING: {
 				if ( this._pointerDelta._lengthSq() > this._movingDeltaLimit ){
-					this._currentState = PointerStates.MOVING;
+					this._currentState = PointerState.MOVING;
 				}
-			}
+			};
 		}
 
 		// Moving or Waiting, control if the target is interactable(button, a, custom class)
 		this._canInteract = this._isInteractable( event.target as HTMLElement );
 
-		// Works like refreshed timeout, but its safe
+		// Refresh idle timer so the state only flips to IDLE after the user truly stops moving.
 		this._animationController.addAnimation({
 			id: "IDLE",
-			duration: this._idleTreshold,
+			duration: this._idleThreshold,
 			timeStyle: "continious",
 			onEnd: ( forced ) => {
-				if ( ! forced && this._currentState === PointerStates.MOVING ){
-					this._currentState = PointerStates.IDLE;
+				if ( ! forced && this._currentState === PointerState.MOVING ){
+					this._currentState = PointerState.IDLE;
 				}
 			}
 		});
 	}
 	
 	/**
+	 * Handles native `pointerup`/`touchend`.
+	 * Dispatches a "tap" event if the duration from press to release
+	 * is less than `_tapThreshold`, then resets state to `IDLE`.
+	 * 
+	 * @param event Current Event 
 	 * @internal
 	 */
-	_onPointerEnd( _event: Event )
+	_onPointerEnd( event: Event )
 	{
-		this._currentState = PointerStates.IDLE;
+		if ( this._clock.elapsedTime < this._pointerStartTime + this._tapThreshold ){
+			this._dispatchCustomEvent( "tap", {
+				target: event.target,
+				position: { 
+					x: this._pointerStart.x, 
+					y: this._pointerStart.y 
+				}
+			} );
+		}
+		this._currentState = PointerState.IDLE;
 	}
 
 	/**
-	 * Used by child classes, after getting pointer x and y by their invidual methods, 
-	 * Updates pointer data values
+	 * Updates pointer vectors: sets _pointerEnd to (x,y),
+	 * computes delta from previous _pointerStart,
+	 * then copies end → start for next frame.
+	 * 
+	 * @param x X position
+	 * @param y Y position
 	 * @internal
 	 */
 	_updatePointer( x: number, y: number ): void

@@ -1,6 +1,7 @@
 {
-	"extends": "@pronotron/config-ts/react-library.json",
+	"extends": "@pronotron/config-ts/base.json",
 	"compilerOptions": {
+		"module": "NodeNext",
 		"stripInternal": true
 	},
 	"include": [

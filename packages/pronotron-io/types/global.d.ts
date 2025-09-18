@@ -1,47 +1,25 @@
-/**
- * Utils
- */
-type RequireAtLeastOne<T> = {
-	[ K in keyof T ]: Pick<T, K> & Partial<T>;
-}[ keyof T ];
-
-type RequireExactlyOne<T> = {
-	[ K in keyof T ]: { [ P in K ]: T[ P ] } & Partial<Record<Exclude<keyof T, K>, never>>;
-}[ keyof T ];
-
-export type BinaryBoolean = 1 | 0;
+import type { RequireAtLeastOne } from "@pronotron/utils";
 
 /**
- * Possible events of an element
+ * Jumpy scroll might cause an element "fast forward", 
+ * eg: first "bottom-enter" following with "top-exit" in the same loop without being visible.
  */
-export type IOVerticalEvent = "onTopIn" | "onTopOut" | "onBottomIn" | "onBottomOut";
-export type IOHorizontalEvent = "onLeftIn" | "onLeftOut" | "onRightIn" | "onRightOut";
+export type FastForwardOptions = "skip_both" | "execute_last" | "execute_both"; 
 
 /**
- * Jumpy scroll values might cause an element "fast forward", 
- * eg: first "bottom-in" following with "top-out" in the same loop.
+ * Event dispatch options
  */
-export type FastForwardOptions = "skip_both" | "execute_both" | "execute_last"; 
-
-/**
- * One time events
- */
-export type IODispatchFunction = Record<IOVerticalEvent, ( () => void ) | ({
+export type IODispatchFunction<TEvents extends string> = Record<TEvents, ( () => void ) | ({
 	dispatch: () => void;
 	limit: number;
 })>;
-
-export type IOEventsDispatch = IODispatchFunction & {
+export type IOEventsDispatch<TEvents extends string> = IODispatchFunction<TEvents> & {
 	onInViewport: ( normalizedPosition: number ) => void
 };
-
-/**
- * Options to passed
- */
-export type IODispatchOptions = RequireAtLeastOne<IOEventsDispatch> & {
+export type IODispatchOptions<TEvents extends string> = RequireAtLeastOne<IOEventsDispatch<TEvents>> & {
 	/**
-	 * Jumpy scroll values might cause an element "fast forward", 
-	 * eg: first "bottom-in" following with "top-out" in the same loop.
+	 * Jumpy scroll might cause an element "fast forward", 
+	 * eg: first "bottom-enter" following with "top-exit" in the same loop without being visible.
 	 */
 	onFastForward?: FastForwardOptions;
 };
@@ -49,21 +27,23 @@ export type IODispatchOptions = RequireAtLeastOne<IOEventsDispatch> & {
 /**
  * Object that needs to pass application as member
  */
-export type IONodeOptions = {
+export type IONodeOptions<TEvents extends string> = {
 	/**
 	 * Node creation reference, to be used to avoid duplicates and respond remove requests.
 	 */
-	ref: Element;
-	dispatch: IODispatchOptions;
+	ref: PronotronIONodeRef;
+	dispatch: IODispatchOptions<TEvents>;
 	/**
-	 * How to get element initial position. (Not relative to scroll value)
-	 * Will be executed for each node if viewport has been changed
-	 * Start & end values can be same for lines.
+	 * How to get IONode's absolute position (not relative to scroll value).
+	 * Will be executed if the layout has been changed.
 	 */
 	getBounds: () => { 
 		start: number;
 		end: number; 
 	};
+	/**
+	 * Will be added/deleted symetricly to both side
+	 */
 	offset?: number;
 	onRemoveNode?: () => void;
 };
@@ -72,10 +52,9 @@ export type IONodeOptions = {
  * To be able to avoid duplicate nodes and respond to remove request, 
  * we need a value from client to use as KEY.
  */
-export type PronotronNodeRef = Element;
+export type PronotronIONodeRef = HTMLElement;
 
 /**
- * Points the id of PronotronIONode object.
- * Each add node request from client, generates a PronotronIONode object.
+ * Points the internal ID of PronotronIONode object.
  */
-export type PronotronNodeID = number;
+export type PronotronIONodeID = number;
