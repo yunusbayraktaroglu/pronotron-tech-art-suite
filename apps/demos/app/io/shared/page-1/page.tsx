@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { IODispatcher } from "../../hooks/usePronotronIO";
+import { IODispatcher } from "../../components/IODispatcher";
 
 export default function SharedNodePageOne()
 {
@@ -21,10 +21,10 @@ export default function SharedNodePageOne()
 			className={ `block py-[50px] my-[40vh] landscape:my-[140vh] ${ colors[ index % 5 ] }` }
 			offset={ 0 }
 			dispatch={{
-				onTopIn: () => console.log( `#${ index } Top-in` ),
-				onTopOut: () => console.log( `#${ index } Top-out` ),
-				onBottomOut: () => console.log( `#${ index } Bottom-out` ),
-				onBottomIn: () => console.log( `#${ index } Bottom-in` ),
+				onTopEnter: () => console.log( `#${ index } Top-enter` ),
+				onTopExit: () => console.log( `#${ index } Top-exit` ),
+				onBottomEnter: () => console.log( `#${ index } Bottom-enter` ),
+				onBottomExit: () => console.log( `#${ index } Bottom-exit` ),
 				onInViewport: ( normalizedPosition: number ) => {
 					console.log( `#${ index } In Viewport`, normalizedPosition );
 				},

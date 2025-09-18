@@ -1,27 +1,19 @@
 "use client";
 
 import { createContext, useContext, useEffect, useRef, useState } from "react";
-import { TouchBase, TouchHoldable, MouseHoldable, MouseBase } from "@pronotron/pointer";
+import { TouchController, MouseController } from "@pronotron/pointer";
 import { PronotronAnimationController, PronotronClock, isTouchDevice } from "@pronotron/utils";
 
 export const pointerSettings = {
-	idleTreshold: 0.6,
+	tapThreshold: 0.25,
+	idleThreshold: 0.5,
+	holdThreshold: 0.75,
 	movingDeltaLimit: 10,
-	/**
-	 * To avoid IOS mignifier appearing with long press, 
-	 * .holding class must be added to document before 0.125 seconds.
-	 * 
-	 * @todo
-	 * Add another state as "mayhold" for that treshold
-	 */
-	holdTreshold: 0.11
 };
 
 interface PointerContextProps {
-	pointer: { x: number; y: number };
-	pointerDelta: { x: number; y: number };
-	pointerTargetInteractable: boolean;
-	pointerState: string;
+	pointerController: React.MutableRefObject<TouchController | MouseController>;
+
 };
 
 const PointerContext = createContext<PointerContextProps | undefined>( undefined );
@@ -29,23 +21,16 @@ const PointerContext = createContext<PointerContextProps | undefined>( undefined
 export const usePointerContext = () => {
 	const context = useContext( PointerContext );
 	if ( ! context ){
-	  	throw new Error("useAppTicker must be used within an AppTickerProvider");
+	  	throw new Error( "usePointerContext must be used within an PronotronPointerProvider" );
 	}
 	return context;
-}
+};
 
 export function PronotronPointerProvider({ children }: { children: React.ReactNode })
 {
 	const clock = useRef( new PronotronClock() );
 	const animationController = useRef( new PronotronAnimationController( clock.current ) );
-	const pointerController = useRef<TouchHoldable | TouchBase | MouseHoldable | MouseBase>( null ! );
-	
-	const [ pointer, setPointer ] = useState({ x: 0, y: 0 });
-	const [ pointerDelta, setPointerDelta ] = useState({ x: 0, y: 0 });
-
-	const [ clockDelta, setClockDelta ] = useState( 0 );
-	const [ pointerState, setPointerState ] = useState( "" );
-	const [ pointerTargetInteractable, setPointerTargetInteractable ] = useState<boolean>( false );
+	const pointerController = useRef<TouchController | MouseController>( null ! );
 
 	useEffect(() => {
 
@@ -53,11 +38,16 @@ export function PronotronPointerProvider({ children }: { children: React.ReactNo
 			target: window.document.body,
 			animationController: animationController.current,
 			clock: clock.current,
-			idleTreshold: pointerSettings.idleTreshold,
+			idleThreshold: pointerSettings.idleThreshold,
+			holdThreshold: pointerSettings.holdThreshold,
+			tapThreshold: pointerSettings.tapThreshold,
 			movingDeltaLimit: pointerSettings.movingDeltaLimit,
-			holdTreshold: pointerSettings.holdTreshold,
 			isInteractable: ( target: HTMLElement ) => {
-				return target.classList.contains( "holdable" ) || target.tagName === "A";
+				if ( target.closest( "a" ) || target.closest( "button" ) || target.closest( ".holdable" ) ){
+					// If target inside an <a>, <button> or .holdable return true
+					return true;
+				}
+				return false;
 			},
 			isHoldable: ( target: HTMLElement ) => {
 				return target.dataset.holded ? true : false;
@@ -67,9 +57,9 @@ export function PronotronPointerProvider({ children }: { children: React.ReactNo
 		const touch = isTouchDevice();
 
 		if ( touch ){
-			pointerController.current = new TouchHoldable( settings );
+			pointerController.current = new TouchController( settings );
 		} else {
-			pointerController.current = new MouseHoldable( settings );
+			pointerController.current = new MouseController( settings );
 		}
 
 		pointerController.current.startEvents();
@@ -77,18 +67,9 @@ export function PronotronPointerProvider({ children }: { children: React.ReactNo
 		let animationFrameId = 0;
 
 		const tick = () => {
-
 			const deltaTime = clock.current.tick();
 			animationController.current.tick();
-
-			setPointer( pointerController.current.getPosition() );
-			setPointerDelta( pointerController.current.getMovement() );
-			setPointerState( pointerController.current.getCurrentState() );
-			setPointerTargetInteractable( pointerController.current.getTargetInteractable() );
-			setClockDelta( deltaTime );
-
 			animationFrameId = requestAnimationFrame( tick );
-
 		};
 
 		animationFrameId = requestAnimationFrame( tick );
@@ -145,14 +126,10 @@ export function PronotronPointerProvider({ children }: { children: React.ReactNo
 	return (
 		<PointerContext.Provider
 			value={{
-				pointer,
-				pointerDelta,
-				pointerTargetInteractable,
-				pointerState
+				pointerController: pointerController
 			}}
 		>
 			{ children }
 		</PointerContext.Provider>
 	);
 }
-

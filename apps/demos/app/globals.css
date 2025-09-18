@@ -153,22 +153,22 @@ body.custom-cursor * {
 		--scale: 1.25;
 	}
 
-	.pointer[ data-state="OUT" ] {
+	.pointer[ data-state="OUTSIDE" ] {
 		--scale: 0;
 	}
 
-	.pointer[ data-state="WAITING" ] {
+	.pointer[ data-state="PENDING" ] {
 		--scale: 0.75;
 		animation: pulse-bg 1.5s infinite;
 	}
 
 	.pointer[ data-state="HOLDING" ],
-	.pointer[ data-state="HOLDMOVING" ] {
+	.pointer[ data-state="HOLD_DRAGGING" ] {
 		background-color: rgba( 255, 255, 255, 0.5 );
 		--scale: 1.25;
 	}
 
-	.pointer[ data-state="HOLDMOVING" ] {
+	.pointer[ data-state="HOLD_DRAGGING" ] {
 		border-color: rgba( 168, 85, 247, 1.0 );
 	}
 
@@ -188,7 +188,7 @@ body.custom-cursor * {
 	}
 	.form label {
 		@apply
-		block mb-2 text-sm font-medium text-gray-900
+		block mb-spacing-xs text-sm font-medium text-gray-900
 	}
 	
 	.form .checkbox {

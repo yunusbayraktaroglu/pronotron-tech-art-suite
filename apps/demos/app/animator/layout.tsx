@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { PronotronAnimatorProvider } from "./hooks/PronotronAnimatorProvider";
 
 export const metadata: Metadata = {
-	title: "Pronotron Animation Controller",
+	title: "Animation Controller",
 	description: "Pronotron Animation Controller Testing.",
 };
 

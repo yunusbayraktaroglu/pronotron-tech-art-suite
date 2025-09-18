@@ -1,6 +1,6 @@
 "use client";
 
-import { IODispatcher } from "../hooks/usePronotronIO";
+import { IODispatcher } from "../components/IODispatcher";
 
 export default function Layout({ children }: Readonly<{ children: React.ReactNode }> )
 {
@@ -11,10 +11,10 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
 				className='bg-blue-500 py-[50px] flex flex-col'
 				offset={ 0 }
 				dispatch={{
-					onTopIn: () => console.log( "Shared node #0 Top-in" ),
-					onTopOut: () => console.log( "Shared node #0 Top-out" ),
-					onBottomOut: () => console.log( "Shared node #0 Bottom-out" ),
-					onBottomIn: () => console.log( "Shared node #0 Bottom-in" ),
+					onTopEnter: () => console.log( "Shared node #0 Top-enter" ),
+					onTopExit: () => console.log( "Shared node #0 Top-exit" ),
+					onBottomEnter: () => console.log( "Shared node #0 Bottom-enter" ),
+					onBottomExit: () => console.log( "Shared node #0 Bottom-exit" ),
 					onInViewport: ( normalizedPosition: number ) => {
 						console.log( "Shared node #0 in viewport", normalizedPosition );
 					},
@@ -31,10 +31,10 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
 				className='bg-blue-500 py-[50px] flex flex-col'
 				offset={ 0 }
 				dispatch={{
-					onTopIn: () => console.log( "Shared node #1 Top-in" ),
-					onTopOut: () => console.log( "Shared node #1 Top-out" ),
-					onBottomOut: () => console.log( "Shared node #1 Bottom-out" ),
-					onBottomIn: () => console.log( "Shared node #1 Bottom-in" ),
+					onTopEnter: () => console.log( "Shared node #1 Top-enter" ),
+					onTopExit: () => console.log( "Shared node #1 Top-exit" ),
+					onBottomEnter: () => console.log( "Shared node #1 Bottom-enter" ),
+					onBottomExit: () => console.log( "Shared node #1 Bottom-exit" ),
 					onInViewport: ( normalizedPosition: number ) => {
 						console.log( "Shared node #1 in viewport", normalizedPosition );
 					},
