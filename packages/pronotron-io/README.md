@@ -1,24 +1,43 @@
 # @pronotron/io
 
-Reliable viewport tracking without missed targets, unlike the default [IntersectionObserver API](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API). Built on @native-control-table, it can safely be used for parallax effects, lazy loading, or tracking when any part of an element enters or exits the screen. Suitable for implementing any custom scrolling application.
+[![NPM Package][npm]][npm-url]
+[![Build Size][build-size]][build-size-url]
 
-### Setup
+Reliable viewport tracking without missed targets, unlike the built-in [IntersectionObserver API](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API). 
+
+Built on [NativeControlTable](https://www.npmjs.com/package/@pronotron/utils), it can safely be used for parallax effects, lazy loading, or tracking when any part of an element enters or exits the screen. Suitable for implementing any custom scrolling application.
+
+### Usage
 
 ```typescript
-import { PronotronIOVertical } from '@pronotron/io';
+import { PronotronIOVerticalObserver, PronotronIOHorizontalObserver } from '@pronotron/io';
 
-const pronotronIO = new PronotronIOVertical();
+export const pronotronIO = new PronotronIOVerticalObserver();
 
+const getViewport = () => {
+	if ( window.visualViewport ){
+		return {
+			height: window.visualViewport.height,
+			offsetTop: window.visualViewport.offsetTop,
+			scale: window.visualViewport.scale,
+		};
+	}
+	return {
+		height: window.innerHeight,
+		offsetTop: 0,
+		scale: 1,
+	};
+};
 const onScroll = () => {
 	pronotronIO.handleScroll( window.scrollY )
 	setScrollDirection( pronotronIO.direction );
 };
-
 const onResize = () => {
-	pronotronIO.setViewport( window.innerHeight, document.documentElement.scrollHeight );
-	pronotronIO.setLastScrollY( 0 );
-	pronotronIO.handleScroll( window.scrollY );
-	setScrollDirection( pronotronIO.direction );
+	const vp = getViewport();
+	pronotronIO.updateViewportLayout( vp.offsetTop, vp.offsetTop + vp.height );
+	// Resizing updates layout. Needs recalculate node bounds
+	pronotronIO.updatePositions( document.documentElement.scrollHeight );
+	onScroll();
 };
 
 /**
@@ -36,7 +55,6 @@ const ResizeObserver = window.ResizeObserver | ResizeObserverPolyfill;
 const ro = new ResizeObserver(( entries, observer ) => {
 	onResize();
 });
-
 ro.observe( document.body );
 ```
 
@@ -48,18 +66,19 @@ const element = document.getElementByID( "test" );
 const nodeID = pronotronIO.addNode({
 	ref: element,
 	dispatch: {
-		onTopIn: () => console.log( "Top-in" ),
-		onTopOut: () => console.log( "Top-out" ),
-		onBottomIn: () => console.log( "Bottom-in" ),
-		onBottomOut: {
-			retry: 3,
-			dispatch: () => console.log( "Bottom-out" ),
+		// Vertical events
+		onTopEnter: () => console.log( "Top-enter" ),
+		onTopExit: () => console.log( "Top-exit" ),
+		onBottomEnter: () => console.log( "Bottom-enter" ),
+		onBottomExit: {
+			limit: 3,
+			dispatch: () => console.log( "Bottom-exit" ),
 		},
 		// Returns -1 to +1 normalized position
 		onInViewport: ( normalizedPosition: number ) => {
 			console.log( normalizedPosition );
 		},
-		// On jumpy scrolls a node may bottom-in then top-out in same loop
+		// On jumpy scrolls a node may bottom-enter then top-exit in same loop
 		onFastForward: "execute_both" // "skip_both" | "execute_last"
 	},
 	offset: 10, // increases bounds in pixels
@@ -74,6 +93,7 @@ const nodeID = pronotronIO.addNode({
 });
 ```
 
-## TODO
-- Refactor to be able to run with horizontal scrolls
-- Execute logic for initial in-viewport nodes
+[npm]: https://img.shields.io/npm/v/@pronotron/io
+[npm-url]: https://www.npmjs.com/package/@pronotron/io
+[build-size]: https://badgen.net/bundlephobia/minzip/@pronotron/io
+[build-size-url]: https://bundlephobia.com/result?p=@pronotron/io

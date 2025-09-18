@@ -64,7 +64,7 @@ export class PronotronAnimationController
 	private _animationInternalIDsPool: IDPool;
 
 	/** @internal */
-	private _controlTable: NativeControlTable<typeof AnimationData>;
+	private _controlTable: NativeControlTable<AnimationData>;
 
 	/**
 	 * @param clock Clock instance

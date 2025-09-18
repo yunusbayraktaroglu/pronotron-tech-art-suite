@@ -1,9 +1,8 @@
 /**
- * Helps to get a unique Number, by using indices
+ * IDPool
  * 
- * Another approach may be increasing a static property, 
- * but it might be bigger than 255, 65535, etc. which can't be stored in TypedArray,
- * in a long rally since re-use is not possible.
+ * Manages a pool of unique numeric IDs, providing efficient allocation and release of IDs using an internal bit array.
+ * Supports automatic capacity expansion when all IDs are in use.
  */
 export class IDPool
 {
@@ -14,7 +13,9 @@ export class IDPool
 	private _availableIDs: Uint8Array; // We will store only 0 | 1 to define used or not
 
 	/**
-	 * @param capacityHint Initial capacity. Will be expanded auto if needed.
+	 * Initializes the IDPool with a given initial capacity.
+	 * 
+	 * @param capacityHint Initial number of IDs available; the pool will expand dynamically if needed.
 	 */
 	constructor( capacityHint: number )
 	{
@@ -23,7 +24,10 @@ export class IDPool
 	}
 
 	/**
-	 * Returns an available ID.
+	 * Returns the first available numeric ID from the pool. 
+	 * If all IDs are used, the pool automatically expands and returns the next available ID.
+	 * 
+	 * @returns The allocated ID as a number.
 	 */
 	getID(): number
 	{
@@ -41,17 +45,30 @@ export class IDPool
 		return last;
 	}
 
+	/**
+	 * Marks a specific ID as used in the pool.
+	 * 
+	 * @param ID Numeric ID to mark as consumed.
+	 */
 	consumeID( ID: number ): void
 	{
 		this._availableIDs[ ID ] = 1;
 	}
 
+	/**
+	 * Releases a previously consumed ID, making it available for future allocation.
+	 * 
+	 * @param ID Numeric ID to release.
+	 */
 	releaseID( ID: number ): void
 	{
 		this._availableIDs[ ID ] = 0;
 	}
 
 	/**
+	 * Doubles the internal storage capacity of the pool when all IDs are in use.
+	 * Copies existing ID usage state to the new storage.
+	 * 
 	 * @internal
 	 */
 	private _expandCapacity(): void

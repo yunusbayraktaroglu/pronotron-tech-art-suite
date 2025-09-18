@@ -11,6 +11,15 @@
 	"files": [
 		"dist/**"
 	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite.git",
+		"directory": "packages/pronotron-utils"
+	},
+	"bugs": {
+		"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/issues"
+	},
+	"homepage": "https://yunusbayraktaroglu.github.io/pronotron-tech-art-suite/",
 	"scripts": {
 		"build": "tsup src/index.tsx --format esm,cjs --dts --external react --minify terser",
 		"dev": "tsup src/index.tsx --format esm,cjs --watch --dts --external react",

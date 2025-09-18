@@ -1,4 +1,16 @@
-export abstract class EventUtils<T extends string> 
+type CustomEventDetail = {
+	target: HTMLElement | null;
+	endTarget?: HTMLElement | null;
+	position: { 
+		x: number; 
+		y: number;
+	};
+};
+
+/**
+ * Helps to trigger {@link CustomEvent} with inferred event names.
+ */
+export abstract class EventUtils<TEvent extends string> 
 {
 	abstract _target: HTMLElement | Window | Document;
 
@@ -8,10 +20,10 @@ export abstract class EventUtils<T extends string>
 	 * @param events List of events to add target
 	 * @internal
 	 */
-	_addEventListeners<E extends Event>( ...events: [ keyof GlobalEventHandlersEventMap, ( event: E ) => void ][] ): void 
+	_addEventListeners<E extends Event>( ...events: [ keyof GlobalEventHandlersEventMap, ( event: E ) => void, AddEventListenerOptions? ][] ): void 
 	{
-		events.forEach(([ eventKey, listener ]) => {
-			this._target.addEventListener( eventKey, listener as EventListener, { passive: false } );
+		events.forEach(([ eventKey, listener, options ]) => {
+			this._target.addEventListener( eventKey, listener as EventListener, options ?? { passive: false } );
 		});
 	}
 
@@ -35,7 +47,7 @@ export abstract class EventUtils<T extends string>
 	 * @param detail Custom event detail
 	 * @internal
 	 */
-	_dispatchCustomEvent( customEvent: T, detail: Object ): void
+	_dispatchCustomEvent( customEvent: TEvent, detail: Object ): void
 	{
 		this._target.dispatchEvent( new CustomEvent( customEvent, { detail } ) );
 	}
