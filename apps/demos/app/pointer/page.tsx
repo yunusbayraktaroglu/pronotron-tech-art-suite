@@ -143,14 +143,16 @@ function PointerDebugger()
 
 function PointerView()
 {
-	const { pointerPosition, pointerState, pointerTargetInteractable } = usePointerDataContext();
+	const { pointerPosition, pointerState, pointerTargetInteractable, pointerEasedPosition } = usePointerDataContext();
 
 	return (
 		<div 
 			className="pointer"
 			data-interactable={ pointerTargetInteractable }
 			data-state={ pointerState }
-			style={{ "--x": `${ pointerPosition.x }px`, "--y": `${ pointerPosition.y }px` } as React.CSSProperties }
-		/>
+			style={{ "--x": `${ pointerEasedPosition.x }px`, "--y": `${ pointerEasedPosition.y }px` } as React.CSSProperties }
+		>
+			<div className="pointer-inside" />
+		</div>
 	)
 }
