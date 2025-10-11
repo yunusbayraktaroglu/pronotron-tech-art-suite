@@ -1,23 +1,16 @@
-import { PointerState, PointerBase, PointerBaseDependencies } from "../PointerBase";
-import { PointerHoldable, PointerHoldableDependencies } from "../PointerHoldable";
-
-type PointerSettings = {
-	idleThreshold: number;
-	tapThreshold: number;
-	holdThreshold: number;
-	movingDeltaLimit: number;
-};
+import { PointerState, PointerBase, PointerBaseDependencies, BaseSettings } from "../PointerBase";
+import { PointerHoldable, PointerHoldableDependencies, HoldableSettings } from "../PointerHoldable";
 
 /**
  * Common methods between models
  */
-export abstract class PointerModel
+export abstract class ModelController
 {
 	/**
-	 * Possible touch handlers
+	 * Possible models
 	 * @internal
 	 */
-	_model: PointerBase<"tap"> | PointerHoldable;
+	_model: PointerBase | PointerHoldable;
 
 	/**
 	 * Every pointer model has its own pointer position getter model
@@ -30,16 +23,23 @@ export abstract class PointerModel
 		this._model = ( "holdThreshold" in dependencies ) ? new PointerHoldable( dependencies ) : new PointerBase( dependencies ); 
 	}
 
-	updateSettings({ idleThreshold, tapThreshold, holdThreshold, movingDeltaLimit }: PointerSettings )
+	/**
+	 * Updates settings of the pointer controller
+	 * @param settings 
+	 */
+	updateSettings( settings: BaseSettings | HoldableSettings ): void
 	{
-		//@ts-expect-error
-		this._model._idleThreshold = idleThreshold;
-		//@ts-expect-error
-		this._model._tapThreshold = tapThreshold;
-		//@ts-expect-error
-		this._model._holdThreshold = holdThreshold;
-		this._model._movingDeltaLimit = movingDeltaLimit;
-		console.log( this._model );
+		/**
+		 * @todo
+		 * Find a better way
+		 */
+		for ( const [ key, value ] of Object.entries( settings ) ){
+			const internalKey = `_${ key }` as keyof this[ "_model" ];
+			if ( internalKey in this._model ){
+				( this._model as any )[ internalKey ] = value;
+			}
+		}
+		// console.log( this._model );
 	}
 
 	/**
@@ -59,7 +59,7 @@ export abstract class PointerModel
 	 *
 	 * @returns True if the active event target is interactable.
 	 */
-	getTargetInteractable(): boolean
+	canInteract(): boolean
 	{
 		return this._model._canInteract;
 	}

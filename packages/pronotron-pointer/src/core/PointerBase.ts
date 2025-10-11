@@ -1,4 +1,4 @@
-import { PronotronClock, PronotronAnimationController } from "@pronotron/utils";
+import { PronotronClock, PronotronAnimator } from "@pronotron/utils";
 import { EventUtils } from "./helpers/EventUtils";
 import { Vector2 } from "./helpers/Vector2";
 
@@ -41,20 +41,7 @@ export enum PointerState
  * Elements or globals that can receive pointer events.
  */
 export type PossibleTarget = Window | Document | HTMLElement;
-
-export type PointerBaseDependencies = {
-	/**
-	 * DOM node or global object that pointer listeners attach to.
-	 */
-	target: PossibleTarget;
-	/**
-	 * Central animation scheduler for idle timers.
-	 */
-	animationController: PronotronAnimationController;
-	/**
-	 * Shared clock used to measure elapsed time for taps/holds.
-	 */
-	clock: PronotronClock;
+export type BaseSettings = {
 	/**
 	 * Seconds of inactivity before auto-transition to IDLE.
 	 * @default 0.5 sec.
@@ -71,6 +58,20 @@ export type PointerBaseDependencies = {
 	 * @default 10
 	 */
 	movingDeltaLimit: number;
+}
+export type PointerBaseDependencies = BaseSettings & {
+	/**
+	 * DOM node or global object that pointer listeners attach to.
+	 */
+	target: PossibleTarget;
+	/**
+	 * Central animation scheduler for idle timers.
+	 */
+	animator: PronotronAnimator;
+	/**
+	 * Shared clock used to measure elapsed time for taps/holds.
+	 */
+	clock: PronotronClock;
 	/**
 	 * Should return true if the element under the pointer
 	 * should be considered “interactive” (e.g. buttons, links).
@@ -86,7 +87,7 @@ export type PointerBaseDependencies = {
  * state transitions (idle, waiting, moving, holding) and
  * emits high-level events like "tap".
  */
-export class PointerBase<T extends string> extends EventUtils<T | "tap">
+export class PointerBase<TDispatchableEvents extends string = string> extends EventUtils<TDispatchableEvents | "tap">
 {
 	/**
 	 * True while event listeners are active
@@ -98,7 +99,7 @@ export class PointerBase<T extends string> extends EventUtils<T | "tap">
 	_clock: PronotronClock;
 
 	/** @internal */
-	_animationController: PronotronAnimationController;
+	_animator: PronotronAnimator;
 
 	/**
 	 * Pointer events target
@@ -167,12 +168,12 @@ export class PointerBase<T extends string> extends EventUtils<T | "tap">
 	 */
 	private _isInteractable: ( target: HTMLElement ) => boolean;
 
-	constructor({ target, animationController, clock, idleThreshold, tapThreshold, movingDeltaLimit, isInteractable }: PointerBaseDependencies)
+	constructor({ target, animator, clock, idleThreshold, tapThreshold, movingDeltaLimit, isInteractable }: PointerBaseDependencies)
 	{
 		super();
 
 		this._target = target;
-		this._animationController = animationController;
+		this._animator = animator;
 		this._clock = clock;
 
 		this._idleThreshold = idleThreshold;
@@ -225,7 +226,9 @@ export class PointerBase<T extends string> extends EventUtils<T | "tap">
 		// Pending for transition
 		this._currentState = PointerState.PENDING;
 
-		this._pointerStartTime = this._clock.elapsedTime;
+		const { elapsedTime } = this._clock.getTime();
+
+		this._pointerStartTime = elapsedTime;
 
 		// Reset pointer delta to calculate movement limit correct in _onMove
 		this._pointerDelta._set( 0, 0 );
@@ -259,10 +262,10 @@ export class PointerBase<T extends string> extends EventUtils<T | "tap">
 		this._canInteract = this._isInteractable( event.target as HTMLElement );
 
 		// Refresh idle timer so the state only flips to IDLE after the user truly stops moving.
-		this._animationController.addAnimation({
+		this._animator.add({
 			id: "IDLE",
 			duration: this._idleThreshold,
-			timeStyle: "continious",
+			autoPause: false,
 			onEnd: ( forced ) => {
 				if ( ! forced && this._currentState === PointerState.MOVING ){
 					this._currentState = PointerState.IDLE;
@@ -281,7 +284,9 @@ export class PointerBase<T extends string> extends EventUtils<T | "tap">
 	 */
 	_onPointerEnd( event: Event )
 	{
-		if ( this._clock.elapsedTime < this._pointerStartTime + this._tapThreshold ){
+		const { elapsedTime } = this._clock.getTime();
+		
+		if ( elapsedTime < this._pointerStartTime + this._tapThreshold ){
 			this._dispatchCustomEvent( "tap", {
 				target: event.target,
 				position: { 
