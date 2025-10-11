@@ -1,71 +1,154 @@
 /**
- * @see https://github.com/mrdoob/three.js/blob/master/src/core/Clock.js
+ * PronotronClock
+ *
+ * A dual-domain clock that tracks both:
+ *
+ * - **Global time** — always progresses (unaffected by tab focus)
+ * - **Active time** — pauses when the screen/tab is unfocused
+ *
+ * This allows animations or logic to selectively follow either time domain.
  * 
- * Tracks two type of time
+ * @example
+ * ```ts
+ * const clock = new PronotronClock();
+ * const handleVisibilityChange = () => {
+ * 	if ( document.hidden ){
+ * 		clock.pause();
+ * 	} else {
+ * 		clock.resume();
+ * 	}
+ * };
+ * document.addEventListener( 'visibilitychange', handleVisibilityChange );
  * 
- * - Global time: Always ticking even screen is unfocused
- * - Active time: Only ticking if screen is focused
+ * // In your main loop:
+ * function frame()
+ * {
+ * 	const delta = clock.tick();
+ * 	const { elapsedTime, elapsedPausedTime } = clock.getTime();
+ * 	// ...rest
+ * }
+ * frame();
+ * ```
  */
 export class PronotronClock 
 {
-	running = false;
-
-	startTime = 0;
-	oldTime = 0;
-	elapsedTime = 0;
-
-	pauseTime = 0;
-	pauseDiff = 0;
-	elapsedPausedTime = 0;
-
-	start()
-	{
-		this.startTime = now();
-		this.oldTime = this.startTime;
-		this.running = true;
-	}
-
-	pause()
-	{
-		this.pauseTime = now();
-	}
-
-	continue()
-	{
-		this.pauseDiff += ( now() - this.pauseTime ) / 1000;
-	}
+	/**
+	 * Indicates whether the clock has started ticking.
+	 * @internal
+	 */
+	private _running = false;
 
 	/**
-	 * Ticks the clock
-	 * @returns Delta time
+	 * Timestamp when the clock first started (ms)
+	 * @internal
+	 */
+	private _startTime = 0;
+
+	/**
+	 * Timestamp of the last tick (ms)
+	 * @internal
+	 */
+	private _lastTickTime = 0;
+
+	/**
+	 * Total elapsed real-world time (s) — unaffected by pause state
+	 * @internal
+	 */
+	private _globalElapsed = 0;
+
+	/**
+	 * Timestamp when pause() was last triggered (ms)
+	 * @internal
+	 */
+	private _pauseStartTime = 0;
+
+	/**
+	 * Accumulated time spent paused (s)
+	 * @internal
+	 */
+	private _totalPausedDuration = 0;
+
+	/**
+	 * Elapsed time excluding paused intervals (s)
+	 * @internal
+	 */
+	private _activeElapsed = 0;
+
+	/**
+	 * Advances the clock by one frame and computes the delta time.
+	 * Call this once per render frame
+	 * 
+	 * @returns The time elapsed since the previous tick (delta time), in seconds.
 	 */
 	tick(): number
 	{
-		if ( ! this.running ) this.start();
+		if ( ! this._running ) this._start();
 		return this._getDelta();
 	}
 
 	/**
+	 * Pauses the "active" time domain without affecting global time.
+	 * Call when the window or app loses focus.
+	 */
+	pause(): void
+	{
+		this._pauseStartTime = now();
+	}
+
+	/**
+	 * Resumes the "active" time domain.
+	 * Adjusts for time spent paused so that active time remains continuous.
+	 */
+	resume(): void
+	{
+		this._totalPausedDuration += ( now() - this._pauseStartTime ) / 1000;
+	}
+
+	/**
+	 * Returns the current time states for both global and active timelines.
+	 */
+	getTime(): { elapsedTime: number; elapsedPausedTime: number }
+	{
+		return { 
+			elapsedTime: this._globalElapsed, 
+			elapsedPausedTime: this._activeElapsed 
+		};
+	}
+
+	/**
+	 * Initializes the clock on the first tick.
 	 * @internal
 	 */
-	private _getDelta()
+	private _start(): void
 	{
-		let diff = 0;
-		const newTime = now();
+		this._startTime = now();
+		this._lastTickTime = this._startTime;
+		this._running = true;
+	}
 
-		diff = ( newTime - this.oldTime ) / 1000;
+	/**
+	 * Computes delta time between frames and updates elapsed counters.
+	 * @internal
+	 */
+	private _getDelta(): number
+	{
+		const newTime = now();
+		const diff = ( newTime - this._lastTickTime ) / 1000;
 		
-		this.oldTime = newTime;
+		this._lastTickTime = newTime;
 		
-		this.elapsedTime += diff;
-		this.elapsedPausedTime = this.elapsedTime - this.pauseDiff;
+		this._globalElapsed += diff;
+		this._activeElapsed = this._globalElapsed - this._totalPausedDuration;
 
 		return diff;
 	}
 
 }
 
-function now()
+/**
+ * Returns the current high-resolution timestamp in milliseconds.
+ */
+function now(): number
 {
 	return performance.now();
 }

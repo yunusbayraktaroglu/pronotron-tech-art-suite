@@ -1,7 +1,10 @@
 import type { RequireAtLeastOne, EnumValueMap } from "../utils/Types";
 
-type NativeTableTypes = Float32Array | Float64Array | Int32Array | Uint8Array | Uint16Array | Uint32Array;
+type NativeTable = Float32Array | Float64Array | Int32Array | Uint8Array | Uint16Array | Uint32Array;
+
+/** Client-given slot ID */
 type SlotID = string | number;
+/** Slot index in the table */
 type SlotPosition = number;
 
 /**
@@ -12,27 +15,47 @@ type SlotPosition = number;
  * @example
  * ```typescript
  * enum AnimationData {
- * 	ID,
+ * 	DELAY,
  * 	DURATION,
  * 	...
  * };
- * // Any typed array can be used
- * const table: NativeControlTable<AnimationData> = new NativeControlTable( 2, Uint16Array, nodeCountHint );
+ * // Any typed array can be used depends on your data
+ * const controlTable: NativeControlTable<AnimationData> = new NativeControlTable( 2, Float32Array, nodeCountHint );
+ * controlTable.add( YOUR_ANIMATION_ID, {
+ * 	[ AnimationData.DELAY ]: 0.15,
+ * 	[ AnimationData.DURATION ]: 1.75
+ * } );
  * ```
  * @example
  * ```typescript
  * // Iterating over the control table,
- * for ( i = 0; i < table.usedSlots; i++ ){
- * 	const slotOffset = i * table.stride;
- * 	const duration = this.table[ slotOffset + AnimationData.DURATION ];
- * 	const id = this.table[ slotOffset + AnimationData.ID ];
- * 	...
+ * const { table, usedSlots, stride } = controlTable;
+ * for ( i = 0; i < usedSlots; i++ ){
+ * 	const slotOffset = i * stride;
+ * 	const delay = table[ slotOffset + AnimationData.DELAY ];
+ * 	const duration = table[ slotOffset + AnimationData.DURATION ];
  * }
  * ```
  */
 export class NativeControlTable<EnumType extends number>
 {
-	public table: NativeTableTypes;
+	/**
+	 * Raw typed array that holds flattened data
+	 */
+	public table: NativeTable;
+
+	/**
+	 * Defines how many elements each node holds.
+	 * @example
+	 * 4: [ ( +, +, +, + ), ( +, +, +, + ), ... ]
+	 */
+	public stride: number;
+
+	/**
+	 * The control table is created with a fixed size.
+	 * This property tracks how many slots are currently used.
+	 */
+	public usedSlots = 0;
 
 	/**
 	 * Keeps track of slot IDs and their current slot positions to enable slot removal.
@@ -48,20 +71,10 @@ export class NativeControlTable<EnumType extends number>
 	private _slotPositionToSlotID = new Map<SlotPosition, SlotID>();
 
 	/**
-	 * The control table is created with a fixed size.
-	 * This property tracks how many slots are currently used.
+	 * To be used tracking table capacity
+	 * @internal
 	 */
-	public usedSlots = 0;
-
-	/** @internal */
 	private _maxSlots: number;
-
-	/**
-	 * Defines how many elements each node holds.
-	 * @example
-	 * 4: [ ( +, +, +, + ), ( +, +, +, + ), ... ]
-	 */
-	public stride: number;
 
 	/**
 	 * Initializes a fixed-size native control table with a specified stride and underlying typed array.
@@ -70,41 +83,41 @@ export class NativeControlTable<EnumType extends number>
 	 * @param tableType Typed array version
 	 * @param nodeCountHint Used to initialize the fixed-size native array, capacity will expand if needed.
 	 */
-	constructor( stride: number, tableType: { new ( length: number ): NativeTableTypes }, nodeCountHint: number )
+	constructor( stride: number, tableType: { new ( length: number ): NativeTable }, nodeCountHint: number )
 	{
 		/**
 		 * Stride could be calculated with passing Enum but that causes Enum bundled as object in build code
 		 * @see https://stackoverflow.com/questions/38034673/determine-the-number-of-enum-elements-typescript
 		 */
-		//const stride = Object.keys( enumType ).length / 2;
+		// const stride = Object.keys( enumType ).length / 2;
 
-		this._maxSlots = nodeCountHint;
+		this.table = new tableType( stride * nodeCountHint );
 		this.stride = stride;
-		this.table = new tableType( this._maxSlots * this.stride );
+		this._maxSlots = nodeCountHint;
 	}
 
 	/**
 	 * Adds a new slot to the table with the provided ID and full node data.
 	 * 
 	 * @param ID Unique identifier for the slot.
-	 * @param allData Object containing a value for every enum key.
+	 * @param fullData Object containing a value for every enum key.
 	 */
-	addSlot( ID: SlotID, allData: EnumValueMap<EnumType> ): void
+	add( ID: SlotID, fullData: EnumValueMap<EnumType> ): void
 	{
-		if ( this._slotIDToSlotPosition.get( ID ) ){
+		if ( this.isExist( ID ) ){
 			console.warn( `ID: '${ ID }' already exist in the table.` );
 		}
 
-		const availableSlot = this._findEmptySlot();
-		const emptyOffset = availableSlot * this.stride;
+		const availableSlotPosition = this._findEmptySlotPosition();
+		const emptyOffset = availableSlotPosition * this.stride;
 
 		// Object keys are always coerced to strings when you use the object literal syntax
-		for ( const [ key, value ] of Object.entries<number>( allData ) ){
+		for ( const [ key, value ] of Object.entries<number>( fullData ) ){
 			this.table[ emptyOffset + Number( key ) ] = value;
 		}
 
-		this._slotIDToSlotPosition.set( ID, availableSlot );
-		this._slotPositionToSlotID.set( availableSlot, ID );
+		this._slotIDToSlotPosition.set( ID, availableSlotPosition );
+		this._slotPositionToSlotID.set( availableSlotPosition, ID );
 		this.usedSlots += 1;
 	}
 
@@ -113,20 +126,13 @@ export class NativeControlTable<EnumType extends number>
 	 * 
 	 * @param ID Slot ID to remove.
 	 */
-	removeSlot( ID: SlotID ): void 
+	remove( ID: SlotID ): void | Error
 	{
 		/**
 		 * Does not actually remove data; instead, it shifts the last slot's data to the removed slot,
 		 * and updates available slots and used slots, avoiding a bulk sort operation.
 		 */
-		const removedSlotPosition = this._slotIDToSlotPosition.get( ID );
-
-		// Check for undefined; a boolean check is incorrect since ID might be 0
-		if ( removedSlotPosition === undefined ){
-			console.warn( `ID: '${ ID }' is not found in the table.` );
-			return;
-		}
-
+		const removedSlotPosition = this._getSlotPositionOrThrowError( ID );
 		const isLastSlot = removedSlotPosition === this.usedSlots - 1;
 
         /**
@@ -152,12 +158,29 @@ export class NativeControlTable<EnumType extends number>
 			this._slotPositionToSlotID.delete( lastSlotPosition );
 
         } else {
+
 			this._slotPositionToSlotID.delete( removedSlotPosition );
+
 		}
 
 		// Delete the given ID from the map
 		this._slotIDToSlotPosition.delete( ID );
 		this.usedSlots -= 1;
+	}
+
+	/**
+	 * Retrieves a specific value from a slot by its ID and enum key.
+	 * 
+	 * @param ID Slot ID to get
+	 * @param dataKey Enum key corresponding to the desired value.
+	 * @returns The numeric value stored for that key in the slot, or undefined if the ID does not exist.
+	 */
+	getData( ID: SlotID, dataKey: EnumType ): number | Error
+	{
+		const slotPosition = this._getSlotPositionOrThrowError( ID );
+		const offset = slotPosition * this.stride;
+
+		return this.table[ offset + dataKey ];
 	}
 
 	/**
@@ -167,17 +190,10 @@ export class NativeControlTable<EnumType extends number>
 	 * @param data Object with at least one property defined
 	 * @returns 
 	 */
-	modifySlotByID( ID: SlotID, data: RequireAtLeastOne<EnumValueMap<EnumType>> ): void
+	modifyByID( ID: SlotID, data: RequireAtLeastOne<EnumValueMap<EnumType>> ): void | Error
 	{
-		const slotPosition = this._slotIDToSlotPosition.get( ID );
-
-		// Check for undefined; a boolean check is incorrect since ID might be 0
-		if ( slotPosition === undefined ){
-			console.warn( `ID: '${ ID }' is not found in the table.` );
-			return;
-		}
-
-		this.modifySlotByPosition( slotPosition, data );
+		const slotPosition = this._getSlotPositionOrThrowError( ID );
+		this.modifyByPosition( slotPosition, data );
 	}
 
 	/**
@@ -187,7 +203,7 @@ export class NativeControlTable<EnumType extends number>
 	 * @param position Index of the slot in the table.
 	 * @param data Partial or full node data.
 	 */
-	modifySlotByPosition( position: number, data: RequireAtLeastOne<EnumValueMap<EnumType>> ): void
+	modifyByPosition( position: number, data: RequireAtLeastOne<EnumValueMap<EnumType>> ): void
 	{
 		const offset = position * this.stride;
 
@@ -198,35 +214,32 @@ export class NativeControlTable<EnumType extends number>
 	}
 
 	/**
-	 * Retrieves a specific value from a slot by its ID and enum key.
-	 * 
-	 * @param ID Slot ID to get
-	 * @param dataKey Enum key corresponding to the desired value.
-	 * @returns The numeric value stored for that key in the slot, or undefined if the ID does not exist.
-	 */
-	getSlotData( ID: SlotID, dataKey: EnumType ): number | false
-	{
-		const slotPosition = this._slotIDToSlotPosition.get( ID );
-
-		// Check for undefined; a boolean check is incorrect since ID might be 0
-		if ( slotPosition === undefined ){
-			console.warn( `ID: '${ ID }' is not found in the table.` );
-			return false;
-		}
-
-		const offset = slotPosition * this.stride;
-		return this.table[ offset + dataKey ];
-	}
-
-	/**
 	 * Checks whether a slot with the given ID currently exists in the table.
 	 * 
 	 * @param ID Slot ID.
 	 * @returns true if the slot exists; otherwise false.
 	 */
-	isSlotExist( ID: SlotID ): boolean
+	isExist( ID: SlotID ): boolean
 	{
 		return this._slotIDToSlotPosition.has( ID );
+	}
+
+	/**
+	 * Returns slot position by given ID or throws error
+	 * 
+	 * @param ID Slot ID
+	 * @returns Error or SlotPosition
+	 */
+	private _getSlotPositionOrThrowError( ID: SlotID ): SlotPosition
+	{
+		const slotPosition = this._slotIDToSlotPosition.get( ID );
+
+		// Check for undefined; a boolean check is incorrect since ID might be 0
+		if ( slotPosition === undefined ){
+			throw new Error( `ID: '${ ID }' is not found in the table.` );
+		}
+
+		return slotPosition;
 	}
 
 	/**
@@ -236,7 +249,7 @@ export class NativeControlTable<EnumType extends number>
 	 * 
 	 * @internal
 	 */
-	private _findEmptySlot(): number 
+	private _findEmptySlotPosition(): SlotPosition 
 	{
 		// Expand capacity if there is no available slot
 		if ( this.usedSlots === this._maxSlots ){
@@ -257,7 +270,7 @@ export class NativeControlTable<EnumType extends number>
 		const newMaxSlots = this._maxSlots * 2;
 
 		// Create new table with increased size and copy old table onto it
-		const newControlTable = new ( this.table.constructor as { new ( length: number ): NativeTableTypes } )( newMaxSlots * this.stride );
+		const newControlTable = new ( this.table.constructor as { new ( length: number ): NativeTable } )( newMaxSlots * this.stride );
 		newControlTable.set( this.table );
 
 		// Update references and max slots
