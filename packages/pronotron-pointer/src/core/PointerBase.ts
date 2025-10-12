@@ -133,12 +133,12 @@ export class PointerBase<TDispatchableEvents extends string = string> extends Ev
 	 * Timeout for the IDLE transition
 	 * @internal
 	 */
-	private _idleThreshold = 0.5;
+	_idleThreshold = 0.5;
 	/**
 	 * Timeout for the TAP event
 	 * @internal
 	 */
-	private _tapThreshold = 0.25;
+	_tapThreshold = 0.25;
 	/**
 	 * Pixel limit to convert IDLE to MOVING, helps to keep state on micro movements
 	 * @internal

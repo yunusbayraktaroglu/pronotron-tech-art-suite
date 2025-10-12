@@ -33,11 +33,13 @@ export abstract class ModelController
 		 * @todo
 		 * Find a better way
 		 */
-		for ( const [ key, value ] of Object.entries( settings ) ){
-			const internalKey = `_${ key }` as keyof this[ "_model" ];
-			if ( internalKey in this._model ){
-				( this._model as any )[ internalKey ] = value;
-			}
+		this._model._movingDeltaLimit = settings.movingDeltaLimit;
+		this._model._tapThreshold = settings.tapThreshold;
+		this._model._idleThreshold = settings.idleThreshold;
+
+		if ( '_holdThreshold' in this._model ){
+			//@ts-expect-error - holdThreshold only in HoldableSettings
+			this._model._holdThreshold = settings.holdThreshold;
 		}
 		// console.log( this._model );
 	}
