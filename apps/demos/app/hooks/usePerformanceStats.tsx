@@ -3,18 +3,18 @@
 import { useState, createContext, useContext } from "react";
 
 interface IPerformanceStatsContext {
-	isActive: boolean;
-	setIsActive: React.Dispatch<React.SetStateAction<boolean>>;
+	showStats: boolean;
+	setShowStats: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const PerformanceStatsContext = createContext<IPerformanceStatsContext>( null ! );
 
 export function PerformanceStatsProvider({ children }: { children: React.ReactNode })
 {
-	const [ isActive, setIsActive ] = useState( false );
+	const [ showStats, setShowStats ] = useState( false );
 
 	return (
-		<PerformanceStatsContext.Provider value={{ isActive, setIsActive }}>
+		<PerformanceStatsContext.Provider value={{ showStats, setShowStats }}>
 			{ children }
 		</PerformanceStatsContext.Provider>
 	);

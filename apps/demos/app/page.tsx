@@ -6,18 +6,19 @@ import { usePerformanceStats } from "./hooks/usePerformanceStats";
 
 export default function HomePage()
 {
-	const { setIsActive } = usePerformanceStats();
+	const { setShowStats } = usePerformanceStats();
 	
 	useEffect(() => {
-		setIsActive( false );
+		setShowStats( false );
 	}, []);
 
 	return (
 		<>
 			<main className="container min-h-screen flex flex-col justify-center">
-				<div className="mb-spacing-lg space-y-spacing-xs">
+				<div className="mb-spacing-lg space-y-spacing-sm">
 					<h1 className="text-3xl">Pronotron <span className="whitespace-nowrap">Tech-Art</span> Suite</h1>
-					<p>A high-performance TypeScript-based suite designed to enhance interaction, UI, and UX without compromising web standards.</p>
+					<p>A high-performance TypeScript suite designed to enhance interaction, UI, and UX without compromising web standards.</p>
+					<pre className="py-spacing-xs px-spacing-sm bg-slate-200 inline-block rounded-xl text-xs">npm i <a href="https://www.npmjs.com/package/@pronotron/io" className="text-link">@pronotron/io</a> <a href="https://www.npmjs.com/package/@pronotron/pointer" className="text-link">@pronotron/pointer</a> <a href="https://www.npmjs.com/package/@pronotron/utils" className="text-link">@pronotron/utils</a></pre>
 				</div>
 				<div className="grid grid-cols-2 landscape:grid-cols-3 gap-spacing-sm">
 					<PackageCard 
@@ -32,14 +33,13 @@ export default function HomePage()
 					/>
 					<PackageCard 
 						name="Pronotron Animator"
-						description="Built on NativeControlTable and Clock, it provides per-frame normalized timeline data (ranging from 0 to 1), enabling developers to create any kind of animation."
+						description="Provides a lightweight yet powerful system for managing large-scale animations with high efficiency."
 						href="/animator"
 					/>
 				</div>
 			</main>
 		</>
 	)
-
 }
 
 

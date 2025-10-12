@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useEffect, useState, useContext, useMemo } from 'react';
+import { createContext, useEffect, useContext, useMemo, useCallback } from 'react';
 import { usePathname } from 'next/navigation'
 import { PronotronIOVerticalObserver } from "@pronotron/io";
 import { ResizeObserver as Polyfill } from '@juggle/resize-observer';
@@ -9,14 +9,17 @@ import throttle from "lodash.throttle";
 import { stats } from "@/app/components/PerformanceStats";
 import { usePerformanceStats } from "@/app/hooks/usePerformanceStats";
 
-interface PronotronIOContextType {
-	io: PronotronIOVerticalObserver;
-};
-
-type vp = {
+type ViewportData = {
 	height: number;
 	offsetTop: number;
 	scale: number;
+};
+
+/**
+ * IO CONTEXT
+ */
+interface PronotronIOContextType {
+	io: PronotronIOVerticalObserver;
 };
 
 const PronotronIOContext = createContext<PronotronIOContextType>( null ! );
@@ -41,11 +44,11 @@ export function usePronotronIOContext<T>( selector: ( context: PronotronIOContex
 export function PronotronIOProvider({ children }: { children: React.ReactNode })
 {
 	const pathname = usePathname();
-	const { setIsActive } = usePerformanceStats();
+	const { setShowStats } = usePerformanceStats();
 
 	const pronotronIO = useMemo(() => new PronotronIOVerticalObserver(), []);
 	
-	const getViewport = () => {
+	const getViewport = useCallback<() => ViewportData>(() => {
 		if ( window.visualViewport ){
 			return {
 				height: window.visualViewport.height,
@@ -58,11 +61,11 @@ export function PronotronIOProvider({ children }: { children: React.ReactNode })
 			offsetTop: 0,
 			scale: 1,
 		};
-	};
+	}, []);
 
-	const updateLayout = ( vp: vp ) => {
+	const updateLayout = useCallback(( vp: ViewportData ) => {
 		pronotronIO.updateViewportLayout( vp.offsetTop, vp.offsetTop + vp.height );
-	};
+	}, []);
 
 	useEffect(() => {
 		/**
@@ -99,7 +102,7 @@ export function PronotronIOProvider({ children }: { children: React.ReactNode })
 		 */
 
 		// Activate performance stats
-		setIsActive( true );
+		setShowStats( true );
 
 		let needsTick = false;
 		let animationFrameId = 0;
@@ -121,7 +124,12 @@ export function PronotronIOProvider({ children }: { children: React.ReactNode })
 			// Request a scroll handle
 			scrollTicker();
 		};
-		const visualViewportResize = ( vp: vp ) => {
+
+		/**
+		 * - Mobile statusbar shrink/expand
+		 * - Mobile zoom
+		 */
+		const visualViewportResize = ( vp: ViewportData ) => {
 			// VisualViewport changes doesnt affects layout
 			updateLayout( vp );
 			// Request a scroll handle

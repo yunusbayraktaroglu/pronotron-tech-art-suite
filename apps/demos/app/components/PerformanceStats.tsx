@@ -187,7 +187,7 @@ export const stats = new PronotronStats();
 export function PronotronStatsComponent()
 {
 	const containerRef = useRef<HTMLDivElement>( null ! );
-	const { isActive } = usePerformanceStats();
+	const { showStats } = usePerformanceStats();
 
 	useEffect(() => {
 
@@ -208,7 +208,7 @@ export function PronotronStatsComponent()
 	return (
 		<div 
 			id="performance-stats" 
-			className={ "fixed flex flex-col left-2 bottom-2 opacity-[1] z-[999] space-y-[1px]" + ( ! isActive ? " hidden" : "" ) }
+			className={ "fixed flex flex-col left-2 bottom-2 opacity-[1] z-[999] space-y-[1px]" + ( ! showStats ? " hidden" : "" ) }
 			ref={ containerRef } 
 		/>
 	)
