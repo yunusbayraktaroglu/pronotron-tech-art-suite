@@ -1,8 +1,21 @@
-# @pronotron/utils
+---
+"@pronotron/pointer": patch
+"@pronotron/utils": patch
+"@pronotron/io": patch
+"@pronotron/config-ts": patch
+---
 
-## 0.0.1-beta.6
+### @pronotron/io
 
-### Patch Changes
+- Fix: Adjusted code to support recent NativeControlTable and IDPool breaking changes
+
+### @pronotron/pointer
+
+- Fix: Documentation inconsistencies
+- Fix: Minor typos
+- Fix: Adjusted code to support recent Animator breaking changes
+
+### @pronotron/utils
 
 **Animator**
 - Rename: PronotronAnimationController → PronotronAnimator
@@ -20,41 +33,3 @@
 
 **IDPool**
 - Rename: 'getID' → 'get', 'consumeID' → 'consume', ..., removed redundant ID suffix from method names.
-
-## 0.0.1-beta.5
-
-### Patch Changes
-
-- Added clear, concise descriptions for all public and private methods.
-- Documented parameters, return values, and behavior.
-- Prepared for version 0.0.1-beta.5.
-
-## 0.0.1-beta.4
-
-### Patch Changes
-
-- Beta 4
-
-## 0.0.1-beta.3
-
-### Patch Changes
-
-- Bugs fixed
-
-## 0.0.1-beta.2
-
-### Patch Changes
-
-- Dependencies fixed
-
-## 0.0.1-beta.1
-
-### Patch Changes
-
-- Dependencies fixed
-
-## 0.0.1-beta.0
-
-### Patch Changes
-
-- Initial versions

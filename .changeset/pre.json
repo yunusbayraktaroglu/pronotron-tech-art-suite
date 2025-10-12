@@ -11,6 +11,7 @@
     "@pronotron/utils": "0.0.0"
   },
   "changesets": [
+    "dirty-keys-occur",
     "empty-stingrays-heal",
     "fifty-camels-serve"
   ]
