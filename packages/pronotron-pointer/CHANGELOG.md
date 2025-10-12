@@ -1,5 +1,15 @@
 # @pronotron/io
 
+## 0.0.1-beta.6
+
+### Patch Changes
+
+- Fix: Documentation inconsistencies
+- Fix: Minor typos
+- Fix: Adjusted code to support recent Animator breaking changes
+- Updated dependencies
+  - @pronotron/utils@0.0.1-beta.6
+
 ## 0.0.1-beta.5
 
 ### Patch Changes

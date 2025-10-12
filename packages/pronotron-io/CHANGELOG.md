@@ -1,5 +1,13 @@
 # @pronotron/io
 
+## 0.0.1-beta.6
+
+### Patch Changes
+
+- Fix: Adjusted code to support recent NativeControlTable and IDPool breaking changes
+- Updated dependencies
+  - @pronotron/utils@0.0.1-beta.6
+
 ## 0.0.1-beta.5
 
 ### Patch Changes

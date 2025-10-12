@@ -9,8 +9,11 @@ export class IDPool
 	/** @internal */
 	private _capacity: number;
 
-	/** @internal */
-	private _availableIDs: Uint8Array; // We will store only 0 | 1 to define used or not
+	/**
+	 * We will store only 0 | 1 to define used or not
+	 * @internal
+	 */
+	private _availableIDs: Uint8Array;
 
 	/**
 	 * Initializes the IDPool with a given initial capacity.
@@ -27,9 +30,11 @@ export class IDPool
 	 * Returns the first available numeric ID from the pool. 
 	 * If all IDs are used, the pool automatically expands and returns the next available ID.
 	 * 
-	 * @returns The allocated ID as a number.
+	 * ***Returned ID must be used with IDPool.consume( ID )***
+	 * 
+	 * @returns The available ID as a number.
 	 */
-	getID(): number
+	get(): number
 	{
 		// Search for first available ID
 		for ( let i = 0; i < this._availableIDs.length; i++ ){
@@ -50,7 +55,7 @@ export class IDPool
 	 * 
 	 * @param ID Numeric ID to mark as consumed.
 	 */
-	consumeID( ID: number ): void
+	consume( ID: number ): void
 	{
 		this._availableIDs[ ID ] = 1;
 	}
@@ -60,7 +65,7 @@ export class IDPool
 	 * 
 	 * @param ID Numeric ID to release.
 	 */
-	releaseID( ID: number ): void
+	release( ID: number ): void
 	{
 		this._availableIDs[ ID ] = 0;
 	}

@@ -8,10 +8,10 @@ Tracks mouse and touch pointers with custom states such as holding, tapping, idl
 ### Setup
 ```typescript
 import { MouseController, TouchController } from "@pronotron/pointer";
-import { PronotronAnimationController, PronotronClock, isTouchDevice } from "@pronotron/utils";
+import { PronotronAnimator, PronotronClock, isTouchDevice } from "@pronotron/utils";
 
 const clock = new PronotronClock();
-const animationController = new PronotronAnimationController( clock );
+const animator = new PronotronAnimator( clock );
 
 /**
  * Or create a touch controller if
@@ -20,7 +20,7 @@ const animationController = new PronotronAnimationController( clock );
 const pointerController = new MouseController({
 	target: window.document.body,
 	clock: clock,
-	animationController: animationController,
+	animator: animator,
 	idleThreshold: 0.5,
 	tapThreshold: 0.25,
 	holdThreshold: 0.75,
@@ -58,7 +58,7 @@ let animationFrameId = 0;
 function tick()
 {
 	const deltaTime = clock.tick();
-	animationController.tick();
+	animator.tick();
 
 	const pointerPosition = pointerController.getPosition();
 	const pointerDelta = pointerController.getDelta();

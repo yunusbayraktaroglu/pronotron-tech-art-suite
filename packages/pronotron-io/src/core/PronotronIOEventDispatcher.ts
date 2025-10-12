@@ -127,7 +127,7 @@ export abstract class PronotronIOEventDispatcher<TEvents extends string> extends
 				}
 
 				// Update the node’s position in the control table
-				this._controlTable.modifySlotByPosition( i, {
+				this._controlTable.modifyByPosition( i, {
 					[ IONodeStrideIndex.LastPosition ]: currentPosition,
 					[ IONodeStrideIndex.InViewport ]: currentPosition === IONodePosition.InViewport ? 1 : 0,
 				} );

@@ -16,7 +16,7 @@
 		"release": "turbo build --filter=./packages/* && changeset publish"
 	},
 	"devDependencies": {
-		"@changesets/cli": "^2.27.1",
+		"@changesets/cli": "^2.27.8",
 		"eslint": "^8.57.0",
 		"prettier": "^3.2.5",
 		"turbo": "^2.1.2"

@@ -1,4 +1,4 @@
-import { PointerModel } from "./ModelBase";
+import { ModelController } from "./ModelController";
 import { PointerBaseDependencies } from "../PointerBase";
 import { PointerHoldableDependencies } from "../PointerHoldable";
 
@@ -16,7 +16,7 @@ import { PointerHoldableDependencies } from "../PointerHoldable";
  * controller.stopEvents();
  * ```
  */
-export class TouchController extends PointerModel
+export class TouchController extends ModelController
 {
 	constructor( dependencies: PointerBaseDependencies | PointerHoldableDependencies )
 	{
@@ -124,8 +124,8 @@ export class TouchController extends PointerModel
 	_onPointerMove( event: TouchEvent ): void
 	{
 		const { x, y } = this._getPointerPosition( event );
-		this._model._updatePointer( x, y );
 
+		this._model._updatePointer( x, y );
 		this._model._onPointerMove( event );
 	}
 

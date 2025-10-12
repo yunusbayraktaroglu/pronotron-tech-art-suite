@@ -1,7 +1,6 @@
 {
-	"extends": "@pronotron/config-ts/base.json",
+	"extends": "@pronotron/config-ts/js-library.json",
 	"compilerOptions": {
-		"module": "NodeNext",
 		"stripInternal": true
 	},
 	"include": [

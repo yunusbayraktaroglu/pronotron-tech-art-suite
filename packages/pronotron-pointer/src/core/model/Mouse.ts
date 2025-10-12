@@ -1,4 +1,4 @@
-import { PointerModel } from "./ModelBase";
+import { ModelController } from "./ModelController";
 import { PointerState, PointerBaseDependencies } from "../PointerBase";
 import { PointerHoldableDependencies } from "../PointerHoldable";
 
@@ -16,10 +16,10 @@ import { PointerHoldableDependencies } from "../PointerHoldable";
  * controller.stopEvents();
  * ```
  */
-export class MouseController extends PointerModel
+export class MouseController extends ModelController
 {
 	/**
-	 * Prevents the extra `pointermove` event that the browser sometimes fires
+	 * Prevents the extra `pointermove` event that the browser fires
 	 * immediately after `pointerup`. Used only for mouse input.
 	 *
 	 * @internal

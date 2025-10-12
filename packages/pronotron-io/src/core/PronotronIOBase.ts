@@ -242,7 +242,7 @@ export abstract class PronotronIOBase<TEvents extends string>
 	{
 		if ( ! this._nodeReferences.has( newNodeOptions.ref ) ){
 
-			const internalID = this._idPool.getID();
+			const internalID = this._idPool.get();
 
 			this._nodeReferences.set( newNodeOptions.ref, internalID );
 			this._nodes.set( internalID, newNodeOptions );
@@ -250,7 +250,7 @@ export abstract class PronotronIOBase<TEvents extends string>
 			const fastForwardOption = this._getFastForwardOption( newNodeOptions.dispatch.onFastForward );
 
 			// Add all data as placeholder
-			this._controlTable.addSlot( internalID, {
+			this._controlTable.add( internalID, {
 				[ IONodeStrideIndex.ID ]: internalID,
 				[ IONodeStrideIndex.StartPosition ]: 0,
 				[ IONodeStrideIndex.EndPosition ]: 0,
@@ -265,7 +265,7 @@ export abstract class PronotronIOBase<TEvents extends string>
 			});
 
 			// IONode has been created successfully, consume ID
-			this._idPool.consumeID( internalID );
+			this._idPool.consume( internalID );
 
 			// IONode might be added while app is running. Calculate bounds
 			this._updateNodeBounds( internalID, newNodeOptions );
@@ -375,8 +375,8 @@ export abstract class PronotronIOBase<TEvents extends string>
 			
 			this._nodeReferences.delete( nodeSettings.ref );
 			this._nodes.delete( nodeID );
-			this._controlTable.removeSlot( nodeID );
-			this._idPool.releaseID( nodeID );
+			this._controlTable.remove( nodeID );
+			this._idPool.release( nodeID );
 
 			if ( nodeSettings.onRemoveNode ){
 				nodeSettings.onRemoveNode();
@@ -400,7 +400,7 @@ export abstract class PronotronIOBase<TEvents extends string>
 		const nodeStart = this._useRounded ? Math.round( start - elementOffset ) : start - elementOffset;
 		const nodeEnd = this._useRounded ? Math.round( end + elementOffset ) : end + elementOffset;
 
-		this._controlTable.modifySlotByID( nodeID, {
+		this._controlTable.modifyByID( nodeID, {
 			[ IONodeStrideIndex.StartPosition ]: nodeStart,
 			[ IONodeStrideIndex.EndPosition ]: nodeEnd
 		} );

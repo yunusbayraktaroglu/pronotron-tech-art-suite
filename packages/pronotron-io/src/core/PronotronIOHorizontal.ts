@@ -51,6 +51,3 @@ export class PronotronIOHorizontalObserver extends PronotronIOEventDispatcher<Ho
 		_positiveExitEvent: "onRightExit"
 	} as const;
 }
-
-//const pronotronIO = new PronotronIOHorizontalObserver();
-//pronotronIO.handleScroll( 10 );

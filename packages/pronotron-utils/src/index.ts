@@ -1,7 +1,7 @@
 export { PronotronClock } from "./clock/PronotronClock";
-export { PronotronAnimationController } from "./animation-controller/PronotronAnimationController";
+export { PronotronAnimator, type AnimationOption } from "./animator/PronotronAnimator";
 export { NativeControlTable } from "./native-control-table/NativeControlTable";
 export { IDPool } from "./utils/IDPool";
 export { isTouchDevice } from "./utils/isTouchDevice";
 
-export type { RequireAtLeastOne, RequireExactlyOne, BinaryBoolean, EnumValueMap } from "./utils/Types";
+export * from "./utils/Types";

@@ -2,8 +2,8 @@
  * Touch screen detection
  * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Browser_detection_using_the_user_agent
  */
-export function isTouchDevice(): boolean {
-
+export function isTouchDevice(): boolean
+{
 	let hasTouchScreen = false;
 
 	if ( "maxTouchPoints" in navigator ){
@@ -39,5 +39,4 @@ export function isTouchDevice(): boolean {
 	}
 
 	return hasTouchScreen;
-	
 }

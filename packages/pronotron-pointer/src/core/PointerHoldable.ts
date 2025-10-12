@@ -1,15 +1,18 @@
-import { PointerBase, PointerBaseDependencies, PointerState } from "./PointerBase";
+import { PointerBase, PointerBaseDependencies, PointerState, type BaseSettings } from "./PointerBase";
 
-export type PointerHoldableDependencies = PointerBaseDependencies & {
+export type HoldableSettings = BaseSettings & {
+	/**
+	 * Duration in seconds required to trigger a hold gesture.
+	 */
+	holdThreshold: number;
+};
+
+export type PointerHoldableDependencies = PointerBaseDependencies & HoldableSettings & {
 	/**
 	 * User-provided function to determine whether a DOM element supports hold interaction.
 	 * @param target HTMLElement that user trying to hold
 	 */
 	isHoldable: ( target: HTMLElement ) => boolean;
-	/**
-	 * Duration in seconds required to trigger a hold gesture.
-	 */
-	holdThreshold: number;
 };
 
 /**
@@ -68,10 +71,10 @@ export class PointerHoldable extends PointerBase<"hold" | "holdend">
 		 */
 		if ( event.target && this._isHoldable( event.target as HTMLElement ) ){
 
-			this._animationController.addAnimation({
+			this._animator.add({
 				id: "HOLD",
 				duration: this._holdThreshold,
-				timeStyle: "continious",
+				autoPause: false,
 				onEnd: ( forced ) => {
 					// If id: "HOLD" animation not overriden and state is still "PENDING"
 					if ( ! forced && this._currentState === PointerState.PENDING ){
@@ -98,6 +101,7 @@ export class PointerHoldable extends PointerBase<"hold" | "holdend">
 	_onPointerMove( event: Event ): void
 	{
 		if ( this._currentState === PointerState.HOLDING || this._currentState === PointerState.HOLD_DRAGGING ){
+			
 			// Disable touch scroll if holding
 			event.stopImmediatePropagation();
 			event.preventDefault();

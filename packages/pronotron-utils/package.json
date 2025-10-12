@@ -1,6 +1,6 @@
 {
 	"name": "@pronotron/utils",
-	"version": "0.0.1-beta.5",
+	"version": "0.0.1-beta.6",
 	"description": "A set of helper modules used by other @pronotron packages, which can also be used individually.",
 	"author": "Yunus Bayraktaroglu <yunus.bayraktaroglu@gmail.com>",
 	"main": "./dist/index.js",
@@ -21,19 +21,17 @@
 	},
 	"homepage": "https://yunusbayraktaroglu.github.io/pronotron-tech-art-suite/",
 	"scripts": {
-		"build": "tsup src/index.tsx --format esm,cjs --dts --external react --minify terser",
-		"dev": "tsup src/index.tsx --format esm,cjs --watch --dts --external react",
+		"build": "tsup src/index.ts --format esm,cjs --dts --minify terser",
+		"dev": "tsup src/index.ts --format esm,cjs --watch --dts",
 		"lint": "eslint \"src/**/*.ts*\"",
 		"clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
 	},
 	"devDependencies": {
-		"@pronotron/config-ts": "*",
 		"@pronotron/config-eslint": "*",
-		"@types/react": "^18.2.61",
-		"@types/react-dom": "^18.2.19",
+		"@pronotron/config-ts": "0.0.1-beta.0",
 		"eslint": "^8.57.0",
-		"tsup": "^8.0.2",
-		"typescript": "^5.3.3",
-		"react": "^18.2.0"
+		"terser": "^5.33.0",
+		"tsup": "^8.5.0",
+		"typescript": "^5.9.3"
 	}
 }
