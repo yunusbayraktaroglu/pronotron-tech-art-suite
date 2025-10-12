@@ -128,6 +128,13 @@ body.custom-cursor * {
 		}
 	}
 
+	.text-link {
+		@apply
+		text-blue-600
+		underline 
+		hover:no-underline
+	}
+
 	.pointer {
 		--cursor-size: max( 25px, calc( 100vw / 40 ) );
 		--cursor-half-size: calc( var( --cursor-size ) / 2 );

@@ -2,9 +2,9 @@
 
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { TouchController, MouseController } from "@pronotron/pointer";
-import { PronotronAnimationController, PronotronClock, isTouchDevice } from "@pronotron/utils";
+import { PronotronAnimator, PronotronClock, isTouchDevice } from "@pronotron/utils";
 
-export const pointerSettings = {
+export const defaultPointerSettings = {
 	tapThreshold: 0.25,
 	idleThreshold: 0.5,
 	holdThreshold: 0.75,
@@ -13,7 +13,6 @@ export const pointerSettings = {
 
 interface PointerContextProps {
 	pointerController: React.MutableRefObject<TouchController | MouseController>;
-
 };
 
 const PointerContext = createContext<PointerContextProps | undefined>( undefined );
@@ -21,7 +20,7 @@ const PointerContext = createContext<PointerContextProps | undefined>( undefined
 export const usePointerContext = () => {
 	const context = useContext( PointerContext );
 	if ( ! context ){
-	  	throw new Error( "usePointerContext must be used within an PronotronPointerProvider" );
+	  	throw new Error( "usePointerContext must be used within a PronotronPointerProvider" );
 	}
 	return context;
 };
@@ -29,22 +28,21 @@ export const usePointerContext = () => {
 export function PronotronPointerProvider({ children }: { children: React.ReactNode })
 {
 	const clock = useRef( new PronotronClock() );
-	const animationController = useRef( new PronotronAnimationController( clock.current ) );
+	const animator = useRef( new PronotronAnimator( clock.current ) );
 	const pointerController = useRef<TouchController | MouseController>( null ! );
 
+	/**
+	 * Pointer controller setup
+	 */
 	useEffect(() => {
 
-		const settings = {
+		const baseSettings = {
 			target: window.document.body,
-			animationController: animationController.current,
+			animator: animator.current,
 			clock: clock.current,
-			idleThreshold: pointerSettings.idleThreshold,
-			holdThreshold: pointerSettings.holdThreshold,
-			tapThreshold: pointerSettings.tapThreshold,
-			movingDeltaLimit: pointerSettings.movingDeltaLimit,
 			isInteractable: ( target: HTMLElement ) => {
+				// If target inside an <a>, <button> or .holdable return true
 				if ( target.closest( "a" ) || target.closest( "button" ) || target.closest( ".holdable" ) ){
-					// If target inside an <a>, <button> or .holdable return true
 					return true;
 				}
 				return false;
@@ -53,10 +51,9 @@ export function PronotronPointerProvider({ children }: { children: React.ReactNo
 				return target.dataset.holded ? true : false;
 			}
 		};
+		const settings = { ...baseSettings, ...defaultPointerSettings };
 
-		const touch = isTouchDevice();
-
-		if ( touch ){
+		if (  isTouchDevice() ){
 			pointerController.current = new TouchController( settings );
 		} else {
 			pointerController.current = new MouseController( settings );
@@ -68,7 +65,7 @@ export function PronotronPointerProvider({ children }: { children: React.ReactNo
 
 		const tick = () => {
 			const deltaTime = clock.current.tick();
-			animationController.current.tick();
+			animator.current.tick();
 			animationFrameId = requestAnimationFrame( tick );
 		};
 
@@ -78,7 +75,7 @@ export function PronotronPointerProvider({ children }: { children: React.ReactNo
 			if ( document.hidden ){
 				clock.current.pause();
 			} else {
-				clock.current.continue();
+				clock.current.resume();
 			}
 		};
 
@@ -92,23 +89,21 @@ export function PronotronPointerProvider({ children }: { children: React.ReactNo
 		
 	}, []);
 
+	/**
+	 * CustomEvent listeners
+	 */
 	useEffect(() => {
 
 		const holdHandler = ( event: CustomEvent ) => {
-			/**
-				On mobile, while holding, selection is buggy and unavoidable
-				Best way adding no-select to document, when something holded.
-				https://stackoverflow.com/questions/61485693/preventing-tap-and-hold-from-selecting-nearby-text
-			*/
 			document.documentElement.classList.add( "holding" );
-			console.log( "HOLD", event )
+			console.log( "HOLD", event );
 		};
 		const holdendHandler = ( event: CustomEvent ) => {
 			document.documentElement.classList.remove( "holding" );
-			console.log( "HOLD-END", event )
+			console.log( "HOLD-END", event );
 		};
 		const tapHandler = ( event: CustomEvent ) => {
-			console.log( "TAP", event )
+			console.log( "TAP", event );
 		};
 
 		window.document.body.addEventListener( "hold", holdHandler as EventListener );
@@ -124,11 +119,7 @@ export function PronotronPointerProvider({ children }: { children: React.ReactNo
 	}, []);
 
 	return (
-		<PointerContext.Provider
-			value={{
-				pointerController: pointerController
-			}}
-		>
+		<PointerContext.Provider value={{ pointerController }}>
 			{ children }
 		</PointerContext.Provider>
 	);

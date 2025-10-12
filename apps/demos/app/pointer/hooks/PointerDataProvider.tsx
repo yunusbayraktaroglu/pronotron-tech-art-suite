@@ -16,7 +16,7 @@ const PointerDataContext = createContext<PointerDataContextProps | undefined>( u
 export const usePointerDataContext = () => {
 	const context = useContext( PointerDataContext );
 	if ( ! context ){
-	  	throw new Error( "usePointerDataContext must be used within an PointerDataProvider" );
+	  	throw new Error( "usePointerDataContext must be used within a PronotronPointerDataProvider" );
 	}
 	return context;
 };
@@ -38,8 +38,13 @@ export function PronotronPointerDataProvider({ children }: { children: React.Rea
 		let animationFrameId = 0;
 
 		const tick = () => {
+
 			const pos = pointerController.current.getPosition();
 
+			/**
+			 * Another way to easing cursor position is using CSS, but it acts quirk in Android,
+			 * that try is in the js and css files.
+			 */
     		easedPosRef.current.x += ( pos.x - easedPosRef.current.x ) * 0.15;
       		easedPosRef.current.y += ( pos.y - easedPosRef.current.y ) * 0.15;
 
@@ -48,7 +53,8 @@ export function PronotronPointerDataProvider({ children }: { children: React.Rea
 
 			setPointerDelta( pointerController.current.getDelta() );
 			setPointerState( pointerController.current.getState() );
-			setPointerTargetInteractable( pointerController.current.getTargetInteractable() );
+			setPointerTargetInteractable( pointerController.current.canInteract() );
+			
 			animationFrameId = requestAnimationFrame( tick );
 		};
 

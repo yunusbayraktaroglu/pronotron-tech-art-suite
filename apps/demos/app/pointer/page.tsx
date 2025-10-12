@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Expandable } from "@/app/components/Expandable";
-import { PronotronPointerProvider, usePointerContext, pointerSettings } from "./hooks/PointerProvider";
+import { PronotronPointerProvider, usePointerContext, defaultPointerSettings } from "./hooks/PointerProvider";
 import { PronotronPointerDataProvider, usePointerDataContext } from "./hooks/PointerDataProvider";
 
 export default function PointerDemoPage()
@@ -52,18 +52,18 @@ export default function PointerDemoPage()
 function PointerSettings()
 {
 	const { pointerController } = usePointerContext();
-	const [ ps, setPs ] = useState( pointerSettings );
+	const [ pointerSettings, setPointerSettings ] = useState( defaultPointerSettings );
 
 	useEffect(() => {
-		if ( pointerController.current ){
-			pointerController.current.updateSettings( ps );
+		if ( pointerController ){
+			pointerController.current.updateSettings( pointerSettings );
 		}
-	}, [ ps ]);
+	}, [ pointerSettings ]);
 
 	// Handle change for numeric inputs
 	const handleInputChange = ( event: React.ChangeEvent<HTMLInputElement> ) => {
 		const { name, value } = event.target;
-		setPs(( prev ) => ({
+		setPointerSettings(( prev ) => ({
 			...prev,
 			[ name ]: Number( value ),
 		}));
@@ -80,7 +80,7 @@ function PointerSettings()
 					step={ 0.1 }
 					name="tapThreshold"
 					id="tapThreshold"
-					value={ ps.tapThreshold }
+					value={ pointerSettings.tapThreshold }
 					onChange={ handleInputChange }
 				/>
 			</fieldset>
@@ -93,7 +93,7 @@ function PointerSettings()
 					step={ 0.1 }
 					name="idleThreshold"
 					id="idleThreshold"
-					value={ ps.idleThreshold }
+					value={ pointerSettings.idleThreshold }
 					onChange={ handleInputChange }
 				/>
 			</fieldset>
@@ -106,7 +106,7 @@ function PointerSettings()
 					step={ 0.1 }
 					name="holdThreshold"
 					id="holdThreshold"
-					value={ ps.holdThreshold }
+					value={ pointerSettings.holdThreshold }
 					onChange={ handleInputChange }
 				/>
 			</fieldset>
@@ -119,7 +119,7 @@ function PointerSettings()
 					step={ 1 }
 					name="movingDeltaLimit"
 					id="movingDeltaLimit"
-					value={ ps.movingDeltaLimit }
+					value={ pointerSettings.movingDeltaLimit }
 					onChange={ handleInputChange }
 				/>
 			</fieldset>
@@ -143,7 +143,7 @@ function PointerDebugger()
 
 function PointerView()
 {
-	const { pointerPosition, pointerState, pointerTargetInteractable, pointerEasedPosition } = usePointerDataContext();
+	const { pointerState, pointerTargetInteractable, pointerEasedPosition } = usePointerDataContext();
 
 	return (
 		<div 
