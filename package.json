@@ -7,6 +7,7 @@
 	"scripts": {
 		"build": "turbo build",
 		"build:demos": "turbo build --filter=@pronotron/demos",
+		"build:docs": "turbo docs --filter=@pronotron/docs",
 		"dev": "turbo dev",
 		"lint": "turbo lint",
 		"clean": "turbo clean && rm -rf node_modules",

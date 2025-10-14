@@ -32,7 +32,7 @@
 		"clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
 	},
 	"devDependencies": {
-		"@pronotron/config-ts": "0.0.1-beta.0",
+		"@pronotron/config-ts": "*",
 		"@pronotron/config-eslint": "*",
 		"eslint": "^8.57.0",
 		"terser": "^5.33.0",

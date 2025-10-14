@@ -8,6 +8,8 @@
 	"access": "public",
 	"updateInternalDependencies": "patch",
 	"ignore": [
+		"@pronotron/config-ts",
+		"@pronotron/config-eslint",
 		"@pronotron/docs",
 		"@pronotron/demos"
 	]
