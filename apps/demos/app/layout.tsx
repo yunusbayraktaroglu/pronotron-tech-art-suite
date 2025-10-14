@@ -42,6 +42,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 				<header className="container">
 					<nav className="flex flex-row -mx-spacing-sm">
 						<Link href="/" className="p-spacing-sm hover:underline">Home</Link>
+						<Link href="/docs" className="p-spacing-sm hover:underline">Documents</Link>
 						<a className="ml-auto flex flex-row align-center p-spacing-sm text-slate-500 fill-slate-500 hover:fill-black hover:text-black transition-colors" target="_blank" href="https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite">
 							Github <GithubIcon fill="inherit" stroke="none" className="ml-1" />
 						</a>
