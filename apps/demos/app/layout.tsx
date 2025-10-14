@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 		default: "Homepage | Pronotron Tech-Art Suite",
 		template: '%s | Pronotron Tech-Art Suite',
 	},
-	description: "Demo setups for Pronotron Tech-Art Suite",
+	description: "Demo setup for Pronotron Tech-Art Suite",
 	authors: [
 		{ 
 			name: "Yunus Bayraktaroglu",
