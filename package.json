@@ -6,6 +6,7 @@
 	"license": "MIT",
 	"scripts": {
 		"build": "turbo build",
+		"build:packages": "turbo build --filter=./packages/*",
 		"build:demos": "turbo build --filter=@pronotron/demos",
 		"build:docs": "turbo docs --filter=@pronotron/docs",
 		"dev": "turbo dev",
