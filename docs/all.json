@@ -32,7 +32,7 @@
 								"content": [
 									{
 										"kind": "code",
-										"text": "```ts\nconst pronotronIO = new PronotronIOHorizontalObserver();\r\npronotronIO.setLastScroll( 0 );\r\npronotronIO.addNode({\r\n\tref: HTMLElement,\r\n\tdispatch: {\r\n\t\tonInViewport: ( normalizedPosition: number ) => console.log( \"Element is in viewport\", normalizedPosition ),\r\n\t\tonLeftEnter: () => console.log( \"Element entered from left\" ),\r\n\t\tonLeftExit: {\r\n\t\t\tdispatch: () => console.log( \"Element exited from left\" ),\r\n\t\t\tlimit: 2\r\n\t\t},\r\n\t\tonRightEnter...,\r\n\t\tonRightExit...,\r\n\t\tonFastForward: \"execute_both\",\r\n\t},\r\n\tonRemoveNode: () => element.dataset.ioActive = \"0\",\r\n\tgetBounds: () => {\r\n\t\tconst { left, right } = element.getBoundingClientRect();\r\n\t\tconst start = left + window.scrollX;\r\n\t\tconst end = right + window.scrollX;\r\n\t\treturn { start, end };\r\n\t}\r\n\toffset: 100, // In pixels, applied to both directions\r\n});\r\n// Recommended: wrap in a throttled handler for performance\r\nwindow.addEventListener( 'scroll', () => pronotronIO.handleScroll( window.scrollX ) );\n```"
+										"text": "```ts\nconst pronotronIO = new PronotronIOHorizontalObserver();\npronotronIO.setLastScroll( 0 );\npronotronIO.addNode({\n\tref: HTMLElement,\n\tdispatch: {\n\t\tonInViewport: ( normalizedPosition: number ) => console.log( \"Element is in viewport\", normalizedPosition ),\n\t\tonLeftEnter: () => console.log( \"Element entered from left\" ),\n\t\tonLeftExit: {\n\t\t\tdispatch: () => console.log( \"Element exited from left\" ),\n\t\t\tlimit: 2\n\t\t},\n\t\tonRightEnter...,\n\t\tonRightExit...,\n\t\tonFastForward: \"execute_both\",\n\t},\n\tonRemoveNode: () => element.dataset.ioActive = \"0\",\n\tgetBounds: () => {\n\t\tconst { left, right } = element.getBoundingClientRect();\n\t\tconst start = left + window.scrollX;\n\t\tconst end = right + window.scrollX;\n\t\treturn { start, end };\n\t}\n\toffset: 100, // In pixels, applied to both directions\n});\n// Recommended: wrap in a throttled handler for performance\nwindow.addEventListener( 'scroll', () => pronotronIO.handleScroll( window.scrollX ) );\n```"
 									}
 								]
 							}
@@ -50,7 +50,7 @@
 									"fileName": "PronotronIOBase.ts",
 									"line": 223,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOBase.ts#L223"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOBase.ts#L223"
 								}
 							],
 							"signatures": [
@@ -65,7 +65,7 @@
 											"fileName": "PronotronIOBase.ts",
 											"line": 223,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOBase.ts#L223"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOBase.ts#L223"
 										}
 									],
 									"parameters": [
@@ -150,7 +150,7 @@
 									"fileName": "PronotronIOHorizontal.ts",
 									"line": 40,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOHorizontal.ts#L40"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOHorizontal.ts#L40"
 								}
 							],
 							"type": {
@@ -186,7 +186,7 @@
 									"fileName": "PronotronIOBase.ts",
 									"line": 241,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOBase.ts#L241"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOBase.ts#L241"
 								}
 							],
 							"signatures": [
@@ -222,7 +222,7 @@
 											"fileName": "PronotronIOBase.ts",
 											"line": 241,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOBase.ts#L241"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOBase.ts#L241"
 										}
 									],
 									"parameters": [
@@ -305,7 +305,7 @@
 									"fileName": "PronotronIOEventDispatcher.ts",
 									"line": 95,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOEventDispatcher.ts#L95"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOEventDispatcher.ts#L95"
 								}
 							],
 							"signatures": [
@@ -321,7 +321,7 @@
 										"summary": [
 											{
 												"kind": "text",
-												"text": "Handles scroll events and updates the current scroll direction,\r\nthen recalculates intersections."
+												"text": "Handles scroll events and updates the current scroll direction,\nthen recalculates intersections."
 											}
 										]
 									},
@@ -330,7 +330,7 @@
 											"fileName": "PronotronIOEventDispatcher.ts",
 											"line": 95,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOEventDispatcher.ts#L95"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOEventDispatcher.ts#L95"
 										}
 									],
 									"parameters": [
@@ -386,7 +386,7 @@
 									"fileName": "PronotronIOBase.ts",
 									"line": 286,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOBase.ts#L286"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOBase.ts#L286"
 								}
 							],
 							"signatures": [
@@ -421,7 +421,7 @@
 											"fileName": "PronotronIOBase.ts",
 											"line": 286,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOBase.ts#L286"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOBase.ts#L286"
 										}
 									],
 									"parameters": [
@@ -483,7 +483,7 @@
 									"fileName": "PronotronIOBase.ts",
 									"line": 302,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOBase.ts#L302"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOBase.ts#L302"
 								}
 							],
 							"signatures": [
@@ -508,7 +508,7 @@
 											"fileName": "PronotronIOBase.ts",
 											"line": 302,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOBase.ts#L302"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOBase.ts#L302"
 										}
 									],
 									"parameters": [
@@ -564,7 +564,7 @@
 									"fileName": "PronotronIOBase.ts",
 									"line": 315,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOBase.ts#L315"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOBase.ts#L315"
 								}
 							],
 							"signatures": [
@@ -580,7 +580,7 @@
 										"summary": [
 											{
 												"kind": "text",
-												"text": "Bulk updates all IONode positions.\r\nShould be executed when the layout changes, e.g.:\r\n- Screen resize\r\n- Resizing in-page elements (accordion, etc.)"
+												"text": "Bulk updates all IONode positions.\nShould be executed when the layout changes, e.g.:\n- Screen resize\n- Resizing in-page elements (accordion, etc.)"
 											}
 										]
 									},
@@ -589,7 +589,7 @@
 											"fileName": "PronotronIOBase.ts",
 											"line": 315,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOBase.ts#L315"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOBase.ts#L315"
 										}
 									],
 									"parameters": [
@@ -653,7 +653,7 @@
 									"fileName": "PronotronIOBase.ts",
 									"line": 333,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOBase.ts#L333"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOBase.ts#L333"
 								}
 							],
 							"signatures": [
@@ -669,7 +669,7 @@
 										"summary": [
 											{
 												"kind": "text",
-												"text": "Updates viewport layout data used in calculations.\r\nShould be called on:\r\n- Mobile viewport changes (status bar collapse/expand)\r\n- Pinch-zoom changes\r\n- Screen or in-page resizes"
+												"text": "Updates viewport layout data used in calculations.\nShould be called on:\n- Mobile viewport changes (status bar collapse/expand)\n- Pinch-zoom changes\n- Screen or in-page resizes"
 											}
 										]
 									},
@@ -678,7 +678,7 @@
 											"fileName": "PronotronIOBase.ts",
 											"line": 333,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOBase.ts#L333"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOBase.ts#L333"
 										}
 									],
 									"parameters": [
@@ -771,7 +771,7 @@
 							"fileName": "PronotronIOHorizontal.ts",
 							"line": 38,
 							"character": 13,
-							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOHorizontal.ts#L38"
+							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOHorizontal.ts#L38"
 						}
 					],
 					"extendedTypes": [
@@ -818,7 +818,7 @@
 								"content": [
 									{
 										"kind": "code",
-										"text": "```ts\nconst pronotronIO = new PronotronIOVerticalObserver();\r\npronotronIO.setLastScroll( 0 );\r\npronotronIO.addNode({\r\n\tref: HTMLElement,\r\n\tdispatch: {\r\n\t\tonInViewport: ( normalizedPosition: number ) => console.log( \"Element is in viewport\", normalizedPosition ),\r\n\t\tonTopEnter: () => console.log( \"Element entered from top\" ),\r\n\t\tonTopExit: {\r\n\t\t\tdispatch: () => console.log( \"Element exited from top\" ),\r\n\t\t\tlimit: 2\r\n\t\t},\r\n\t\tonBottomEnter...,\r\n\t\tonBottomExit...,\r\n\t\tonFastForward: \"execute_both\",\r\n\t},\r\n\tonRemoveNode: () => element.dataset.ioActive = \"0\",\r\n\tgetBounds: () => {\r\n\t\tconst { top, bottom } = element.getBoundingClientRect();\r\n\t\tconst start = top + window.scrollY;\r\n\t\tconst end = bottom + window.scrollY;\r\n\t\treturn { start, end };\r\n\t}\r\n\toffset: 100, // In pixels, applied to both directions\r\n});\r\n// Recommended: wrap in a throttled handler for performance\r\nwindow.addEventListener( 'scroll', () => pronotronIO.handleScroll( window.scrollY ) );\n```"
+										"text": "```ts\nconst pronotronIO = new PronotronIOVerticalObserver();\npronotronIO.setLastScroll( 0 );\npronotronIO.addNode({\n\tref: HTMLElement,\n\tdispatch: {\n\t\tonInViewport: ( normalizedPosition: number ) => console.log( \"Element is in viewport\", normalizedPosition ),\n\t\tonTopEnter: () => console.log( \"Element entered from top\" ),\n\t\tonTopExit: {\n\t\t\tdispatch: () => console.log( \"Element exited from top\" ),\n\t\t\tlimit: 2\n\t\t},\n\t\tonBottomEnter...,\n\t\tonBottomExit...,\n\t\tonFastForward: \"execute_both\",\n\t},\n\tonRemoveNode: () => element.dataset.ioActive = \"0\",\n\tgetBounds: () => {\n\t\tconst { top, bottom } = element.getBoundingClientRect();\n\t\tconst start = top + window.scrollY;\n\t\tconst end = bottom + window.scrollY;\n\t\treturn { start, end };\n\t}\n\toffset: 100, // In pixels, applied to both directions\n});\n// Recommended: wrap in a throttled handler for performance\nwindow.addEventListener( 'scroll', () => pronotronIO.handleScroll( window.scrollY ) );\n```"
 									}
 								]
 							}
@@ -836,7 +836,7 @@
 									"fileName": "PronotronIOBase.ts",
 									"line": 223,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOBase.ts#L223"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOBase.ts#L223"
 								}
 							],
 							"signatures": [
@@ -851,7 +851,7 @@
 											"fileName": "PronotronIOBase.ts",
 											"line": 223,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOBase.ts#L223"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOBase.ts#L223"
 										}
 									],
 									"parameters": [
@@ -936,7 +936,7 @@
 									"fileName": "PronotronIOVertical.ts",
 									"line": 40,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOVertical.ts#L40"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOVertical.ts#L40"
 								}
 							],
 							"type": {
@@ -972,7 +972,7 @@
 									"fileName": "PronotronIOBase.ts",
 									"line": 241,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOBase.ts#L241"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOBase.ts#L241"
 								}
 							],
 							"signatures": [
@@ -1008,7 +1008,7 @@
 											"fileName": "PronotronIOBase.ts",
 											"line": 241,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOBase.ts#L241"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOBase.ts#L241"
 										}
 									],
 									"parameters": [
@@ -1091,7 +1091,7 @@
 									"fileName": "PronotronIOEventDispatcher.ts",
 									"line": 95,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOEventDispatcher.ts#L95"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOEventDispatcher.ts#L95"
 								}
 							],
 							"signatures": [
@@ -1107,7 +1107,7 @@
 										"summary": [
 											{
 												"kind": "text",
-												"text": "Handles scroll events and updates the current scroll direction,\r\nthen recalculates intersections."
+												"text": "Handles scroll events and updates the current scroll direction,\nthen recalculates intersections."
 											}
 										]
 									},
@@ -1116,7 +1116,7 @@
 											"fileName": "PronotronIOEventDispatcher.ts",
 											"line": 95,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOEventDispatcher.ts#L95"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOEventDispatcher.ts#L95"
 										}
 									],
 									"parameters": [
@@ -1172,7 +1172,7 @@
 									"fileName": "PronotronIOBase.ts",
 									"line": 286,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOBase.ts#L286"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOBase.ts#L286"
 								}
 							],
 							"signatures": [
@@ -1207,7 +1207,7 @@
 											"fileName": "PronotronIOBase.ts",
 											"line": 286,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOBase.ts#L286"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOBase.ts#L286"
 										}
 									],
 									"parameters": [
@@ -1269,7 +1269,7 @@
 									"fileName": "PronotronIOBase.ts",
 									"line": 302,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOBase.ts#L302"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOBase.ts#L302"
 								}
 							],
 							"signatures": [
@@ -1294,7 +1294,7 @@
 											"fileName": "PronotronIOBase.ts",
 											"line": 302,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOBase.ts#L302"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOBase.ts#L302"
 										}
 									],
 									"parameters": [
@@ -1350,7 +1350,7 @@
 									"fileName": "PronotronIOBase.ts",
 									"line": 315,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOBase.ts#L315"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOBase.ts#L315"
 								}
 							],
 							"signatures": [
@@ -1366,7 +1366,7 @@
 										"summary": [
 											{
 												"kind": "text",
-												"text": "Bulk updates all IONode positions.\r\nShould be executed when the layout changes, e.g.:\r\n- Screen resize\r\n- Resizing in-page elements (accordion, etc.)"
+												"text": "Bulk updates all IONode positions.\nShould be executed when the layout changes, e.g.:\n- Screen resize\n- Resizing in-page elements (accordion, etc.)"
 											}
 										]
 									},
@@ -1375,7 +1375,7 @@
 											"fileName": "PronotronIOBase.ts",
 											"line": 315,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOBase.ts#L315"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOBase.ts#L315"
 										}
 									],
 									"parameters": [
@@ -1439,7 +1439,7 @@
 									"fileName": "PronotronIOBase.ts",
 									"line": 333,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOBase.ts#L333"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOBase.ts#L333"
 								}
 							],
 							"signatures": [
@@ -1455,7 +1455,7 @@
 										"summary": [
 											{
 												"kind": "text",
-												"text": "Updates viewport layout data used in calculations.\r\nShould be called on:\r\n- Mobile viewport changes (status bar collapse/expand)\r\n- Pinch-zoom changes\r\n- Screen or in-page resizes"
+												"text": "Updates viewport layout data used in calculations.\nShould be called on:\n- Mobile viewport changes (status bar collapse/expand)\n- Pinch-zoom changes\n- Screen or in-page resizes"
 											}
 										]
 									},
@@ -1464,7 +1464,7 @@
 											"fileName": "PronotronIOBase.ts",
 											"line": 333,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOBase.ts#L333"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOBase.ts#L333"
 										}
 									],
 									"parameters": [
@@ -1557,7 +1557,7 @@
 							"fileName": "PronotronIOVertical.ts",
 							"line": 38,
 							"character": 13,
-							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOVertical.ts#L38"
+							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOVertical.ts#L38"
 						}
 					],
 					"extendedTypes": [
@@ -1596,7 +1596,7 @@
 							"fileName": "PronotronIOHorizontal.ts",
 							"line": 5,
 							"character": 12,
-							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOHorizontal.ts#L5"
+							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOHorizontal.ts#L5"
 						}
 					],
 					"type": {
@@ -1633,7 +1633,7 @@
 							"fileName": "PronotronIOVertical.ts",
 							"line": 5,
 							"character": 12,
-							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-io/src/core/PronotronIOVertical.ts#L5"
+							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-io/src/core/PronotronIOVertical.ts#L5"
 						}
 					],
 					"type": {
@@ -1716,7 +1716,7 @@
 						"summary": [
 							{
 								"kind": "text",
-								"text": "MouseController\r\n\r\nHandles mouse-based pointer interactions."
+								"text": "MouseController\n\nHandles mouse-based pointer interactions."
 							}
 						],
 						"blockTags": [
@@ -1725,7 +1725,7 @@
 								"content": [
 									{
 										"kind": "code",
-										"text": "```ts\r\nconst controller = new MouseController( ...dependencies );\r\n// Start\r\ncontroller.startEvents();\r\n// Dispose\r\ncontroller.stopEvents();\r\n```"
+										"text": "```ts\nconst controller = new MouseController( ...dependencies );\n// Start\ncontroller.startEvents();\n// Dispose\ncontroller.stopEvents();\n```"
 									}
 								]
 							}
@@ -1743,7 +1743,7 @@
 									"fileName": "model/Mouse.ts",
 									"line": 29,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/Mouse.ts#L29"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/Mouse.ts#L29"
 								}
 							],
 							"signatures": [
@@ -1758,7 +1758,7 @@
 											"fileName": "model/Mouse.ts",
 											"line": 29,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/Mouse.ts#L29"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/Mouse.ts#L29"
 										}
 									],
 									"parameters": [
@@ -1821,7 +1821,7 @@
 									"fileName": "model/ModelController.ts",
 									"line": 64,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/ModelController.ts#L64"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/ModelController.ts#L64"
 								}
 							],
 							"signatures": [
@@ -1866,7 +1866,7 @@
 											"fileName": "model/ModelController.ts",
 											"line": 64,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/ModelController.ts#L64"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/ModelController.ts#L64"
 										}
 									],
 									"type": {
@@ -1899,7 +1899,7 @@
 									"fileName": "model/ModelController.ts",
 									"line": 88,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/ModelController.ts#L88"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/ModelController.ts#L88"
 								}
 							],
 							"signatures": [
@@ -1943,7 +1943,7 @@
 											"fileName": "model/ModelController.ts",
 											"line": 88,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/ModelController.ts#L88"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/ModelController.ts#L88"
 										}
 									],
 									"type": {
@@ -1966,7 +1966,7 @@
 															"fileName": "model/ModelController.ts",
 															"line": 88,
 															"character": 15,
-															"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/ModelController.ts#L88"
+															"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/ModelController.ts#L88"
 														}
 													],
 													"type": {
@@ -1985,7 +1985,7 @@
 															"fileName": "model/ModelController.ts",
 															"line": 88,
 															"character": 26,
-															"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/ModelController.ts#L88"
+															"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/ModelController.ts#L88"
 														}
 													],
 													"type": {
@@ -2008,7 +2008,7 @@
 													"fileName": "model/ModelController.ts",
 													"line": 88,
 													"character": 13,
-													"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/ModelController.ts#L88"
+													"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/ModelController.ts#L88"
 												}
 											]
 										}
@@ -2041,7 +2041,7 @@
 									"fileName": "model/ModelController.ts",
 									"line": 74,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/ModelController.ts#L74"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/ModelController.ts#L74"
 								}
 							],
 							"signatures": [
@@ -2085,7 +2085,7 @@
 											"fileName": "model/ModelController.ts",
 											"line": 74,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/ModelController.ts#L74"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/ModelController.ts#L74"
 										}
 									],
 									"type": {
@@ -2108,7 +2108,7 @@
 															"fileName": "model/ModelController.ts",
 															"line": 74,
 															"character": 18,
-															"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/ModelController.ts#L74"
+															"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/ModelController.ts#L74"
 														}
 													],
 													"type": {
@@ -2127,7 +2127,7 @@
 															"fileName": "model/ModelController.ts",
 															"line": 74,
 															"character": 29,
-															"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/ModelController.ts#L74"
+															"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/ModelController.ts#L74"
 														}
 													],
 													"type": {
@@ -2150,7 +2150,7 @@
 													"fileName": "model/ModelController.ts",
 													"line": 74,
 													"character": 16,
-													"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/ModelController.ts#L74"
+													"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/ModelController.ts#L74"
 												}
 											]
 										}
@@ -2183,7 +2183,7 @@
 									"fileName": "model/ModelController.ts",
 									"line": 53,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/ModelController.ts#L53"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/ModelController.ts#L53"
 								}
 							],
 							"signatures": [
@@ -2199,7 +2199,7 @@
 										"summary": [
 											{
 												"kind": "text",
-												"text": "Returns the current pointer state as a human-readable string,\r\ne.g. \"IDLE\", \"MOVING\"."
+												"text": "Returns the current pointer state as a human-readable string,\ne.g. \"IDLE\", \"MOVING\"."
 											}
 										],
 										"blockTags": [
@@ -2233,7 +2233,7 @@
 											"fileName": "model/ModelController.ts",
 											"line": 53,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/ModelController.ts#L53"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/ModelController.ts#L53"
 										}
 									],
 									"type": {
@@ -2264,7 +2264,7 @@
 									"fileName": "model/Mouse.ts",
 									"line": 45,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/Mouse.ts#L45"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/Mouse.ts#L45"
 								}
 							],
 							"signatures": [
@@ -2278,7 +2278,7 @@
 										"summary": [
 											{
 												"kind": "text",
-												"text": "Starts listening for mouse-related pointer events.\r\nMust be called before interaction can be tracked."
+												"text": "Starts listening for mouse-related pointer events.\nMust be called before interaction can be tracked."
 											}
 										]
 									},
@@ -2287,7 +2287,7 @@
 											"fileName": "model/Mouse.ts",
 											"line": 45,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/Mouse.ts#L45"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/Mouse.ts#L45"
 										}
 									],
 									"type": {
@@ -2308,7 +2308,7 @@
 									"fileName": "model/Mouse.ts",
 									"line": 63,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/Mouse.ts#L63"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/Mouse.ts#L63"
 								}
 							],
 							"signatures": [
@@ -2322,7 +2322,7 @@
 										"summary": [
 											{
 												"kind": "text",
-												"text": "Stops and removes all registered mouse event listeners.\r\nShould be called during cleanup or disposal."
+												"text": "Stops and removes all registered mouse event listeners.\nShould be called during cleanup or disposal."
 											}
 										]
 									},
@@ -2331,7 +2331,7 @@
 											"fileName": "model/Mouse.ts",
 											"line": 63,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/Mouse.ts#L63"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/Mouse.ts#L63"
 										}
 									],
 									"type": {
@@ -2354,7 +2354,7 @@
 									"fileName": "model/ModelController.ts",
 									"line": 30,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/ModelController.ts#L30"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/ModelController.ts#L30"
 								}
 							],
 							"signatures": [
@@ -2379,7 +2379,7 @@
 											"fileName": "model/ModelController.ts",
 											"line": 30,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/ModelController.ts#L30"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/ModelController.ts#L30"
 										}
 									],
 									"parameters": [
@@ -2461,7 +2461,7 @@
 							"fileName": "model/Mouse.ts",
 							"line": 19,
 							"character": 13,
-							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/Mouse.ts#L19"
+							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/Mouse.ts#L19"
 						}
 					],
 					"extendedTypes": [
@@ -2487,7 +2487,7 @@
 						"summary": [
 							{
 								"kind": "text",
-								"text": "TouchController\r\n\r\nHandles touch-based pointer."
+								"text": "TouchController\n\nHandles touch-based pointer."
 							}
 						],
 						"blockTags": [
@@ -2496,7 +2496,7 @@
 								"content": [
 									{
 										"kind": "code",
-										"text": "```ts\r\nconst controller = new TouchController( ...dependencies );\r\n// Start\r\ncontroller.startEvents();\r\n// Dispose\r\ncontroller.stopEvents();\r\n```"
+										"text": "```ts\nconst controller = new TouchController( ...dependencies );\n// Start\ncontroller.startEvents();\n// Dispose\ncontroller.stopEvents();\n```"
 									}
 								]
 							}
@@ -2514,7 +2514,7 @@
 									"fileName": "model/Touch.ts",
 									"line": 21,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/Touch.ts#L21"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/Touch.ts#L21"
 								}
 							],
 							"signatures": [
@@ -2529,7 +2529,7 @@
 											"fileName": "model/Touch.ts",
 											"line": 21,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/Touch.ts#L21"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/Touch.ts#L21"
 										}
 									],
 									"parameters": [
@@ -2592,7 +2592,7 @@
 									"fileName": "model/ModelController.ts",
 									"line": 64,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/ModelController.ts#L64"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/ModelController.ts#L64"
 								}
 							],
 							"signatures": [
@@ -2637,7 +2637,7 @@
 											"fileName": "model/ModelController.ts",
 											"line": 64,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/ModelController.ts#L64"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/ModelController.ts#L64"
 										}
 									],
 									"type": {
@@ -2670,7 +2670,7 @@
 									"fileName": "model/ModelController.ts",
 									"line": 88,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/ModelController.ts#L88"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/ModelController.ts#L88"
 								}
 							],
 							"signatures": [
@@ -2714,7 +2714,7 @@
 											"fileName": "model/ModelController.ts",
 											"line": 88,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/ModelController.ts#L88"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/ModelController.ts#L88"
 										}
 									],
 									"type": {
@@ -2737,7 +2737,7 @@
 															"fileName": "model/ModelController.ts",
 															"line": 88,
 															"character": 15,
-															"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/ModelController.ts#L88"
+															"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/ModelController.ts#L88"
 														}
 													],
 													"type": {
@@ -2756,7 +2756,7 @@
 															"fileName": "model/ModelController.ts",
 															"line": 88,
 															"character": 26,
-															"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/ModelController.ts#L88"
+															"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/ModelController.ts#L88"
 														}
 													],
 													"type": {
@@ -2779,7 +2779,7 @@
 													"fileName": "model/ModelController.ts",
 													"line": 88,
 													"character": 13,
-													"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/ModelController.ts#L88"
+													"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/ModelController.ts#L88"
 												}
 											]
 										}
@@ -2812,7 +2812,7 @@
 									"fileName": "model/ModelController.ts",
 									"line": 74,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/ModelController.ts#L74"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/ModelController.ts#L74"
 								}
 							],
 							"signatures": [
@@ -2856,7 +2856,7 @@
 											"fileName": "model/ModelController.ts",
 											"line": 74,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/ModelController.ts#L74"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/ModelController.ts#L74"
 										}
 									],
 									"type": {
@@ -2879,7 +2879,7 @@
 															"fileName": "model/ModelController.ts",
 															"line": 74,
 															"character": 18,
-															"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/ModelController.ts#L74"
+															"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/ModelController.ts#L74"
 														}
 													],
 													"type": {
@@ -2898,7 +2898,7 @@
 															"fileName": "model/ModelController.ts",
 															"line": 74,
 															"character": 29,
-															"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/ModelController.ts#L74"
+															"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/ModelController.ts#L74"
 														}
 													],
 													"type": {
@@ -2921,7 +2921,7 @@
 													"fileName": "model/ModelController.ts",
 													"line": 74,
 													"character": 16,
-													"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/ModelController.ts#L74"
+													"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/ModelController.ts#L74"
 												}
 											]
 										}
@@ -2954,7 +2954,7 @@
 									"fileName": "model/ModelController.ts",
 									"line": 53,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/ModelController.ts#L53"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/ModelController.ts#L53"
 								}
 							],
 							"signatures": [
@@ -2970,7 +2970,7 @@
 										"summary": [
 											{
 												"kind": "text",
-												"text": "Returns the current pointer state as a human-readable string,\r\ne.g. \"IDLE\", \"MOVING\"."
+												"text": "Returns the current pointer state as a human-readable string,\ne.g. \"IDLE\", \"MOVING\"."
 											}
 										],
 										"blockTags": [
@@ -3004,7 +3004,7 @@
 											"fileName": "model/ModelController.ts",
 											"line": 53,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/ModelController.ts#L53"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/ModelController.ts#L53"
 										}
 									],
 									"type": {
@@ -3035,7 +3035,7 @@
 									"fileName": "model/Touch.ts",
 									"line": 34,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/Touch.ts#L34"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/Touch.ts#L34"
 								}
 							],
 							"signatures": [
@@ -3049,7 +3049,7 @@
 										"summary": [
 											{
 												"kind": "text",
-												"text": "Starts listening for touch events.\r\nMust be called before interaction can be tracked."
+												"text": "Starts listening for touch events.\nMust be called before interaction can be tracked."
 											}
 										]
 									},
@@ -3058,7 +3058,7 @@
 											"fileName": "model/Touch.ts",
 											"line": 34,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/Touch.ts#L34"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/Touch.ts#L34"
 										}
 									],
 									"type": {
@@ -3079,7 +3079,7 @@
 									"fileName": "model/Touch.ts",
 									"line": 49,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/Touch.ts#L49"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/Touch.ts#L49"
 								}
 							],
 							"signatures": [
@@ -3093,7 +3093,7 @@
 										"summary": [
 											{
 												"kind": "text",
-												"text": "Stops and removes all registered touch event listeners.\r\nShould be called during cleanup or disposal."
+												"text": "Stops and removes all registered touch event listeners.\nShould be called during cleanup or disposal."
 											}
 										]
 									},
@@ -3102,7 +3102,7 @@
 											"fileName": "model/Touch.ts",
 											"line": 49,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/Touch.ts#L49"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/Touch.ts#L49"
 										}
 									],
 									"type": {
@@ -3125,7 +3125,7 @@
 									"fileName": "model/ModelController.ts",
 									"line": 30,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/ModelController.ts#L30"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/ModelController.ts#L30"
 								}
 							],
 							"signatures": [
@@ -3150,7 +3150,7 @@
 											"fileName": "model/ModelController.ts",
 											"line": 30,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/ModelController.ts#L30"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/ModelController.ts#L30"
 										}
 									],
 									"parameters": [
@@ -3232,7 +3232,7 @@
 							"fileName": "model/Touch.ts",
 							"line": 19,
 							"character": 13,
-							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/model/Touch.ts#L19"
+							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/model/Touch.ts#L19"
 						}
 					],
 					"extendedTypes": [
@@ -3259,7 +3259,7 @@
 							"fileName": "PointerBase.ts",
 							"line": 62,
 							"character": 12,
-							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/PointerBase.ts#L62"
+							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/PointerBase.ts#L62"
 						}
 					],
 					"type": {
@@ -3303,7 +3303,7 @@
 													"fileName": "PointerBase.ts",
 													"line": 70,
 													"character": 1,
-													"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/PointerBase.ts#L70"
+													"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/PointerBase.ts#L70"
 												}
 											],
 											"type": {
@@ -3336,7 +3336,7 @@
 													"fileName": "PointerBase.ts",
 													"line": 74,
 													"character": 1,
-													"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/PointerBase.ts#L74"
+													"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/PointerBase.ts#L74"
 												}
 											],
 											"type": {
@@ -3360,7 +3360,7 @@
 												"summary": [
 													{
 														"kind": "text",
-														"text": "Should return true if the element under the pointer\r\nshould be considered “interactive” (e.g. buttons, links).\r\nMethod provided by user."
+														"text": "Should return true if the element under the pointer\nshould be considered “interactive” (e.g. buttons, links).\nMethod provided by user."
 													}
 												]
 											},
@@ -3369,7 +3369,7 @@
 													"fileName": "PointerBase.ts",
 													"line": 82,
 													"character": 1,
-													"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/PointerBase.ts#L82"
+													"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/PointerBase.ts#L82"
 												}
 											],
 											"type": {
@@ -3385,7 +3385,7 @@
 															"fileName": "PointerBase.ts",
 															"line": 82,
 															"character": 17,
-															"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/PointerBase.ts#L82"
+															"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/PointerBase.ts#L82"
 														}
 													],
 													"signatures": [
@@ -3450,7 +3450,7 @@
 													"fileName": "PointerBase.ts",
 													"line": 66,
 													"character": 1,
-													"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/PointerBase.ts#L66"
+													"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/PointerBase.ts#L66"
 												}
 											],
 											"type": {
@@ -3481,7 +3481,7 @@
 											"fileName": "PointerBase.ts",
 											"line": 62,
 											"character": 53,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/PointerBase.ts#L62"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/PointerBase.ts#L62"
 										}
 									]
 								}
@@ -3500,7 +3500,7 @@
 							"fileName": "PointerHoldable.ts",
 							"line": 10,
 							"character": 12,
-							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/PointerHoldable.ts#L10"
+							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/PointerHoldable.ts#L10"
 						}
 					],
 					"type": {
@@ -3550,7 +3550,7 @@
 													"fileName": "PointerHoldable.ts",
 													"line": 15,
 													"character": 1,
-													"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/PointerHoldable.ts#L15"
+													"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/PointerHoldable.ts#L15"
 												}
 											],
 											"type": {
@@ -3566,7 +3566,7 @@
 															"fileName": "PointerHoldable.ts",
 															"line": 15,
 															"character": 13,
-															"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/PointerHoldable.ts#L15"
+															"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/PointerHoldable.ts#L15"
 														}
 													],
 													"signatures": [
@@ -3626,7 +3626,7 @@
 											"fileName": "PointerHoldable.ts",
 											"line": 10,
 											"character": 87,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-pointer/src/core/PointerHoldable.ts#L10"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-pointer/src/core/PointerHoldable.ts#L10"
 										}
 									]
 								}
@@ -3691,7 +3691,7 @@
 						"summary": [
 							{
 								"kind": "text",
-								"text": "IDPool\r\n\r\nManages a pool of unique numeric IDs, providing efficient allocation and release of IDs using an internal bit array.\r\nSupports automatic capacity expansion when all IDs are in use."
+								"text": "IDPool\n\nManages a pool of unique numeric IDs, providing efficient allocation and release of IDs using an internal bit array.\nSupports automatic capacity expansion when all IDs are in use."
 							}
 						]
 					},
@@ -3707,7 +3707,7 @@
 									"fileName": "utils/IDPool.ts",
 									"line": 23,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/utils/IDPool.ts#L23"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/utils/IDPool.ts#L23"
 								}
 							],
 							"signatures": [
@@ -3730,7 +3730,7 @@
 											"fileName": "utils/IDPool.ts",
 											"line": 23,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/utils/IDPool.ts#L23"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/utils/IDPool.ts#L23"
 										}
 									],
 									"parameters": [
@@ -3774,7 +3774,7 @@
 									"fileName": "utils/IDPool.ts",
 									"line": 58,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/utils/IDPool.ts#L58"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/utils/IDPool.ts#L58"
 								}
 							],
 							"signatures": [
@@ -3797,7 +3797,7 @@
 											"fileName": "utils/IDPool.ts",
 											"line": 58,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/utils/IDPool.ts#L58"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/utils/IDPool.ts#L58"
 										}
 									],
 									"parameters": [
@@ -3839,7 +3839,7 @@
 									"fileName": "utils/IDPool.ts",
 									"line": 37,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/utils/IDPool.ts#L37"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/utils/IDPool.ts#L37"
 								}
 							],
 							"signatures": [
@@ -3853,7 +3853,7 @@
 										"summary": [
 											{
 												"kind": "text",
-												"text": "Returns the first available numeric ID from the pool. \r\nIf all IDs are used, the pool automatically expands and returns the next available ID.\r\n\r\n***Returned ID must be used with IDPool.consume( ID )***"
+												"text": "Returns the first available numeric ID from the pool. \nIf all IDs are used, the pool automatically expands and returns the next available ID.\n\n***Returned ID must be used with IDPool.consume( ID )***"
 											}
 										],
 										"blockTags": [
@@ -3873,7 +3873,7 @@
 											"fileName": "utils/IDPool.ts",
 											"line": 37,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/utils/IDPool.ts#L37"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/utils/IDPool.ts#L37"
 										}
 									],
 									"type": {
@@ -3894,7 +3894,7 @@
 									"fileName": "utils/IDPool.ts",
 									"line": 68,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/utils/IDPool.ts#L68"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/utils/IDPool.ts#L68"
 								}
 							],
 							"signatures": [
@@ -3917,7 +3917,7 @@
 											"fileName": "utils/IDPool.ts",
 											"line": 68,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/utils/IDPool.ts#L68"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/utils/IDPool.ts#L68"
 										}
 									],
 									"parameters": [
@@ -3970,7 +3970,7 @@
 							"fileName": "utils/IDPool.ts",
 							"line": 7,
 							"character": 13,
-							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/utils/IDPool.ts#L7"
+							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/utils/IDPool.ts#L7"
 						}
 					]
 				},
@@ -3984,7 +3984,7 @@
 						"summary": [
 							{
 								"kind": "text",
-								"text": "NativeControlTable class manages a fixed-size native array (as a control table) with an inferred numeric Enum structure. \r\nIt uses a high-frequency access pattern, ideal for animation or real-time applications where \r\ndirect memory access is critical for performance."
+								"text": "NativeControlTable class manages a fixed-size native array (as a control table) with an inferred numeric Enum structure. \nIt uses a high-frequency access pattern, ideal for animation or real-time applications where \ndirect memory access is critical for performance."
 							}
 						],
 						"blockTags": [
@@ -3993,7 +3993,7 @@
 								"content": [
 									{
 										"kind": "code",
-										"text": "```typescript\r\nenum AnimationData {\r\n\tDELAY,\r\n\tDURATION,\r\n\t...\r\n};\r\n// Any typed array can be used depends on your data\r\nconst controlTable: NativeControlTable<AnimationData> = new NativeControlTable( 2, Float32Array, nodeCountHint );\r\ncontrolTable.add( YOUR_ANIMATION_ID, {\r\n\t[ AnimationData.DELAY ]: 0.15,\r\n\t[ AnimationData.DURATION ]: 1.75\r\n} );\r\n```"
+										"text": "```typescript\nenum AnimationData {\n\tDELAY,\n\tDURATION,\n\t...\n};\n// Any typed array can be used depends on your data\nconst controlTable: NativeControlTable<AnimationData> = new NativeControlTable( 2, Float32Array, nodeCountHint );\ncontrolTable.add( YOUR_ANIMATION_ID, {\n\t[ AnimationData.DELAY ]: 0.15,\n\t[ AnimationData.DURATION ]: 1.75\n} );\n```"
 									}
 								]
 							},
@@ -4002,7 +4002,7 @@
 								"content": [
 									{
 										"kind": "code",
-										"text": "```typescript\r\n// Iterating over the control table,\r\nconst { table, usedSlots, stride } = controlTable;\r\nfor ( i = 0; i < usedSlots; i++ ){\r\n\tconst slotOffset = i * stride;\r\n\tconst delay = table[ slotOffset + AnimationData.DELAY ];\r\n\tconst duration = table[ slotOffset + AnimationData.DURATION ];\r\n}\r\n```"
+										"text": "```typescript\n// Iterating over the control table,\nconst { table, usedSlots, stride } = controlTable;\nfor ( i = 0; i < usedSlots; i++ ){\n\tconst slotOffset = i * stride;\n\tconst delay = table[ slotOffset + AnimationData.DELAY ];\n\tconst duration = table[ slotOffset + AnimationData.DURATION ];\n}\n```"
 									}
 								]
 							}
@@ -4020,7 +4020,7 @@
 									"fileName": "native-control-table/NativeControlTable.ts",
 									"line": 86,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L86"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L86"
 								}
 							],
 							"signatures": [
@@ -4043,7 +4043,7 @@
 											"fileName": "native-control-table/NativeControlTable.ts",
 											"line": 86,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L86"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L86"
 										}
 									],
 									"typeParameters": [
@@ -4106,7 +4106,7 @@
 															"fileName": "native-control-table/NativeControlTable.ts",
 															"line": 86,
 															"character": 41,
-															"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L86"
+															"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L86"
 														}
 													],
 													"signatures": [
@@ -4121,7 +4121,7 @@
 																	"fileName": "native-control-table/NativeControlTable.ts",
 																	"line": 86,
 																	"character": 43,
-																	"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L86"
+																	"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L86"
 																}
 															],
 															"parameters": [
@@ -4223,7 +4223,7 @@
 									"fileName": "native-control-table/NativeControlTable.ts",
 									"line": 52,
 									"character": 8,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L52"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L52"
 								}
 							],
 							"type": {
@@ -4252,7 +4252,7 @@
 									"fileName": "native-control-table/NativeControlTable.ts",
 									"line": 45,
 									"character": 8,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L45"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L45"
 								}
 							],
 							"type": {
@@ -4278,7 +4278,7 @@
 								"summary": [
 									{
 										"kind": "text",
-										"text": "The control table is created with a fixed size.\r\nThis property tracks how many slots are currently used."
+										"text": "The control table is created with a fixed size.\nThis property tracks how many slots are currently used."
 									}
 								]
 							},
@@ -4287,7 +4287,7 @@
 									"fileName": "native-control-table/NativeControlTable.ts",
 									"line": 58,
 									"character": 8,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L58"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L58"
 								}
 							],
 							"type": {
@@ -4307,7 +4307,7 @@
 									"fileName": "native-control-table/NativeControlTable.ts",
 									"line": 105,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L105"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L105"
 								}
 							],
 							"signatures": [
@@ -4330,7 +4330,7 @@
 											"fileName": "native-control-table/NativeControlTable.ts",
 											"line": 105,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L105"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L105"
 										}
 									],
 									"parameters": [
@@ -4409,7 +4409,7 @@
 									"fileName": "native-control-table/NativeControlTable.ts",
 									"line": 178,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L178"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L178"
 								}
 							],
 							"signatures": [
@@ -4443,7 +4443,7 @@
 											"fileName": "native-control-table/NativeControlTable.ts",
 											"line": 178,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L178"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L178"
 										}
 									],
 									"parameters": [
@@ -4529,7 +4529,7 @@
 									"fileName": "native-control-table/NativeControlTable.ts",
 									"line": 222,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L222"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L222"
 								}
 							],
 							"signatures": [
@@ -4563,7 +4563,7 @@
 											"fileName": "native-control-table/NativeControlTable.ts",
 											"line": 222,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L222"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L222"
 										}
 									],
 									"parameters": [
@@ -4611,7 +4611,7 @@
 									"fileName": "native-control-table/NativeControlTable.ts",
 									"line": 193,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L193"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L193"
 								}
 							],
 							"signatures": [
@@ -4640,7 +4640,7 @@
 											"fileName": "native-control-table/NativeControlTable.ts",
 											"line": 193,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L193"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L193"
 										}
 									],
 									"parameters": [
@@ -4742,7 +4742,7 @@
 									"fileName": "native-control-table/NativeControlTable.ts",
 									"line": 206,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L206"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L206"
 								}
 							],
 							"signatures": [
@@ -4756,7 +4756,7 @@
 										"summary": [
 											{
 												"kind": "text",
-												"text": "Updates a slot’s data when its table index (position) is already known.\r\nUseful for internal iteration or when the ID-to-position mapping is already available."
+												"text": "Updates a slot’s data when its table index (position) is already known.\nUseful for internal iteration or when the ID-to-position mapping is already available."
 											}
 										]
 									},
@@ -4765,7 +4765,7 @@
 											"fileName": "native-control-table/NativeControlTable.ts",
 											"line": 206,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L206"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L206"
 										}
 									],
 									"parameters": [
@@ -4846,7 +4846,7 @@
 									"fileName": "native-control-table/NativeControlTable.ts",
 									"line": 129,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L129"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L129"
 								}
 							],
 							"signatures": [
@@ -4869,7 +4869,7 @@
 											"fileName": "native-control-table/NativeControlTable.ts",
 											"line": 129,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L129"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L129"
 										}
 									],
 									"parameters": [
@@ -4954,7 +4954,7 @@
 							"fileName": "native-control-table/NativeControlTable.ts",
 							"line": 40,
 							"character": 13,
-							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L40"
+							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/native-control-table/NativeControlTable.ts#L40"
 						}
 					],
 					"typeParameters": [
@@ -4990,7 +4990,7 @@
 								"content": [
 									{
 										"kind": "code",
-										"text": "```ts\r\nconst clock = new PronotronClock();\r\nconst animator = new PronotronAnimator( clock, 50 );\r\nanimator.add({\r\n\tid: `unique_animation_id`,\r\n\tduration: 3.0, // in seconds\r\n\tdelay: 0.5, // in seconds\r\n\tautoPause: true, // Animation pauses when screen is unfocused\r\n\tonBegin: ( currentTime, startTime, duration ) => {\r\n\t\tconsole.log( \"Animation begin\" );\r\n\t},\r\n\tonRender: ( currentTime, startTime, duration ) => {\r\n\t\tconst timeline = ( currentTime - startTime ) / duration;\r\n\t\tconsole.log( Math.min( timeline, 1.0 ) );\r\n\t},\r\n\tonEnd: ( forced ) => {\r\n\t\tif ( ! forced ){\r\n\t\t\tconsole.log( \"Animation finished naturally\" );\r\n\t\t} \r\n\t}\r\n});\r\n```"
+										"text": "```ts\nconst clock = new PronotronClock();\nconst animator = new PronotronAnimator( clock, 50 );\nanimator.add({\n\tid: `unique_animation_id`,\n\tduration: 3.0, // in seconds\n\tdelay: 0.5, // in seconds\n\tautoPause: true, // Animation pauses when screen is unfocused\n\tonBegin: ( currentTime, startTime, duration ) => {\n\t\tconsole.log( \"Animation begin\" );\n\t},\n\tonRender: ( currentTime, startTime, duration ) => {\n\t\tconst timeline = ( currentTime - startTime ) / duration;\n\t\tconsole.log( Math.min( timeline, 1.0 ) );\n\t},\n\tonEnd: ( forced ) => {\n\t\tif ( ! forced ){\n\t\t\tconsole.log( \"Animation finished naturally\" );\n\t\t} \n\t}\n});\n```"
 									}
 								]
 							}
@@ -5008,7 +5008,7 @@
 									"fileName": "animator/PronotronAnimator.ts",
 									"line": 169,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/animator/PronotronAnimator.ts#L169"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/animator/PronotronAnimator.ts#L169"
 								}
 							],
 							"signatures": [
@@ -5023,7 +5023,7 @@
 											"fileName": "animator/PronotronAnimator.ts",
 											"line": 169,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/animator/PronotronAnimator.ts#L169"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/animator/PronotronAnimator.ts#L169"
 										}
 									],
 									"parameters": [
@@ -5089,7 +5089,7 @@
 									"fileName": "animator/PronotronAnimator.ts",
 									"line": 183,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/animator/PronotronAnimator.ts#L183"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/animator/PronotronAnimator.ts#L183"
 								}
 							],
 							"signatures": [
@@ -5103,7 +5103,7 @@
 										"summary": [
 											{
 												"kind": "text",
-												"text": "Adds an animation to the controller.\r\nIf another animation with the same ID exists, it is removed first."
+												"text": "Adds an animation to the controller.\nIf another animation with the same ID exists, it is removed first."
 											}
 										],
 										"blockTags": [
@@ -5123,7 +5123,7 @@
 											"fileName": "animator/PronotronAnimator.ts",
 											"line": 183,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/animator/PronotronAnimator.ts#L183"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/animator/PronotronAnimator.ts#L183"
 										}
 									],
 									"parameters": [
@@ -5167,7 +5167,7 @@
 									"fileName": "animator/PronotronAnimator.ts",
 									"line": 219,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/animator/PronotronAnimator.ts#L219"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/animator/PronotronAnimator.ts#L219"
 								}
 							],
 							"signatures": [
@@ -5190,7 +5190,7 @@
 											"fileName": "animator/PronotronAnimator.ts",
 											"line": 219,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/animator/PronotronAnimator.ts#L219"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/animator/PronotronAnimator.ts#L219"
 										}
 									],
 									"parameters": [
@@ -5252,7 +5252,7 @@
 									"fileName": "animator/PronotronAnimator.ts",
 									"line": 239,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/animator/PronotronAnimator.ts#L239"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/animator/PronotronAnimator.ts#L239"
 								}
 							],
 							"signatures": [
@@ -5266,7 +5266,7 @@
 										"summary": [
 											{
 												"kind": "text",
-												"text": "Updates all active animations.\r\nShould be called once per frame."
+												"text": "Updates all active animations.\nShould be called once per frame."
 											}
 										]
 									},
@@ -5275,7 +5275,7 @@
 											"fileName": "animator/PronotronAnimator.ts",
 											"line": 239,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/animator/PronotronAnimator.ts#L239"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/animator/PronotronAnimator.ts#L239"
 										}
 									],
 									"type": {
@@ -5307,7 +5307,7 @@
 							"fileName": "animator/PronotronAnimator.ts",
 							"line": 133,
 							"character": 13,
-							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/animator/PronotronAnimator.ts#L133"
+							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/animator/PronotronAnimator.ts#L133"
 						}
 					]
 				},
@@ -5321,7 +5321,7 @@
 						"summary": [
 							{
 								"kind": "text",
-								"text": "PronotronClock\r\n\r\nA dual-domain clock that tracks both:\r\n\r\n- **Global time** — always progresses (unaffected by tab focus)\r\n- **Active time** — pauses when the screen/tab is unfocused\r\n\r\nThis allows animations or logic to selectively follow either time domain."
+								"text": "PronotronClock\n\nA dual-domain clock that tracks both:\n\n- **Global time** — always progresses (unaffected by tab focus)\n- **Active time** — pauses when the screen/tab is unfocused\n\nThis allows animations or logic to selectively follow either time domain."
 							}
 						],
 						"blockTags": [
@@ -5330,7 +5330,7 @@
 								"content": [
 									{
 										"kind": "code",
-										"text": "```ts\r\nconst clock = new PronotronClock();\r\nconst handleVisibilityChange = () => {\r\n\tif ( document.hidden ){\r\n\t\tclock.pause();\r\n\t} else {\r\n\t\tclock.resume();\r\n\t}\r\n};\r\ndocument.addEventListener( 'visibilitychange', handleVisibilityChange );\r\n\r\n// In your main loop:\r\nfunction frame()\r\n{\r\n\tconst delta = clock.tick();\r\n\tconst { elapsedTime, elapsedPausedTime } = clock.getTime();\r\n\t// ...rest\r\n}\r\nframe();\r\n```"
+										"text": "```ts\nconst clock = new PronotronClock();\nconst handleVisibilityChange = () => {\n\tif ( document.hidden ){\n\t\tclock.pause();\n\t} else {\n\t\tclock.resume();\n\t}\n};\ndocument.addEventListener( 'visibilitychange', handleVisibilityChange );\n\n// In your main loop:\nfunction frame()\n{\n\tconst delta = clock.tick();\n\tconst { elapsedTime, elapsedPausedTime } = clock.getTime();\n\t// ...rest\n}\nframe();\n```"
 									}
 								]
 							}
@@ -5370,7 +5370,7 @@
 									"fileName": "clock/PronotronClock.ts",
 									"line": 110,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/clock/PronotronClock.ts#L110"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/clock/PronotronClock.ts#L110"
 								}
 							],
 							"signatures": [
@@ -5393,7 +5393,7 @@
 											"fileName": "clock/PronotronClock.ts",
 											"line": 110,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/clock/PronotronClock.ts#L110"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/clock/PronotronClock.ts#L110"
 										}
 									],
 									"type": {
@@ -5416,7 +5416,7 @@
 															"fileName": "clock/PronotronClock.ts",
 															"line": 110,
 															"character": 35,
-															"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/clock/PronotronClock.ts#L110"
+															"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/clock/PronotronClock.ts#L110"
 														}
 													],
 													"type": {
@@ -5435,7 +5435,7 @@
 															"fileName": "clock/PronotronClock.ts",
 															"line": 110,
 															"character": 14,
-															"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/clock/PronotronClock.ts#L110"
+															"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/clock/PronotronClock.ts#L110"
 														}
 													],
 													"type": {
@@ -5458,7 +5458,7 @@
 													"fileName": "clock/PronotronClock.ts",
 													"line": 110,
 													"character": 12,
-													"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/clock/PronotronClock.ts#L110"
+													"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/clock/PronotronClock.ts#L110"
 												}
 											]
 										}
@@ -5477,7 +5477,7 @@
 									"fileName": "clock/PronotronClock.ts",
 									"line": 93,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/clock/PronotronClock.ts#L93"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/clock/PronotronClock.ts#L93"
 								}
 							],
 							"signatures": [
@@ -5491,7 +5491,7 @@
 										"summary": [
 											{
 												"kind": "text",
-												"text": "Pauses the \"active\" time domain without affecting global time.\r\nCall when the window or app loses focus."
+												"text": "Pauses the \"active\" time domain without affecting global time.\nCall when the window or app loses focus."
 											}
 										]
 									},
@@ -5500,7 +5500,7 @@
 											"fileName": "clock/PronotronClock.ts",
 											"line": 93,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/clock/PronotronClock.ts#L93"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/clock/PronotronClock.ts#L93"
 										}
 									],
 									"type": {
@@ -5521,7 +5521,7 @@
 									"fileName": "clock/PronotronClock.ts",
 									"line": 102,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/clock/PronotronClock.ts#L102"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/clock/PronotronClock.ts#L102"
 								}
 							],
 							"signatures": [
@@ -5535,7 +5535,7 @@
 										"summary": [
 											{
 												"kind": "text",
-												"text": "Resumes the \"active\" time domain.\r\nAdjusts for time spent paused so that active time remains continuous."
+												"text": "Resumes the \"active\" time domain.\nAdjusts for time spent paused so that active time remains continuous."
 											}
 										]
 									},
@@ -5544,7 +5544,7 @@
 											"fileName": "clock/PronotronClock.ts",
 											"line": 102,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/clock/PronotronClock.ts#L102"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/clock/PronotronClock.ts#L102"
 										}
 									],
 									"type": {
@@ -5565,7 +5565,7 @@
 									"fileName": "clock/PronotronClock.ts",
 									"line": 83,
 									"character": 1,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/clock/PronotronClock.ts#L83"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/clock/PronotronClock.ts#L83"
 								}
 							],
 							"signatures": [
@@ -5579,7 +5579,7 @@
 										"summary": [
 											{
 												"kind": "text",
-												"text": "Advances the clock by one frame and computes the delta time.\r\nCall this once per render frame"
+												"text": "Advances the clock by one frame and computes the delta time.\nCall this once per render frame"
 											}
 										],
 										"blockTags": [
@@ -5599,7 +5599,7 @@
 											"fileName": "clock/PronotronClock.ts",
 											"line": 83,
 											"character": 1,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/clock/PronotronClock.ts#L83"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/clock/PronotronClock.ts#L83"
 										}
 									],
 									"type": {
@@ -5632,7 +5632,7 @@
 							"fileName": "clock/PronotronClock.ts",
 							"line": 33,
 							"character": 13,
-							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/clock/PronotronClock.ts#L33"
+							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/clock/PronotronClock.ts#L33"
 						}
 					]
 				},
@@ -5655,7 +5655,7 @@
 							"fileName": "animator/PronotronAnimator.ts",
 							"line": 67,
 							"character": 12,
-							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/animator/PronotronAnimator.ts#L67"
+							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/animator/PronotronAnimator.ts#L67"
 						}
 					],
 					"type": {
@@ -5698,7 +5698,7 @@
 												"summary": [
 													{
 														"kind": "text",
-														"text": "Whether the animation should pause when screen is unfocused.\r\ntrue → pauses when unfocused\r\nfalse → continues ticking"
+														"text": "Whether the animation should pause when screen is unfocused.\ntrue → pauses when unfocused\nfalse → continues ticking"
 													}
 												]
 											},
@@ -5707,7 +5707,7 @@
 													"fileName": "animator/PronotronAnimator.ts",
 													"line": 78,
 													"character": 1,
-													"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/animator/PronotronAnimator.ts#L78"
+													"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/animator/PronotronAnimator.ts#L78"
 												}
 											],
 											"type": {
@@ -5736,7 +5736,7 @@
 													"fileName": "animator/PronotronAnimator.ts",
 													"line": 86,
 													"character": 1,
-													"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/animator/PronotronAnimator.ts#L86"
+													"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/animator/PronotronAnimator.ts#L86"
 												}
 											],
 											"type": {
@@ -5763,7 +5763,7 @@
 													"fileName": "animator/PronotronAnimator.ts",
 													"line": 82,
 													"character": 1,
-													"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/animator/PronotronAnimator.ts#L82"
+													"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/animator/PronotronAnimator.ts#L82"
 												}
 											],
 											"type": {
@@ -5781,7 +5781,7 @@
 												"summary": [
 													{
 														"kind": "text",
-														"text": "Unique client-provided identifier.\r\nAdding an animation with the same ID forcibly finishes the previous one."
+														"text": "Unique client-provided identifier.\nAdding an animation with the same ID forcibly finishes the previous one."
 													}
 												]
 											},
@@ -5790,7 +5790,7 @@
 													"fileName": "animator/PronotronAnimator.ts",
 													"line": 72,
 													"character": 1,
-													"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/animator/PronotronAnimator.ts#L72"
+													"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/animator/PronotronAnimator.ts#L72"
 												}
 											],
 											"type": {
@@ -5821,7 +5821,7 @@
 											"fileName": "animator/PronotronAnimator.ts",
 											"line": 67,
 											"character": 66,
-											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/animator/PronotronAnimator.ts#L67"
+											"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/animator/PronotronAnimator.ts#L67"
 										}
 									]
 								}
@@ -5840,7 +5840,7 @@
 							"fileName": "utils/Types.ts",
 							"line": 38,
 							"character": 12,
-							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/utils/Types.ts#L38"
+							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/utils/Types.ts#L38"
 						}
 					],
 					"type": {
@@ -5892,7 +5892,7 @@
 								"content": [
 									{
 										"kind": "code",
-										"text": "```ts\r\nenum Status { \r\n\tIdle = 0, \r\n\tRunning = 1, \r\n\tDone = 2 \r\n}\r\nconst statusDurations: EnumValueMap<Status> = {\r\n  [Status.Idle]: 100,\r\n  [Status.Running]: 500,\r\n  [Status.Done]: 0,\r\n};\r\n```"
+										"text": "```ts\nenum Status { \n\tIdle = 0, \n\tRunning = 1, \n\tDone = 2 \n}\nconst statusDurations: EnumValueMap<Status> = {\n  [Status.Idle]: 100,\n  [Status.Running]: 500,\n  [Status.Done]: 0,\n};\n```"
 									}
 								]
 							}
@@ -5903,7 +5903,7 @@
 							"fileName": "utils/Types.ts",
 							"line": 34,
 							"character": 12,
-							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/utils/Types.ts#L34"
+							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/utils/Types.ts#L34"
 						}
 					],
 					"typeParameters": [
@@ -5945,7 +5945,7 @@
 						"summary": [
 							{
 								"kind": "text",
-								"text": "Extracts all unique keys from every member of a union type.\r\n\r\nExample:\r\n  type U = { a: number } | { b: string };\r\n  KeysOfUnion<U> → \"a\" | \"b\""
+								"text": "Extracts all unique keys from every member of a union type.\n\nExample:\n  type U = { a: number } | { b: string };\n  KeysOfUnion<U> → \"a\" | \"b\""
 							}
 						]
 					},
@@ -5954,7 +5954,7 @@
 							"fileName": "utils/Types.ts",
 							"line": 47,
 							"character": 12,
-							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/utils/Types.ts#L47"
+							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/utils/Types.ts#L47"
 						}
 					],
 					"typeParameters": [
@@ -6006,7 +6006,7 @@
 						"summary": [
 							{
 								"kind": "text",
-								"text": "Merges all properties from a union of object types into one\r\n“combined shape” type, preserving each property’s possible types.\r\n\r\nExample:\r\n  type U = { a: number } | { b: string };\r\n  MergedProps<U> → { a: number; b: string }"
+								"text": "Merges all properties from a union of object types into one\n“combined shape” type, preserving each property’s possible types.\n\nExample:\n  type U = { a: number } | { b: string };\n  MergedProps<U> → { a: number; b: string }"
 							}
 						]
 					},
@@ -6015,7 +6015,7 @@
 							"fileName": "utils/Types.ts",
 							"line": 57,
 							"character": 12,
-							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/utils/Types.ts#L57"
+							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/utils/Types.ts#L57"
 						}
 					],
 					"typeParameters": [
@@ -6156,7 +6156,7 @@
 							},
 							{
 								"kind": "text",
-								"text": " defined.\r\nAll other properties remain optional."
+								"text": " defined.\nAll other properties remain optional."
 							}
 						]
 					},
@@ -6165,7 +6165,7 @@
 							"fileName": "utils/Types.ts",
 							"line": 5,
 							"character": 12,
-							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/utils/Types.ts#L5"
+							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/utils/Types.ts#L5"
 						}
 					],
 					"typeParameters": [
@@ -6279,7 +6279,7 @@
 							},
 							{
 								"kind": "text",
-								"text": "\r\nto be present, while keeping the other possible properties optional.\r\n\r\nEach variant in the resulting type corresponds to one union member\r\nwhose keys are required, while the remaining members’ keys are optional\r\nbut still properly typed.\r\n\r\nExample:\r\n  type U = { a: number } | { b: string };\r\n  RequireAtLeastOneFromUnion<U> → \r\n    | { a: number; b?: string }\r\n    | { b: string; a?: number }"
+								"text": "\nto be present, while keeping the other possible properties optional.\n\nEach variant in the resulting type corresponds to one union member\nwhose keys are required, while the remaining members’ keys are optional\nbut still properly typed.\n\nExample:\n  type U = { a: number } | { b: string };\n  RequireAtLeastOneFromUnion<U> → \n    | { a: number; b?: string }\n    | { b: string; a?: number }"
 							}
 						]
 					},
@@ -6288,7 +6288,7 @@
 							"fileName": "utils/Types.ts",
 							"line": 75,
 							"character": 12,
-							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/utils/Types.ts#L75"
+							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/utils/Types.ts#L75"
 						}
 					],
 					"typeParameters": [
@@ -6430,7 +6430,7 @@
 							},
 							{
 								"kind": "text",
-								"text": " defined.\r\nAll other properties are disallowed (cannot exist)."
+								"text": " defined.\nAll other properties are disallowed (cannot exist)."
 							}
 						]
 					},
@@ -6439,7 +6439,7 @@
 							"fileName": "utils/Types.ts",
 							"line": 13,
 							"character": 12,
-							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/utils/Types.ts#L13"
+							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/utils/Types.ts#L13"
 						}
 					],
 					"typeParameters": [
@@ -6595,7 +6595,7 @@
 							"fileName": "utils/isTouchDevice.ts",
 							"line": 5,
 							"character": 16,
-							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/utils/isTouchDevice.ts#L5"
+							"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/utils/isTouchDevice.ts#L5"
 						}
 					],
 					"signatures": [
@@ -6629,7 +6629,7 @@
 									"fileName": "utils/isTouchDevice.ts",
 									"line": 5,
 									"character": 16,
-									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/2b5845bf4af199383a399bf4d39a2d7d05eda736/packages/pronotron-utils/src/utils/isTouchDevice.ts#L5"
+									"url": "https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/blob/a188c28b6cd65f67b0701742ba9ca6012bef562c/packages/pronotron-utils/src/utils/isTouchDevice.ts#L5"
 								}
 							],
 							"type": {
