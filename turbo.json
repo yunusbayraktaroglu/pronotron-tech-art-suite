@@ -22,6 +22,10 @@
 			],
 			"dependsOn": []
 		},
+		"test:watch": {
+    		"cache": false,
+    		"persistent": true
+    	},
 		"lint": {},
 		"dev": {
 			"cache": false,

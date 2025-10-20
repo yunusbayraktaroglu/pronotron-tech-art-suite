@@ -25,15 +25,18 @@
 		"interaction"
 	],
 	"scripts": {
+		"test": "jest",
+		"test:watch": "jest --watch",
 		"build": "tsup src/index.ts --format esm,cjs --dts --minify terser",
 		"dev": "tsup src/index.ts --format esm,cjs --watch --dts",
-		"lint": "eslint \"src/**/*.ts*\"",
+		"lint": "eslint . --max-warnings 0",
 		"clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
 	},
 	"devDependencies": {
-		"@pronotron/config-ts": "*",
 		"@pronotron/config-eslint": "*",
-		"eslint": "^8.57.0",
+		"@pronotron/config-ts": "*",
+		"@types/jest": "^30.0.0",
+		"jest": "^30.2.0",
 		"terser": "^5.33.0",
 		"tsup": "^8.5.0",
 		"typescript": "^5.9.3"

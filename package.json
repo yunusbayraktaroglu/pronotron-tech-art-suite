@@ -1,6 +1,6 @@
 {
 	"name": "pronotron-tech-art-suite",
-	"description": "A high-performance TypeScript-based suite designed to enhance interaction, UI, and UX without compromising web standards.",
+	"description": "A high-performance TypeScript based suite designed to enhance interaction, UI, and UX without compromising web standards.",
 	"author": "Yunus Bayraktaroglu",
 	"private": true,
 	"license": "MIT",
@@ -10,7 +10,7 @@
 		"build:demos": "turbo build --filter=@pronotron/demos",
 		"build:docs": "turbo docs --filter=@pronotron/docs",
 		"dev": "turbo dev",
-		"lint": "turbo lint",
+		"lint": "turbo lint --filter=./packages/*",
 		"clean": "turbo clean && rm -rf node_modules",
 		"format": "prettier --write \"**/*.{ts,tsx,md}\"",
 		"changeset": "changeset",
@@ -19,7 +19,7 @@
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.27.8",
-		"eslint": "^8.57.0",
+		"eslint": "^9.38.0",
 		"prettier": "^3.2.5",
 		"turbo": "^2.1.2"
 	},
