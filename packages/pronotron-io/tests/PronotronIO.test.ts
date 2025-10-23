@@ -18,9 +18,10 @@ describe( "PronotronIOVerticalObserver (behavior)", () => {
 			getBounds: () => ( { start: 10, end: 20 } ),
 			dispatch: {
 				onInViewport: jest.fn(),
-				onTopEnter: jest.fn(),
-				onBottomExit: jest.fn(),
-				onFastForward: "execute_both"
+				onTopEnter: {
+					dispatch: jest.fn(),
+					limit: 3
+				},
 			},
 			offset: 0,
 			onRemoveNode: jest.fn()
@@ -33,6 +34,7 @@ describe( "PronotronIOVerticalObserver (behavior)", () => {
 	test( "addNode() with duplicated ref, returns false and warns", () => {
 
 		const ref = {} as HTMLElement;
+		
 		const getBounds = () => ( { start: 0, end: 10 } );
 		const dispatch = { onInViewport: jest.fn() };
 
@@ -67,12 +69,10 @@ describe( "PronotronIOVerticalObserver (behavior)", () => {
 
 	} );
 
+	test( "negative -> viewport position transition triggers negative-enter handler", () => {
 
-	test( "negative -> viewport transition triggers negative-enter handler", () => {
-
-		// viewport 0..1000
 		io.updateViewportLayout( 0, 1000 );
-		io.setLastScroll( 1000 );
+		io.setLastScroll( 1000 ); // Visible area is [1000, 2000]
 
 		const onTopEnter = jest.fn();
 		const onTopExit = jest.fn();
@@ -97,9 +97,14 @@ describe( "PronotronIOVerticalObserver (behavior)", () => {
 		// IO node added successfully
 		expect( typeof NODE_ID ).toBe( "number" );
 
-		// Skips all
+		// Node still in the negative area
 		io.handleScroll( 991 );
+
+		// Now in the viewport
 		io.handleScroll( 990 );
+
+		// Now centre
+		io.handleScroll( 945 );
 
 		expect( onTopEnter ).toHaveBeenCalledTimes( 1 );
 		expect( onInViewport ).toHaveBeenCalledTimes( 1 );
@@ -110,7 +115,7 @@ describe( "PronotronIOVerticalObserver (behavior)", () => {
 
 	} );
 
-	test( "fast-forward negative -> positive executes both events when strategy = execute_both", () => {
+	test( "negative -> positive, fast-forward executes both events when strategy = execute_both", () => {
 
 		io.updateViewportLayout( 0, 100 );
 
@@ -225,8 +230,6 @@ describe( "PronotronIOVerticalObserver (behavior)", () => {
 
 	} );
 
-
-
 	test( "removeNode removes and calls onRemoveNode and releases id", () => {
 
 		io.updateViewportLayout( 0, 100 );
@@ -250,7 +253,6 @@ describe( "PronotronIOVerticalObserver (behavior)", () => {
 		expect( onRemove ).toHaveBeenCalled();
 		
 	} );
-
 
 	test( "expands table for very big scroll values", () => {
 
