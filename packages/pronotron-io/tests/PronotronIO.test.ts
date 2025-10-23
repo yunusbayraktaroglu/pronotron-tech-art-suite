@@ -244,7 +244,7 @@ describe( "PronotronIOVerticalObserver (behavior)", () => {
 				onInViewport: jest.fn()
 			}, 
 			onRemoveNode: onRemove 
-		} as any );
+		} );
 
 		expect( typeof id ).toBe( "number" );
 		io.removeNode( ref );
