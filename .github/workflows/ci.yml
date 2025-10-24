@@ -73,6 +73,13 @@ jobs:
         uses: actions/download-artifact@v5
         with:
           name: coverage-reports
+          path: .
+      
+      # ✅ Add debug step to verify files actually exist (useful once, you can remove later)
+      - name: Debug coverage files
+        run: |
+          echo "Looking for coverage-final.json files:"
+          find packages -name "coverage-final.json" || true
 
       - name: Upload Coverage to Codecov
         uses: codecov/codecov-action@v5
@@ -83,30 +90,3 @@ jobs:
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true
-
-  release:
-    name: Release
-    runs-on: ubuntu-latest
-    needs: test
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js 20.x
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20.x
-          cache: 'npm'
-
-      - name: Install Dependencies
-        run: npm ci
-
-      - name: Create Release Pull Request / Publish to npm
-        id: changesets
-        uses: changesets/action@v1
-        with:
-          publish: npm run release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
