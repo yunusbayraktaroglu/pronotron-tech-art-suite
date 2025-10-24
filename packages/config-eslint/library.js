@@ -15,27 +15,28 @@ export const config = [
 		},
 		rules: {
 			"@typescript-eslint/no-use-before-define": "off",
-			"@typescript-eslint/no-unused-vars": [ "warn", {
-				"argsIgnorePattern": "^_"
-			}],
+			"@typescript-eslint/no-unused-vars": [ "warn", { "argsIgnorePattern": "^_" }],
 			"@typescript-eslint/no-var-requires": [ "off" ],
 			"@typescript-eslint/no-non-null-assertion": [ "off" ],
+
 			"@stylistic/type-annotation-spacing": [ "error", { "after": true } ],
-			"max-len": [ "warn", {
+			"@stylistic/space-in-parens": [ "error", "always" ],
+			"@stylistic/semi": [ "error" ],
+			"@stylistic/space-infix-ops": [ "warn" ],
+			"@stylistic/object-curly-spacing": [ "error", "always" ],
+			"@stylistic/array-bracket-spacing": [ "error", "always" ],
+			"@stylistic/computed-property-spacing": [ "error", "always" ],
+			"@stylistic/key-spacing": [ "error", { "afterColon": true } ],
+			"@stylistic/comma-spacing": [ "warn" ],
+			"@stylistic/max-len": [ "warn", {
 				"code": 120,
 				"tabWidth": 4,
 				"ignoreUrls": true,
 				"ignorePattern": "^import|^export"
 			} ],
-			"semi": [ "error" ],
-			"eqeqeq": [ "warn", "smart" ],
-			"space-infix-ops": [ "warn" ],
-			"space-in-parens": [ "error", "always" ],
-			"object-curly-spacing": [ "error", "always" ],
-			"array-bracket-spacing": [ "error", "always" ],
-			"key-spacing": [ "error", { "afterColon": true } ],
-			"no-irregular-whitespace": [ "warn" ],
-			"comma-spacing": [ "warn" ]
+			//"@stylistic/brace-style": [ "error", "allman", { "allowSingleLine": true } ],
+			
+			"eqeqeq": [ "warn", "smart" ]
 		},
 	}
 ];
