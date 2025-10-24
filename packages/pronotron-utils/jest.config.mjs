@@ -7,5 +7,5 @@ export default {
 	testMatch: [ "**/tests/*.test.ts" ],
 	testEnvironment: "node",
 	collectCoverage: true,
-	coverageReporters: [ "text", "html" ],
+	coverageReporters: [ "json" ],
 };

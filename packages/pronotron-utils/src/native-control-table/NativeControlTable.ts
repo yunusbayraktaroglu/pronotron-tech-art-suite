@@ -4,6 +4,7 @@ type NativeTable = Float32Array | Float64Array | Int32Array | Uint8Array | Uint1
 
 /** Client-given slot ID */
 type SlotID = string | number;
+
 /** Slot index in the table */
 type SlotPosition = number;
 
@@ -106,6 +107,10 @@ export class NativeControlTable<EnumType extends number>
 	{
 		if ( this.isExist( ID ) ){
 			console.warn( `ID: '${ ID }' already exist in the table.` );
+			/**
+			 * @fix needs return or do not decrease usedSlots
+			 */
+			return;
 		}
 
 		const availableSlotPosition = this._findEmptySlotPosition();

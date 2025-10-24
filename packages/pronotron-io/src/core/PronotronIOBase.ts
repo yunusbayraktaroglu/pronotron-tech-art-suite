@@ -268,7 +268,18 @@ export abstract class PronotronIOBase<TEvents extends string>
 			this._idPool.consume( internalID );
 
 			// IONode might be added while app is running. Calculate bounds
-			this._updateNodeBounds( internalID, newNodeOptions );
+			const { nodeStart, nodeEnd } = this._updateNodeBounds( internalID, newNodeOptions );
+
+			// If the IONode added while app is running
+			if ( this._viewportSize > 0 ){
+				// 1 - Position will be modified by first handleScroll
+				// 2 - Position will be assigned by here
+				const currentPosition = this._calculatePosition( nodeStart, nodeEnd );
+				this._controlTable.modifyByID( internalID, {
+					[ IONodeStrideIndex.LastPosition ]: currentPosition,
+					[ IONodeStrideIndex.InViewport ]: currentPosition === IONodePosition.InViewport ? 1 : 0,
+				} );
+			}
 
 			return internalID;
 
@@ -302,6 +313,7 @@ export abstract class PronotronIOBase<TEvents extends string>
 	setLastScroll( scrollValue: number ): void 
 	{
 		this._lastScrollValue = scrollValue;
+		this._updateActualIntersection();
 	}
 
 	/**
@@ -339,6 +351,8 @@ export abstract class PronotronIOBase<TEvents extends string>
 		this._viewportStart = start;
 		this._viewportEnd = end;
 		this._viewportSize = end - start; 
+
+		this._updateActualIntersection();
 	}
 
 	/**
@@ -392,7 +406,7 @@ export abstract class PronotronIOBase<TEvents extends string>
 	 * @param nodeSettings - Node creation options.
 	 * @internal
 	 */
-	private _updateNodeBounds( nodeID: number, nodeSettings: IONodeOptions<TEvents> ): void
+	private _updateNodeBounds( nodeID: number, nodeSettings: IONodeOptions<TEvents> ):  { nodeStart: number, nodeEnd: number }
 	{
 		const { start, end } = nodeSettings.getBounds();
 		const elementOffset = nodeSettings.offset || 0;
@@ -404,6 +418,8 @@ export abstract class PronotronIOBase<TEvents extends string>
 			[ IONodeStrideIndex.StartPosition ]: nodeStart,
 			[ IONodeStrideIndex.EndPosition ]: nodeEnd
 		} );
+
+		return { nodeStart, nodeEnd };
 	}
 
 	/**

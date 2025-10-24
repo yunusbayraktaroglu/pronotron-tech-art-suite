@@ -192,7 +192,7 @@ export class PronotronAnimator
 		const now = animationOption.autoPause ? elapsedPausedTime : elapsedTime;
 		const duration = animationOption.duration || 0;
 		const delay = animationOption.delay || 0;
-		const startTime = now + delay 
+		const startTime = now + delay;
 		const endTime = startTime + duration;
 
 		this._controlTable.add( animationOption.id, {
@@ -222,7 +222,7 @@ export class PronotronAnimator
 
 		if ( animationInternalID !== undefined ){
 
-			this._animationReferences[ animationInternalID ].onEnd?.( forced )
+			this._animationReferences[ animationInternalID ].onEnd?.( forced );
 			this._removeAnimationByInternalID( animationInternalID );
 
 		} else {

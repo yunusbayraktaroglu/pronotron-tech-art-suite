@@ -10,6 +10,8 @@
 		"build:demos": "turbo build --filter=@pronotron/demos",
 		"build:docs": "turbo docs --filter=@pronotron/docs",
 		"dev": "turbo dev",
+		"test": "turbo test --filter=./packages/*",
+		"test:watch": "turbo test:watch --filter=./packages/*",
 		"lint": "turbo lint --filter=./packages/*",
 		"clean": "turbo clean && rm -rf node_modules",
 		"format": "prettier --write \"**/*.{ts,tsx,md}\"",

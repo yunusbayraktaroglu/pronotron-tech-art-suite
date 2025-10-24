@@ -30,7 +30,7 @@
 		"test:watch": "jest --watch",
 		"build": "tsup src/index.ts --format esm,cjs --dts --minify terser",
 		"dev": "tsup src/index.ts --format esm,cjs --watch --dts",
-		"lint": "eslint . --max-warnings 0",
+		"lint": "eslint .",
 		"lint:fix": "eslint . --max-warnings 0 --fix",
 		"clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
 	},

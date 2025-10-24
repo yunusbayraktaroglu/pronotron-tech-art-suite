@@ -95,10 +95,8 @@ export abstract class PronotronIOEventDispatcher<TEvents extends string> extends
 	handleScroll( scrollValue: number ): void 
 	{
 		this.direction = ( scrollValue > this._lastScrollValue ) ? this._scrollDirectionNames._negative : this._scrollDirectionNames._positive;
-		this._lastScrollValue = scrollValue;
-		this._updateActualIntersection();
+		this.setLastScroll( scrollValue );
 		this._handlePositions();
-		return;
 	}
 
 	/**
