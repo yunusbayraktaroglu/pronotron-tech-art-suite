@@ -55,7 +55,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: coverage-reports
-          path: packages/**/coverage/coverage-final.json
+          path: ./packages/**/coverage/coverage-final.json
 
   codecov:
     name: Upload Coverage to Codecov
@@ -77,12 +77,3 @@ jobs:
       - name: Debug directory
         run: ls -R
 
-      - name: Upload Coverage to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          fail_ci_if_error: true
-          files: ./${{ matrix.package }}/coverage/coverage-final.json
-          flags: ${{ matrix.package }}
-          name: ${{ matrix.package }}
-          token: ${{ secrets.CODECOV_TOKEN }}
-          verbose: true
