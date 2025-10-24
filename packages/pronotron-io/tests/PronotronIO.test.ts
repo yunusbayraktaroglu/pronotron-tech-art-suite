@@ -107,7 +107,7 @@ describe( "PronotronIOVerticalObserver (behavior)", () => {
 		io.handleScroll( 945 );
 
 		expect( onTopEnter ).toHaveBeenCalledTimes( 1 );
-		expect( onInViewport ).toHaveBeenCalledTimes( 1 );
+		expect( onInViewport ).toHaveBeenCalledTimes( 2 );
 
 		expect( onTopExit ).not.toHaveBeenCalled();
 		expect( onBottomExit ).not.toHaveBeenCalled();
