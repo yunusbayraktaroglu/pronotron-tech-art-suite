@@ -12,7 +12,7 @@ export function isTouchDevice(): boolean
 
 	} else if ( "msMaxTouchPoints" in navigator ){
 
-		hasTouchScreen = navigator["msMaxTouchPoints"] > 0;
+		hasTouchScreen = navigator[ "msMaxTouchPoints" ] > 0;
 
 	} else {
 

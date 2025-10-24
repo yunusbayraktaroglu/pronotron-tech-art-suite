@@ -3,6 +3,7 @@ import { PointerBase, PointerBaseDependencies, PointerState, type BaseSettings }
 export type HoldableSettings = BaseSettings & {
 	/**
 	 * Duration in seconds required to trigger a hold gesture.
+	 * @default 0.35 sec
 	 */
 	holdThreshold: number;
 };
@@ -42,6 +43,12 @@ export class PointerHoldable extends PointerBase<"hold" | "holdend">
 	 */
 	_holdThreshold = 0.35;
 
+	/**
+	 * Defines if the current event target is holdable,
+	 * @internal
+	 */
+	_canHold = false;
+
 	constructor( dependencies: PointerHoldableDependencies )
 	{
 		super( dependencies );
@@ -71,6 +78,7 @@ export class PointerHoldable extends PointerBase<"hold" | "holdend">
 		 */
 		if ( event.target && this._isHoldable( event.target as HTMLElement ) ){
 
+			this._canHold = true;
 			this._animator.add({
 				id: "HOLD",
 				duration: this._holdThreshold,
@@ -109,6 +117,7 @@ export class PointerHoldable extends PointerBase<"hold" | "holdend">
 			this._currentState = PointerState.HOLD_DRAGGING;
 		}
 
+		this._canHold = false;
 		super._onPointerMove( event );
 	}
 

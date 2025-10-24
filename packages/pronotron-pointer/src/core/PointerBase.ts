@@ -55,7 +55,7 @@ export type BaseSettings = {
 	/**
 	 * Minimum squared-pixel distance required to treat
 	 * movement as a true drag rather than micro-jitter.
-	 * @default 10
+	 * @default 10 px
 	 */
 	movingDeltaLimit: number;
 }
@@ -286,7 +286,7 @@ export class PointerBase<TDispatchableEvents extends string = string> extends Ev
 	{
 		const { elapsedTime } = this._clock.getTime();
 		
-		if ( elapsedTime < this._pointerStartTime + this._tapThreshold ){
+		if ( this._currentState === PointerState.PENDING && elapsedTime < this._pointerStartTime + this._tapThreshold ){
 			this._dispatchCustomEvent( "tap", {
 				target: event.target,
 				position: { 
@@ -295,6 +295,7 @@ export class PointerBase<TDispatchableEvents extends string = string> extends Ev
 				}
 			} );
 		}
+
 		this._currentState = PointerState.IDLE;
 	}
 
