@@ -73,20 +73,6 @@ jobs:
         uses: actions/download-artifact@v5
         with:
           name: coverage-reports
-          path: .
-      
-      # ✅ Add debug step to verify files actually exist (useful once, you can remove later)
-      - name: Debug coverage files
-        run: |
-          echo "Looking for coverage-final.json files:"
-          find packages -name "coverage-final.json" || true
 
-      - name: Upload Coverage to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          files: ./packages/${{ matrix.package }}/coverage/coverage-final.json
-          flags: ${{ matrix.package }}
-          name: ${{ matrix.package }}
-          fail_ci_if_error: true
-          token: ${{ secrets.CODECOV_TOKEN }}
-          verbose: true
+      - name: Debug directory
+        run: ls -R
