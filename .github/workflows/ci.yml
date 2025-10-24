@@ -51,11 +51,11 @@ jobs:
       - name: Run Turborepo Tests
         run: npm run test
 
-      # For Codecov to operate correctly, all file paths in the coverage report must match the git file structure.
       - name: Upload Coverage Artifact
         uses: actions/upload-artifact@v4
         with:
           name: coverage-reports
+          # actions/upload-artifact removes 'packages' root
           path: ./packages/**/coverage/coverage-final.json
 
   codecov:
@@ -74,7 +74,18 @@ jobs:
         uses: actions/download-artifact@v5
         with:
           name: coverage-reports
+          # For Codecov to operate correctly, all file paths in the coverage report must match the git file structure.
           path: packages
 
       - name: Debug directory
         run: ls -R
+
+      - name: Upload Coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          fail_ci_if_error: true
+          files: packages/${{ matrix.package }}/coverage/coverage-final.json
+          flags: ${{ matrix.package }}
+          name: ${{ matrix.package }}
+          token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true
