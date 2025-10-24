@@ -8,19 +8,19 @@ A high-performance TypeScript suite designed to enhance interaction, UI, and UX 
 
 > ### [@pronotron/io](packages/pronotron-io)
 >
-> [![NPM Package][npm-io]][npm-url-io] [![Build Size][build-size-io]][build-size-url-io]
+> [![NPM Package][npm-io]][npm-url-io] [![Build Size][build-size-io]][build-size-url-io] [![Codecov][codecov-io]][codecov-url-io]
 >
 > Reliable viewport tracking without missed targets, unlike the default [IntersectionObserver API](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API). Built on **NativeControlTable**, it can safely be used for parallax effects, lazy loading, or tracking when any part of an element enters or exits the screen. Suitable for implementing any custom scrolling application.
 
 > ### [@pronotron/pointer](packages/pronotron-pointer)
 >
-> [![NPM Package][npm-pointer]][npm-url-pointer] [![Build Size][build-size-pointer]][build-size-url-pointer]
+> [![NPM Package][npm-pointer]][npm-url-pointer] [![Build Size][build-size-pointer]][build-size-url-pointer] [![Codecov][codecov-pointer]][codecov-url-pointer]
 >
 > Tracks mouse and touch pointers with custom states such as holding, tapping, idling, interacting, dragging, moving out, and moving in, providing enhanced interaction control.
 
 > ### [@pronotron/utils](packages/pronotron-utils)
 >
-> [![NPM Package][npm-utils]][npm-url-utils] [![Build Size][build-size-utils]][build-size-url-utils]
+> [![NPM Package][npm-utils]][npm-url-utils] [![Build Size][build-size-utils]][build-size-url-utils] [![Codecov][codecov-utils]][codecov-url-utils]
 >
 > A set of helper modules used by other **@pronotron** packages, which can also be used individually:
 > - **Animator**: Built on **NativeControlTable** and **Clock**, it provides per-frame normalized timeline data (ranging from 0 to 1), enabling developers to create any kind of animation.
@@ -56,13 +56,19 @@ See [CONTRIBUTING ↗](.github/CONTRIBUTING.md)
 [npm-url-io]: https://www.npmjs.com/package/@pronotron/io
 [build-size-io]: https://badgen.net/bundlephobia/minzip/@pronotron/io
 [build-size-url-io]: https://bundlephobia.com/result?p=@pronotron/io
+[codecov-io]: https://codecov.io/gh/yunusbayraktaroglu/pronotron-tech-art-suite/branch/main/graph/badge.svg?flag=pronotron-io&precision=1
+[codecov-url-io]: https://app.codecov.io/gh/yunusbayraktaroglu/pronotron-tech-art-suite?flags%5B0%5D=pronotron-io
 
 [npm-pointer]: https://img.shields.io/npm/v/@pronotron/pointer
 [npm-url-pointer]: https://www.npmjs.com/package/@pronotron/pointer
 [build-size-pointer]: https://badgen.net/bundlephobia/minzip/@pronotron/pointer
 [build-size-url-pointer]: https://bundlephobia.com/result?p=@pronotron/pointer
+[codecov-pointer]: https://codecov.io/gh/yunusbayraktaroglu/pronotron-tech-art-suite/branch/main/graph/badge.svg?flag=pronotron-pointer&precision=1
+[codecov-url-pointer]: https://app.codecov.io/gh/yunusbayraktaroglu/pronotron-tech-art-suite?flags%5B0%5D=pronotron-pointer
 
 [npm-utils]: https://img.shields.io/npm/v/@pronotron/utils
 [npm-url-utils]: https://www.npmjs.com/package/@pronotron/utils
 [build-size-utils]: https://badgen.net/bundlephobia/minzip/@pronotron/utils
 [build-size-url-utils]: https://bundlephobia.com/result?p=@pronotron/utils
+[codecov-utils]: https://codecov.io/gh/yunusbayraktaroglu/pronotron-tech-art-suite/branch/main/graph/badge.svg?flag=pronotron-utils&precision=1
+[codecov-url-utils]: https://app.codecov.io/gh/yunusbayraktaroglu/pronotron-tech-art-suite?flags%5B0%5D=pronotron-utils
