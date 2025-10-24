@@ -70,7 +70,7 @@ jobs:
           # add more packages here
     steps:
       - name: Download Coverage Artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v5
         with:
           name: coverage-reports
 
