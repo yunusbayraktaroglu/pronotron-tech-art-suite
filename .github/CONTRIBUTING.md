@@ -91,7 +91,3 @@ Here is a quick guide to doing code contributions to the library.
 ## Coding style
 
 Please follow the coding style of the project. `pronotron-tech-art-suite` uses eslint and prettier. If possible, enable their respective plugins in your editor to get real-time feedback. The linting can be run manually with the following command: `npm lint` and `npm prettier`.
-
-## License
-
-By contributing your code to the `pronotron-tech-art-suite` GitHub repository, you agree to license your contribution under the [MIT license](https://github.com/juliencrn/usehooks-ts/blob/master/LICENSE).
