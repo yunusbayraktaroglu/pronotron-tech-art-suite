@@ -58,6 +58,7 @@ jobs:
         uses: actions/download-artifact@v5
         with:
           name: coverage-reports
+          path: packages
 
       - name: Debug directory
         run: ls -R
@@ -67,7 +68,7 @@ jobs:
         with:
           fail_ci_if_error: true
           working-directory: packages/${{ matrix.package }}
-          files: ./coverage/coverage-final.json
+          files: packages/${{ matrix.package }}/coverage/coverage-final.json
           flags: ${{ matrix.package }}
           name: ${{ matrix.package }}
           token: ${{ secrets.CODECOV_TOKEN }}
