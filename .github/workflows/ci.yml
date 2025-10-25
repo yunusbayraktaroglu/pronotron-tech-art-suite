@@ -89,6 +89,7 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           fail_ci_if_error: true
+          working-directory: packages/${{ matrix.package }}
           files: packages/${{ matrix.package }}/coverage/coverage-final.json
           flags: ${{ matrix.package }}
           name: ${{ matrix.package }}
