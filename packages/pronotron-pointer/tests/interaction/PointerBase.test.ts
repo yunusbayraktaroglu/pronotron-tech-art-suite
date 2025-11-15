@@ -1,6 +1,6 @@
 import { PronotronAnimator, PronotronClock } from '@pronotron/utils';
 
-import { PointerBase, PointerState } from '../src/core/PointerBase';
+import { PointerBase, PointerState } from '../../src/core/interaction/PointerBase';
 
 jest.mock( '@pronotron/utils' );
 
@@ -19,6 +19,7 @@ describe( 'PointerBase', () => {
 	const tapThreshold = 0.25;
 	const idleThreshold = 0.50;
 	const movingDeltaLimit = 20;
+	const startPosition = { x: 300, y: 120 };
 
 	beforeEach( () => {
 
@@ -32,6 +33,7 @@ describe( 'PointerBase', () => {
 		isInteractable = jest.fn().mockReturnValue( false );
 
 		pointerBase = new PointerBase( {
+			startPosition,
 			target: mockTarget,
 			animator: mockAnimator,
 			clock: mockClock,
@@ -123,9 +125,12 @@ describe( 'PointerBase', () => {
 
 		it( 'should not transition "IDLE ■ MOVING" before exceeding movement threshold', () => {
 
+			// Add some delta that not discards IDLE
+			const currentPosition = pointerBase._pointerEnd;
+
 			// Simulate minor move (should not change state)
 			// Will test deltaSq = x*x + y*y < movingDeltaLimit
-			pointerBase._updatePointer( moveValueToNotReachLimit, 1 );
+			pointerBase._updatePointer( currentPosition.x + moveValueToNotReachLimit, currentPosition.y );
 			pointerBase._onPointerMove( mockedEvent );
 
 			// Despite movement it should still be PENDING
@@ -224,7 +229,7 @@ describe( 'PointerBase', () => {
 			 * 	onEnd: [Function: onEnd]
 			 * }
 			 */
-			const scheduledAnimationOptions = jest.mocked( mockAnimator.add ).mock.lastCall![ 0 ]
+			const scheduledAnimationOptions = jest.mocked( mockAnimator.add ).mock.lastCall![ 0 ];
 
 			// Manually trigger the animation end callback
 			scheduledAnimationOptions!.onEnd!( false );

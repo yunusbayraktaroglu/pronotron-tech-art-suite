@@ -1,7 +1,7 @@
 import { PronotronAnimator, PronotronClock } from '@pronotron/utils';
 
-import { PointerState } from '../src/core/PointerBase';
-import { PointerHoldable } from '../src/core/PointerHoldable';
+import { PointerState } from '../../src/core/interaction/PointerBase';
+import { PointerHoldable } from '../../src/core/interaction/PointerHoldable';
 
 jest.mock( '@pronotron/utils' );
 
@@ -16,8 +16,8 @@ describe( 'PointerHoldable', () => {
 	let mockClock: PronotronClock;
 	let pointerHoldable: PointerHoldable;
 	
-	let isInteractable: jest.Mock = jest.fn().mockImplementation( ( target: HTMLElement ) => false );
-	let isHoldable: jest.Mock = jest.fn().mockImplementation( ( target: HTMLElement ) => target.tagName === 'BUTTON' );
+	const isInteractable: jest.Mock = jest.fn().mockImplementation( ( target: HTMLElement ) => false );
+	const isHoldable: jest.Mock = jest.fn().mockImplementation( ( target: HTMLElement ) => target.tagName === 'BUTTON' );
 
 	const holdableElement = document.createElement( 'button' );
 	const nonHoldableElement = document.createElement( 'div' );
@@ -168,7 +168,6 @@ describe( 'PointerHoldable', () => {
 			expect( holdEndEvent.type ).toBe( 'holdend' );
 			expect( holdableElement.dataset.holded ).toBe( '0' );
 			expect( pointerHoldable._currentState ).toBe( PointerState.IDLE );
-			// expect( pointerHoldable._holdedElement ).toBeNull();
 		} );
 		
 	} );
