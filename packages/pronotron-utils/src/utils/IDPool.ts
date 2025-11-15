@@ -3,6 +3,14 @@
  * 
  * Manages a pool of unique numeric IDs, providing efficient allocation and release of IDs using an internal bit array.
  * Supports automatic capacity expansion when all IDs are in use.
+ * 
+ * @example
+ * ```typescript
+ * const idPool = new IDPool();
+ * const availableID: number = idPool.get();
+ * idPool.consume( availableID );
+ * idPool.release( availableID );
+ * ```
  */
 export class IDPool
 {

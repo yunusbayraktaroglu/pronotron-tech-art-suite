@@ -107,9 +107,6 @@ export class NativeControlTable<EnumType extends number>
 	{
 		if ( this.isExist( ID ) ){
 			console.warn( `ID: '${ ID }' already exist in the table.` );
-			/**
-			 * @fix needs return or do not decrease usedSlots
-			 */
 			return;
 		}
 
