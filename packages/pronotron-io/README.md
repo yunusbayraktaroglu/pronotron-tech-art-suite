@@ -2,6 +2,7 @@
 
 [![NPM Package][npm]][npm-url]
 [![Build Size][build-size]][build-size-url]
+[![Codecov][codecov-io]][codecov-url-io]
 
 Reliable viewport tracking without missed targets, unlike the built-in [IntersectionObserver API](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API). 
 
@@ -95,5 +96,7 @@ const nodeID = pronotronIO.addNode({
 
 [npm]: https://img.shields.io/npm/v/@pronotron/io
 [npm-url]: https://www.npmjs.com/package/@pronotron/io
-[build-size]: https://badgen.net/bundlephobia/minzip/@pronotron/io
+[build-size]: https://img.shields.io/bundlephobia/minzip/@pronotron/io
 [build-size-url]: https://bundlephobia.com/result?p=@pronotron/io
+[codecov-io]: https://codecov.io/gh/yunusbayraktaroglu/pronotron-tech-art-suite/branch/main/graph/badge.svg?flag=pronotron-io&precision=1
+[codecov-url-io]: https://app.codecov.io/gh/yunusbayraktaroglu/pronotron-tech-art-suite?flags%5B0%5D=pronotron-io
