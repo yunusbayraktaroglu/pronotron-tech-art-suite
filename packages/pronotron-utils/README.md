@@ -2,6 +2,7 @@
 
 [![NPM Package][npm]][npm-url]
 [![Build Size][build-size]][build-size-url]
+[![Codecov][codecov-utils]][codecov-url-utils]
 
 A set of helper modules used by other @pronotron packages, which can also be used individually.
 
@@ -11,5 +12,7 @@ A set of helper modules used by other @pronotron packages, which can also be use
 
 [npm]: https://img.shields.io/npm/v/@pronotron/utils
 [npm-url]: https://www.npmjs.com/package/@pronotron/utils
-[build-size]: https://badgen.net/bundlephobia/minzip/@pronotron/utils
+[build-size]: https://img.shields.io/bundlephobia/minzip/@pronotron/utils
 [build-size-url]: https://bundlephobia.com/result?p=@pronotron/utils
+[codecov-utils]: https://codecov.io/gh/yunusbayraktaroglu/pronotron-tech-art-suite/branch/main/graph/badge.svg?flag=pronotron-utils&precision=1
+[codecov-url-utils]: https://app.codecov.io/gh/yunusbayraktaroglu/pronotron-tech-art-suite?flags%5B0%5D=pronotron-utils

@@ -54,21 +54,21 @@ See [CONTRIBUTING ↗](.github/CONTRIBUTING.md)
 
 [npm-io]: https://img.shields.io/npm/v/@pronotron/io
 [npm-url-io]: https://www.npmjs.com/package/@pronotron/io
-[build-size-io]: https://badgen.net/bundlephobia/minzip/@pronotron/io
+[build-size-io]: https://img.shields.io/bundlephobia/minzip/@pronotron/io
 [build-size-url-io]: https://bundlephobia.com/result?p=@pronotron/io
 [codecov-io]: https://codecov.io/gh/yunusbayraktaroglu/pronotron-tech-art-suite/branch/main/graph/badge.svg?flag=pronotron-io&precision=1
 [codecov-url-io]: https://app.codecov.io/gh/yunusbayraktaroglu/pronotron-tech-art-suite?flags%5B0%5D=pronotron-io
 
 [npm-pointer]: https://img.shields.io/npm/v/@pronotron/pointer
 [npm-url-pointer]: https://www.npmjs.com/package/@pronotron/pointer
-[build-size-pointer]: https://badgen.net/bundlephobia/minzip/@pronotron/pointer
+[build-size-pointer]: https://img.shields.io/bundlephobia/minzip/@pronotron/pointer
 [build-size-url-pointer]: https://bundlephobia.com/result?p=@pronotron/pointer
 [codecov-pointer]: https://codecov.io/gh/yunusbayraktaroglu/pronotron-tech-art-suite/branch/main/graph/badge.svg?flag=pronotron-pointer&precision=1
 [codecov-url-pointer]: https://app.codecov.io/gh/yunusbayraktaroglu/pronotron-tech-art-suite?flags%5B0%5D=pronotron-pointer
 
 [npm-utils]: https://img.shields.io/npm/v/@pronotron/utils
 [npm-url-utils]: https://www.npmjs.com/package/@pronotron/utils
-[build-size-utils]: https://badgen.net/bundlephobia/minzip/@pronotron/utils
+[build-size-utils]: https://img.shields.io/bundlephobia/minzip/@pronotron/utils
 [build-size-url-utils]: https://bundlephobia.com/result?p=@pronotron/utils
 [codecov-utils]: https://codecov.io/gh/yunusbayraktaroglu/pronotron-tech-art-suite/branch/main/graph/badge.svg?flag=pronotron-utils&precision=1
 [codecov-url-utils]: https://app.codecov.io/gh/yunusbayraktaroglu/pronotron-tech-art-suite?flags%5B0%5D=pronotron-utils
