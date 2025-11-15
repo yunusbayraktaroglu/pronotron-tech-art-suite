@@ -19,29 +19,29 @@ const animator = new PronotronAnimator( clock );
  * isTouchDevice(); 
  */
 const pointerController = new MouseController({
-	target: window.document.body,
-	clock: clock,
-	animator: animator,
-	idleThreshold: 0.5,
-	tapThreshold: 0.25,
-	holdThreshold: 0.75,
-	movingDeltaLimit: 10,
-	isInteractable: ( target: HTMLElement ) => {
-		return target.classList.contains( "holdable" ) || target.tagName === "A";
-	},
-	isHoldable: ( target: HTMLElement ) => {
-		return target.dataset.holdable ? true : false;
-	}
+  target: window.document.body,
+  clock: clock,
+  animator: animator,
+  idleThreshold: 0.5,
+  tapThreshold: 0.25,
+  holdThreshold: 0.75,
+  movingDeltaLimit: 10,
+  isInteractable: ( target: HTMLElement ) => {
+    return target.classList.contains( "holdable" ) || target.tagName === "A";
+  },
+  isHoldable: ( target: HTMLElement ) => {
+    return target.dataset.holdable ? true : false;
+  }
 });
 
 const holdHandler = ( event: CustomEvent ) => {
-	console.log( "HOLD", event )
+  console.log( "HOLD", event )
 };
 const holdendHandler = ( event: CustomEvent ) => {
-	console.log( "HOLD-END", event )
+  console.log( "HOLD-END", event )
 };
 const tapHandler = ( event: CustomEvent ) => {
-	console.log( "TAP", event )
+  console.log( "TAP", event )
 };
 
 window.document.body.addEventListener( "hold", holdHandler as EventListener );
@@ -58,15 +58,15 @@ let animationFrameId = 0;
 
 function tick()
 {
-	const deltaTime = clock.tick();
-	animator.tick();
+  const deltaTime = clock.tick();
+  animator.tick();
 
-	const pointerPosition = pointerController.getPosition();
-	const pointerDelta = pointerController.getDelta();
-	const pointerState = pointerController.getState();
-	const isPointerTargetInteractable = pointerController.getTargetInteractable();    
+  const pointerPosition = pointerController.getPosition();
+  const pointerDelta = pointerController.getDelta();
+  const pointerState = pointerController.getState();
+  const isPointerTargetInteractable = pointerController.getTargetInteractable();    
 
-	animationFrameId = requestAnimationFrame( tick );
+  animationFrameId = requestAnimationFrame( tick );
 };
 
 animationFrameId = requestAnimationFrame( tick );
