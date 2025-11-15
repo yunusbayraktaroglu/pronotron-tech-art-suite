@@ -77,7 +77,7 @@ animationFrameId = requestAnimationFrame( tick );
 
 [npm]: https://img.shields.io/npm/v/@pronotron/pointer
 [npm-url]: https://www.npmjs.com/package/@pronotron/pointer
-[build-size]: https://img.shields.io/bundlephobia/minzip/pointer
+[build-size]: https://img.shields.io/bundlephobia/minzip/@pronotron/pointer
 [build-size-url]: https://bundlephobia.com/result?p=@pronotron/pointer
 [codecov-pointer]: https://codecov.io/gh/yunusbayraktaroglu/pronotron-tech-art-suite/branch/main/graph/badge.svg?flag=pronotron-pointer&precision=1
 [codecov-url-pointer]: https://app.codecov.io/gh/yunusbayraktaroglu/pronotron-tech-art-suite?flags%5B0%5D=pronotron-pointer
