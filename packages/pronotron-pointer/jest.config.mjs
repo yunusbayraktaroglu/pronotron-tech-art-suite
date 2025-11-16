@@ -4,8 +4,8 @@ const defaultPreset = createDefaultPreset();
 
 export default {
 	...defaultPreset,
-	testMatch: [ "**/tests/*.test.ts" ],
+	testMatch: [ "**/tests/**/*.test.ts" ],
 	testEnvironment: "jsdom",
 	collectCoverage: true,
-	coverageReporters: [ "json" ],
+	coverageReporters: [ 'text', 'cobertura' ],
 };

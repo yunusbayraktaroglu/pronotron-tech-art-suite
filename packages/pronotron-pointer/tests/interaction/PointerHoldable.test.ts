@@ -9,7 +9,7 @@ const MockedAnimator = PronotronAnimator as jest.MockedClass<typeof PronotronAni
 const MockedClock = PronotronClock as jest.MockedClass<typeof PronotronClock>;
 MockedClock.prototype.getTime = jest.fn().mockReturnValue( { elapsedTime: 0 } );
 
-describe( 'PointerHoldable', () => {
+describe( 'PointerHoldable Test Suite', () => {
 
 	let mockTarget: HTMLElement;
 	let mockAnimator: PronotronAnimator;
@@ -105,6 +105,26 @@ describe( 'PointerHoldable', () => {
 			expect( mockAnimator.add ).toHaveBeenCalledWith( expect.objectContaining( { id: 'HOLD', duration: holdThreshold } ) );
 			expect( pointerHoldable._canHold ).toBe( true );
 
+		} );
+
+		// Add this test to cover the `forced = true` case
+		it( 'should not convert to hold if animation is forced to end', () => {
+
+			// Spy on _convertToHold to ensure it's NOT called
+			const convertToHoldSpy = jest.spyOn( pointerHoldable as any, '_convertToHold' );
+			
+			// Start the pointer on a holdable element
+			pointerHoldable._onPointerStart( createMockEvent( holdableElement ) );
+
+			// Get the onEnd callback
+			const scheduledAnimationOptions = jest.mocked( mockAnimator.add ).mock.lastCall![ 0 ];
+
+			// Simulate the animation being forced to end (e.g., by another animation)
+			scheduledAnimationOptions.onEnd!( true ); // forced = true
+
+			expect( pointerHoldable._currentState ).toBe( PointerState.PENDING );
+			expect( convertToHoldSpy ).not.toHaveBeenCalled();
+			
 		} );
 
 		it( 'should dispatch "HOLD" event when holdThreshold is exceeded', () => {

@@ -1,14 +1,11 @@
-import { PronotronAnimator, PronotronClock } from '@pronotron/utils';
+import { PronotronAnimator, PronotronClock, Vector2 } from '@pronotron/utils';
 
 import { PointerBase, PointerState } from '../../src/core/interaction/PointerBase';
 
-jest.mock( '@pronotron/utils' );
-
 const MockedAnimator = PronotronAnimator as jest.MockedClass<typeof PronotronAnimator>;
-const MockedClock = PronotronClock as jest.MockedClass<typeof PronotronClock>;
-MockedClock.prototype.getTime = jest.fn().mockReturnValue( { elapsedTime: 0 } );
+MockedAnimator.prototype.add = jest.fn();
 
-describe( 'PointerBase', () => {
+describe( 'PointerBase Test Suite', () => {
 
 	let mockTarget: HTMLElement;
 	let pointerBase: PointerBase;
@@ -26,7 +23,7 @@ describe( 'PointerBase', () => {
 		jest.restoreAllMocks();
 
 		mockTarget = document.body;
-		mockClock = new MockedClock();
+		mockClock = new PronotronClock();
 		mockAnimator = new MockedAnimator( mockClock );
 
 		jest.spyOn( mockTarget, 'dispatchEvent' );
@@ -107,7 +104,31 @@ describe( 'PointerBase', () => {
 			expect( pointerBase._isRunning ).toBe( false );
 
 		} );
-		
+
+		it( 'should warn and return false if _startEvents is called twice', () => {
+
+			// Spy on console.warn to ensure it's called
+			const consoleWarnSpy = jest.spyOn( console, 'warn' ).mockImplementation( () => {} );
+
+			// --- First call (the "happy path") ---
+			const firstCallResult = pointerBase._startEvents();
+			expect( firstCallResult ).toBe( true );
+			expect( pointerBase._isRunning ).toBe( true );
+
+			// --- Second call (the test for the uncovered lines) ---
+			const secondCallResult = pointerBase._startEvents();
+
+			// Check that it returned false (Line 232)
+			expect( secondCallResult ).toBe( false );
+
+			// Check that console.warn was called (Line 231)
+			expect( consoleWarnSpy ).toHaveBeenCalledWith( "Already running" );
+
+			// Clean up the spy
+			consoleWarnSpy.mockRestore();
+
+		} );
+
 	} );
 
 	describe( 'Movement Delta Threshold Check', () => {
@@ -115,15 +136,17 @@ describe( 'PointerBase', () => {
 		const eventTarget = document.createElement( 'div' );
 		const mockedEvent = createMockEvent( eventTarget );
 		const moveValueToNotReachLimit = Math.sqrt( movingDeltaLimit - 2 );
-		const moveValueToReactLimit = Math.sqrt( movingDeltaLimit / 2 );
+		const moveValueToReachLimit = Math.sqrt( movingDeltaLimit / 2 );
 
 		beforeEach( () => {
 			pointerBase._startEvents();
 			// Sets pointer start position as [0, 0], pointer start time as 0
 			pointerBase._onPointerStart( mockedEvent );
+
+			// Now PointerState is PENDING
 		} );
 
-		it( 'should not transition "IDLE ■ MOVING" before exceeding movement threshold', () => {
+		it( 'should not transition "PENDING ■ MOVING" before exceeding movement threshold', () => {
 
 			// Add some delta that not discards IDLE
 			const currentPosition = pointerBase._pointerEnd;
@@ -138,11 +161,14 @@ describe( 'PointerBase', () => {
 
 		} );
 
-		it( 'should transition "IDLE → MOVING" after exceeding movement threshold', () => {
+		it( 'should transition "PENDING → MOVING" after exceeding movement threshold', () => {
+
+			// Add some delta that not discards IDLE
+			const currentPosition = pointerBase._pointerEnd;
 
 			// Simulate major move (should change state)
 			// Will test deltaSq = x*x + y*y > movingDeltaLimit
-			pointerBase._updatePointer( moveValueToReactLimit, moveValueToReactLimit );
+			pointerBase._updatePointer( currentPosition.x + moveValueToReachLimit, moveValueToReachLimit );
 			pointerBase._onPointerMove( mockedEvent );
 
 			expect( pointerBase._currentState ).toBe( PointerState.MOVING );
@@ -198,7 +224,6 @@ describe( 'PointerBase', () => {
 
 		beforeEach( () => {
 			pointerBase._startEvents();
-			// Sets pointer start position as [0, 0], pointer start time as 0
 			pointerBase._onPointerStart( mockedEvent );
 		} );
 
