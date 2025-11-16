@@ -1,26 +1,17 @@
-import { ModelController } from "./ModelController";
-import { PointerBaseDependencies } from "../PointerBase";
-import { PointerHoldableDependencies } from "../PointerHoldable";
+import { ModelController } from "../model/ModelController";
+import { PointerBase } from "../interaction/PointerBase";
+import { PointerHoldable } from "../interaction/PointerHoldable";
 
 /**
  * TouchController
  *
  * Handles touch-based pointer.
- *
- * @example
- * ```ts
- * const controller = new TouchController( ...dependencies );
- * // Start
- * controller.startEvents();
- * // Dispose
- * controller.stopEvents();
- * ```
  */
 export class TouchController extends ModelController
 {
-	constructor( dependencies: PointerBaseDependencies | PointerHoldableDependencies )
+	constructor( model: PointerBase | PointerHoldable )
 	{
-		super( dependencies );
+		super( model );
 
 		this._onPointerStart = this._onPointerStart.bind( this );
 		this._onPointerMove = this._onPointerMove.bind( this );
@@ -92,7 +83,7 @@ export class TouchController extends ModelController
 		const { x, y } = this._getPointerPosition( event );
 
 		// Set pointerStart manually in "touch"
-		this._model._pointerStart._set( x, y );
+		this._model._pointerStart.set( x, y );
 
 		this._model._onPointerStart( event );
 	}

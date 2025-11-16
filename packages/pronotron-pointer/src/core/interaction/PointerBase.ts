@@ -1,6 +1,5 @@
-import { PronotronClock, PronotronAnimator } from "@pronotron/utils";
-import { EventUtils } from "./helpers/EventUtils";
-import { Vector2 } from "./helpers/Vector2";
+import { PronotronClock, PronotronAnimator, Vector2 } from "@pronotron/utils";
+import { EventUtils } from "../helpers/EventUtils";
 
 /**
  * High-level pointer state machine.
@@ -58,7 +57,14 @@ export type BaseSettings = {
 	 * @default 10 px
 	 */
 	movingDeltaLimit: number;
-}
+	/**
+	 * Start position of the pointer, instead of top-left corner
+	 */
+	startPosition?: {
+		x: number;
+		y: number;
+	};
+};
 export type PointerBaseDependencies = BaseSettings & {
 	/**
 	 * DOM node or global object that pointer listeners attach to.
@@ -95,17 +101,24 @@ export class PointerBase<TDispatchableEvents extends string = string> extends Ev
 	 */
 	_isRunning: boolean = false;
 
-	/** @internal */
-	_clock: PronotronClock;
+	/**
+	 * Defines if the current event target is interactable,
+	 * Updated pointer start and pointer move
+	 * @internal
+	 */
+	_canInteract: boolean = false;
 
 	/** @internal */
-	_animator: PronotronAnimator;
+	readonly _clock: PronotronClock;
+
+	/** @internal */
+	readonly _animator: PronotronAnimator;
 
 	/**
 	 * Pointer events target
 	 * @internal
 	 */
-	_target: PossibleTarget;
+	readonly _target: PossibleTarget;
 	
 	/**
 	 * Defines current pointer state
@@ -128,6 +141,13 @@ export class PointerBase<TDispatchableEvents extends string = string> extends Ev
 	 * @internal
 	 */
 	readonly _pointerDelta = new Vector2();
+	/**
+	 * Accumulates the total, unconsumed delta (delta x and y) registered 
+	 * from pointer events. This serves as the target position for the
+	 * easing/inertia/glide mechanism.
+	 * @internal
+	 */
+	readonly _pointerDeltaAdditive = new Vector2();
 
 	/**
 	 * Timeout for the IDLE transition
@@ -152,13 +172,6 @@ export class PointerBase<TDispatchableEvents extends string = string> extends Ev
 	private _pointerStartTime = 0;
 
 	/**
-	 * Defines if the current event target is interactable,
-	 * Updated pointer start and pointer move
-	 * @internal
-	 */
-	_canInteract = false;
-
-	/**
 	 * Should return true if the element under the pointer
 	 * should be considered “interactive” (e.g. buttons, links).
 	 * Method provided by user.
@@ -168,18 +181,40 @@ export class PointerBase<TDispatchableEvents extends string = string> extends Ev
 	 */
 	private _isInteractable: ( target: HTMLElement ) => boolean;
 
-	constructor({ target, animator, clock, idleThreshold, tapThreshold, movingDeltaLimit, isInteractable }: PointerBaseDependencies)
+	constructor( dependencies: PointerBaseDependencies )
 	{
 		super();
 
-		this._target = target;
-		this._animator = animator;
-		this._clock = clock;
+		this._target = dependencies.target;
+		this._animator = dependencies.animator;
+		this._clock = dependencies.clock;
 
-		this._idleThreshold = idleThreshold;
-		this._tapThreshold = tapThreshold;
-		this._movingDeltaLimit = movingDeltaLimit;
-		this._isInteractable = isInteractable;
+		this._isInteractable = dependencies.isInteractable;
+
+		// User may want change start position of the pointer, instead of top-left corner
+		if ( dependencies.startPosition ){
+
+			const { x, y } = dependencies.startPosition;
+
+			this._pointerStart.set( x, y );
+			this._pointerEnd.set( x, y );
+			
+		}
+
+		this._updateSettings( dependencies );
+	}
+
+	/**
+	 * Updates settings of the pointer controller
+	 * @param settings
+	 * 
+	 * @internal
+	 */
+	_updateSettings( settings: BaseSettings )
+	{
+		this._idleThreshold = settings.idleThreshold;
+		this._tapThreshold = settings.tapThreshold;
+		this._movingDeltaLimit = settings.movingDeltaLimit;
 	}
 
 	/**
@@ -231,7 +266,7 @@ export class PointerBase<TDispatchableEvents extends string = string> extends Ev
 		this._pointerStartTime = elapsedTime;
 
 		// Reset pointer delta to calculate movement limit correct in _onMove
-		this._pointerDelta._set( 0, 0 );
+		this._pointerDelta.set( 0, 0 );
 		
 		// Is pointer current target is interactable
 		this._canInteract = this._isInteractable( event.target as HTMLElement );
@@ -252,7 +287,7 @@ export class PointerBase<TDispatchableEvents extends string = string> extends Ev
 			// Convert WAITING or IDLE to MOVING if pointer delta is bigger than defined limit
 			case PointerState.IDLE:
 			case PointerState.PENDING: {
-				if ( this._pointerDelta._lengthSq() > this._movingDeltaLimit ){
+				if ( this._pointerDelta.lengthSq() > this._movingDeltaLimit ){
 					this._currentState = PointerState.MOVING;
 				}
 			};
@@ -310,9 +345,10 @@ export class PointerBase<TDispatchableEvents extends string = string> extends Ev
 	 */
 	_updatePointer( x: number, y: number ): void
 	{
-		this._pointerEnd._set( x, y );
-		this._pointerDelta._subVectors( this._pointerEnd, this._pointerStart );
-		this._pointerStart._copy( this._pointerEnd );
+		this._pointerEnd.set( x, y );
+		this._pointerDelta.sub( this._pointerEnd, this._pointerStart );
+		this._pointerDeltaAdditive.add( this._pointerDelta );
+		this._pointerStart.copy( this._pointerEnd );
 	}
 
 }

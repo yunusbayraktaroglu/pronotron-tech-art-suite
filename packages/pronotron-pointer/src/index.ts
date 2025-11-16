@@ -1,4 +1,4 @@
-export { type PointerBaseDependencies } from "./core/PointerBase";
-export { type PointerHoldableDependencies } from "./core/PointerHoldable";
-export { MouseController } from "./core/model/Mouse";
-export { TouchController } from "./core/model/Touch";
+export { type PointerBaseDependencies } from "./core/interaction/PointerBase";
+export { type PointerHoldableDependencies } from "./core/interaction/PointerHoldable";
+export { createBasePointer } from "./factories/createBasePointer";
+export { createHoldablePointer } from "./factories/createHoldablePointer";

@@ -1,5 +1,5 @@
-import { PointerState, PointerBase, PointerBaseDependencies, BaseSettings } from "../PointerBase";
-import { PointerHoldable, PointerHoldableDependencies, HoldableSettings } from "../PointerHoldable";
+import { PointerState, PointerBase, BaseSettings } from "../interaction/PointerBase";
+import { PointerHoldable, HoldableSettings } from "../interaction/PointerHoldable";
 
 /**
  * Common methods between models
@@ -10,7 +10,7 @@ export abstract class ModelController
 	 * Possible models
 	 * @internal
 	 */
-	_model: PointerBase | PointerHoldable;
+	readonly _model: PointerBase | PointerHoldable;
 
 	/**
 	 * Every pointer model has its own pointer position getter model
@@ -18,9 +18,9 @@ export abstract class ModelController
 	 */
 	abstract _getPointerPosition( event: MouseEvent | TouchEvent ): { x: number; y: number }
 
-	constructor( dependencies: PointerBaseDependencies | PointerHoldableDependencies )
+	constructor( model: PointerBase | PointerHoldable )
 	{
-		this._model = ( "holdThreshold" in dependencies ) ? new PointerHoldable( dependencies ) : new PointerBase( dependencies ); 
+		this._model = model;
 	}
 
 	/**
@@ -29,19 +29,8 @@ export abstract class ModelController
 	 */
 	updateSettings( settings: BaseSettings | HoldableSettings ): void
 	{
-		/**
-		 * @todo
-		 * Find a better way
-		 */
-		this._model._movingDeltaLimit = settings.movingDeltaLimit;
-		this._model._tapThreshold = settings.tapThreshold;
-		this._model._idleThreshold = settings.idleThreshold;
-
-		if ( '_holdThreshold' in this._model ){
-			//@ts-expect-error - holdThreshold only in HoldableSettings
-			this._model._holdThreshold = settings.holdThreshold;
-		}
-		// console.log( this._model );
+		//@ts-expect-error - Property 'holdThreshold' is missing in type 'BaseSettings', harmless warning.
+		this._model._updateSettings( settings );
 	}
 
 	/**
@@ -90,4 +79,15 @@ export abstract class ModelController
 		return this._model._pointerDelta;
 	}
 
+	/**
+	 * Accumulated the total delta registered from pointer events. 
+	 * This serves as the target position for the
+	 * easing/inertia/glide mechanism.
+	 * 
+	 * @returns Object with `{ x, y }` delta in pixels.
+	 */
+	getDeltaAdditive(): { x: number; y: number; }
+	{
+		return this._model._pointerDeltaAdditive;
+	}
 }

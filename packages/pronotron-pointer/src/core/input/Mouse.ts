@@ -1,20 +1,11 @@
-import { ModelController } from "./ModelController";
-import { PointerState, PointerBaseDependencies } from "../PointerBase";
-import { PointerHoldableDependencies } from "../PointerHoldable";
+import { ModelController } from "../model/ModelController";
+import { PointerState, PointerBase } from "../interaction/PointerBase";
+import { PointerHoldable } from "../interaction/PointerHoldable";
 
 /**
  * MouseController
  *
  * Handles mouse-based pointer interactions.
- *
- * @example
- * ```ts
- * const controller = new MouseController( ...dependencies );
- * // Start
- * controller.startEvents();
- * // Dispose
- * controller.stopEvents();
- * ```
  */
 export class MouseController extends ModelController
 {
@@ -26,9 +17,9 @@ export class MouseController extends ModelController
 	 */
 	private _skipMove = false;
 
-	constructor( dependencies: PointerBaseDependencies | PointerHoldableDependencies )
+	constructor( model: PointerBase | PointerHoldable )
 	{
-		super( dependencies );
+		super( model );
 
 		this._onPointerStart = this._onPointerStart.bind( this );
 		this._onPointerMove = this._onPointerMove.bind( this );
@@ -97,7 +88,7 @@ export class MouseController extends ModelController
 	 *
 	 * @internal
 	 */
-	private _onPointerStart( event: MouseEvent ): void
+	_onPointerStart( event: MouseEvent ): void
 	{
 		this._model._addEventListeners(
 			[ "pointerup", this._onPointerEnd ],
@@ -114,7 +105,7 @@ export class MouseController extends ModelController
 	 *
 	 * @internal
 	 */
-	private _onPointerEnd( event: MouseEvent ): void
+	_onPointerEnd( event: MouseEvent ): void
 	{
 		/**
 		 * Skip onMove caused by onEnd. {@link _skipMove}
@@ -143,7 +134,7 @@ export class MouseController extends ModelController
 	 *
 	 * @internal
 	 */
-	private _onPointerMove( event: MouseEvent ): void
+	_onPointerMove( event: MouseEvent ): void
 	{
 		/**
 		 * Skip onMove caused by onEnd. {@link _skipMove}
@@ -154,15 +145,19 @@ export class MouseController extends ModelController
 		};
 
 		const { x, y } = this._getPointerPosition( event );
+
+		// Reset start-end position to get correct delta value, if previously OUTSIDE
+		if ( this._model._currentState === PointerState.OUTSIDE ){
+			this._model._pointerStart.set( x, y );
+			this._model._pointerEnd.set( x, y );
+			this._model._currentState = PointerState.MOVING;
+		}
+
 		this._model._updatePointer( x, y );
 
 		// Native dragging is connected to _onPointerMove, we only updating the pointer position
 		if ( this._model._currentState === PointerState.DRAGGING ){
 			return;
-		}
-
-		if ( this._model._currentState === PointerState.OUTSIDE ){
-			this._model._currentState = PointerState.MOVING;
 		}
 
 		this._model._onPointerMove( event );
@@ -175,11 +170,12 @@ export class MouseController extends ModelController
 	 *
 	 * @internal
 	 */
-	private _onPointerLeave( event: MouseEvent ): void
+	_onPointerLeave( event: MouseEvent ): void
 	{
 		if ( this._model._currentState === PointerState.HOLD_DRAGGING ){
 			this._model._onPointerEnd( event );
 		}
+		
 		this._model._currentState = PointerState.OUTSIDE;
 	}
 
@@ -190,7 +186,7 @@ export class MouseController extends ModelController
 	 *
 	 * @internal
 	 */
-	private _onDragStart( event: Event ): void
+	_onDragStart( event: Event ): void
 	{
 		this._model._addEventListeners(
 			[ "dragover", this._onPointerMove ],
@@ -206,7 +202,7 @@ export class MouseController extends ModelController
 	 *
 	 * @internal
 	 */
-	private _onDragEnd( event: Event ): void
+	_onDragEnd( event: Event ): void
 	{
 		this._model._removeEventListeners(
 			[ "dragover", this._onPointerMove ],

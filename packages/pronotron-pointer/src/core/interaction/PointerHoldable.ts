@@ -53,8 +53,19 @@ export class PointerHoldable extends PointerBase<"hold" | "holdend">
 	{
 		super( dependencies );
 
-		this._holdThreshold = dependencies.holdThreshold;
 		this._isHoldable = dependencies.isHoldable;
+		this._updateSettings( dependencies );
+	}
+	
+	/**
+	 * Updates settings of the pointer controller
+	 * @param settings 
+	 * @internal
+	 */
+	_updateSettings( settings: HoldableSettings )
+	{
+		super._updateSettings( settings );
+		this._holdThreshold = settings.holdThreshold;
 	}
 
 	/**
