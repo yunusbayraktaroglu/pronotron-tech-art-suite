@@ -13,6 +13,8 @@ export type IOVerticalOptions = IONodeOptions<VerticalEvent>;
  * pronotronIO.addNode({
  * 	ref: HTMLElement,
  * 	dispatch: {
+ * 		onEnter: () => console.log( "Element entered from no matter" ),
+ * 		onExit: () => console.log( "Element exited from no matter" ),
  * 		onInViewport: ( normalizedPosition: number ) => console.log( "Element is in viewport", normalizedPosition ),
  * 		onTopEnter: () => console.log( "Element entered from top" ),
  * 		onTopExit: {
@@ -32,8 +34,6 @@ export type IOVerticalOptions = IONodeOptions<VerticalEvent>;
  * 	}
  * 	offset: 100, // In pixels, applied to both directions
  * });
- * // Recommended: wrap in a throttled handler for performance
- * window.addEventListener( 'scroll', () => pronotronIO.handleScroll( window.scrollY ) );
  */
 export class PronotronIOVerticalObserver extends PronotronIOEventDispatcher<VerticalEvent>
 {
