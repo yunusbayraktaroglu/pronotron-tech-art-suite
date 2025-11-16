@@ -1,10 +1,17 @@
 # @pronotron/utils
 
+## 1.0.0
+
+### Major Changes
+
+- First major release
+
 ## 0.0.1-beta.6
 
 ### Patch Changes
 
 **Animator**
+
 - Rename: PronotronAnimationController → PronotronAnimator
 - Rename: timeStyle → autoPause boolean
 - Rename: 'addAnimation' → 'add', 'removeAnimation' -> 'remove'
@@ -12,13 +19,16 @@
 - Add: onBegin callback
 
 **Clock**
+
 - Add: getTime() method — returns two elapsed time values
 - Docs: Improved code documentation and type safety
 
 **NativeControlTable**
+
 - Rename: 'addSlot' → 'add', 'removeSlot' → 'remove', 'modifySlotByID' → 'modifyByID', 'modifySlotByPosition' → 'modifyByPosition', ..., removed redundant 'slot' prefix from all method names.
 
 **IDPool**
+
 - Rename: 'getID' → 'get', 'consumeID' → 'consume', ..., removed redundant ID suffix from method names.
 
 ## 0.0.1-beta.5
