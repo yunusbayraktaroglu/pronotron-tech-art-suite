@@ -4,22 +4,23 @@
 	"private": true,
 	"type": "module",
 	"exports": {
-		"./library": "./library.js",
-		"./next-js": "./next.js",
-		"./react-internal": "./react-internal.js"
+		"./library": "./src/library.ts",
+		"./next": "./src/next.ts",
+		"./react-internal": "./src/react-internal.ts"
 	},
 	"devDependencies": {
+		"@pronotron/config-ts": "*",
 		"@eslint/js": "^9.39.1",
-		"eslint": "^9.39.1",
-		"@next/eslint-plugin-next": "^15.5.0",
+		"@next/eslint-plugin-next": "^16.0.3",
 		"@stylistic/eslint-plugin": "^5.5.0",
-		"eslint-config-prettier": "^10.1.1",
+		"eslint": "^9.39.1",
+		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-only-warn": "^1.1.0",
 		"eslint-plugin-react": "^7.37.5",
 		"eslint-plugin-react-hooks": "^5.2.0",
-		"eslint-plugin-turbo": "^2.6.0",
+		"eslint-plugin-turbo": "^2.6.1",
 		"globals": "^16.5.0",
-		"typescript": "^5.9.3",
+		"jiti": "^2.6.1",
 		"typescript-eslint": "^8.46.4"
 	}
 }

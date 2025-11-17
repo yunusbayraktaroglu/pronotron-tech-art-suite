@@ -1,33 +1,24 @@
+import type { Linter } from "eslint";
+
 import pluginReactHooks from "eslint-plugin-react-hooks";
 import pluginReact from "eslint-plugin-react";
 import globals from "globals";
-import pluginNext from "@next/eslint-plugin-next";
 
-import { config as baseConfig } from "./base.js";
+import { baseConfig } from "./base.js";
 
 /**
- * A custom ESLint configuration for libraries that use Next.js.
- *
- * @type {import("eslint").Linter.Config}
- * */
-export const nextJsConfig = [
+ * A custom ESLint configuration for libraries that use React.
+ */
+export const reactConfig: Linter.Config[] = [
 	...baseConfig,
+	pluginReact.configs.flat.recommended,
 	{
-		...pluginReact.configs.flat.recommended,
 		languageOptions: {
 			...pluginReact.configs.flat.recommended.languageOptions,
 			globals: {
 				...globals.serviceworker,
+				...globals.browser,
 			},
-		},
-	},
-	{
-		plugins: {
-			"@next/next": pluginNext,
-		},
-		rules: {
-			...pluginNext.configs.recommended.rules,
-			...pluginNext.configs[ "core-web-vitals" ].rules,
 		},
 	},
 	{
