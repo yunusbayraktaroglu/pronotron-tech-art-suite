@@ -3,8 +3,14 @@ name: Continuous Integration
 on:
   push:
     branches: [ main ]
+    # Skip CI on push if changes only occur in the apps directory
+    paths-ignore:
+      - 'apps/**'
   pull_request:
     branches: [ main ]
+    # Skip CI on push if changes only occur in the apps directory
+    paths-ignore:
+      - 'apps/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
