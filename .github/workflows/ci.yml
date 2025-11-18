@@ -57,7 +57,7 @@ jobs:
         with:
           name: coverage-reports
           # actions/upload-artifact glob pattern removes 'packages' root, see 'coverage-reports' below
-          path: ./packages/**/coverage/coverage-final.json
+          path: ./packages/**/coverage/cobertura-coverage.xml
 
   codecov:
     name: Upload Coverage to Codecov
@@ -90,7 +90,7 @@ jobs:
         with:
           fail_ci_if_error: true
           working-directory: packages/${{ matrix.package }}
-          files: packages/${{ matrix.package }}/coverage/coverage-final.json
+          files: packages/${{ matrix.package }}/coverage/cobertura-coverage.xml
           flags: ${{ matrix.package }}
           name: ${{ matrix.package }}
           token: ${{ secrets.CODECOV_TOKEN }}
