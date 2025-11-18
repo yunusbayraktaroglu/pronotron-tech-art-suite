@@ -1,0 +1,8 @@
+1:"$Sreact.fragment"
+2:I[97367,["/pronotron-tech-art-suite/_next/static/chunks/ff1a16fafef87110.js","/pronotron-tech-art-suite/_next/static/chunks/247eb132b7f7b574.js"],"ViewportBoundary"]
+4:I[97367,["/pronotron-tech-art-suite/_next/static/chunks/ff1a16fafef87110.js","/pronotron-tech-art-suite/_next/static/chunks/247eb132b7f7b574.js"],"MetadataBoundary"]
+5:"$Sreact.suspense"
+7:I[27201,["/pronotron-tech-art-suite/_next/static/chunks/ff1a16fafef87110.js","/pronotron-tech-art-suite/_next/static/chunks/247eb132b7f7b574.js"],"IconMark"]
+0:{"buildId":"g4EaUleg768Uu6xuI-xcz","rsc":["$","$1","h",{"children":[null,["$","$L2",null,{"children":"$@3"}],["$","div",null,{"hidden":true,"children":["$","$L4",null,{"children":["$","$5",null,{"name":"Next.Metadata","children":"$@6"}]}]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}],"loading":null,"isPartial":false}
+3:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
+6:[["$","title","0",{"children":"Animator | Pronotron Tech-Art Suite"}],["$","meta","1",{"name":"description","content":"Pronotron Animator Testing."}],["$","link","2",{"rel":"author","href":"https://www.linkedin.com/in/yunusbayraktaroglu"}],["$","meta","3",{"name":"author","content":"Yunus Bayraktaroglu"}],["$","link","4",{"rel":"icon","href":"/pronotron-tech-art-suite/favicon.ico?favicon.4818be1b.ico","sizes":"64x64","type":"image/x-icon"}],["$","$L7","5",{}]]
