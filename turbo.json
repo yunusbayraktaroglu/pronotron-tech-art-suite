@@ -3,7 +3,11 @@
 	"tasks": {
 		"dev": {
 			"cache": false,
-			"persistent": true
+			"persistent": true,
+			"dependsOn": [
+                "@pronotron/config-tsup#build",
+                "@pronotron/config-jest#build"
+            ]
 		},
 		"build": {
 			"inputs": [ 

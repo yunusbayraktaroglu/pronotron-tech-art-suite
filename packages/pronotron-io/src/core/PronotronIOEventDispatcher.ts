@@ -11,7 +11,7 @@ type EventMap = Record<ValidNodePosition, Partial<Record<ValidNodePosition, ( of
 
 /**
  * Index of event flags within the stride.
- * Value is a {@link BinaryBoolean} to represent exist or not.
+ * Value is a {@link BinaryBoolean} to represent, event is tracked for IONode or not.
  */
 type EventFlagIndex = IONodeStrideIndex.HasNegativeEnterEvent | IONodeStrideIndex.HasNegativeExitEvent | IONodeStrideIndex.HasPositiveEnterEvent | IONodeStrideIndex.HasPositiveExitEvent | IONodeStrideIndex.HasEnterEvent | IONodeStrideIndex.HasExitEvent; 
 

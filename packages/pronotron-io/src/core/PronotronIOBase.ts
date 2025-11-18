@@ -64,11 +64,11 @@ export enum IONodeStrideIndex
 	 */
 	HasPositiveExitEvent,
 	/**
-	 * 1 or 0 – Whether the node has an event handler for entering the viewport from whenever
+	 * 1 or 0 – Whether the node has an event handler for entering the viewport regardless of direction
 	 */
 	HasEnterEvent,
 	/**
-	 * 1 or 0 – Whether the node has an event handler for leaving the viewport into whenever
+	 * 1 or 0 – Whether the node has an event handler for leaving the viewport regardless of direction
 	 */
 	HasExitEvent,
 	/**

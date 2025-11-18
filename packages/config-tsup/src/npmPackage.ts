@@ -1,6 +1,6 @@
 import type { Options } from "tsup";
 
-export const baseOptions = {
+export const packageConfig = {
 	entry: [ 'src/index.ts' ],
 	dts: true,
 	outDir: 'dist',

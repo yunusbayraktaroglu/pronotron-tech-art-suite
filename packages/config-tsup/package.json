@@ -11,9 +11,6 @@
 	"files": [
 		"dist/**"
 	],
-	"tsup": {
-		"clean": true
-	},
 	"devDependencies": {
 		"@pronotron/config-ts": "*",
 		"tsup": "^8.5.1",
@@ -21,7 +18,7 @@
 	},
 	"scripts": {
 		"dev": "tsup index.ts --format esm,cjs --watch --dts",
-		"build": "tsup index.ts --format esm,cjs --dts",
+		"build": "tsup index.ts --format esm,cjs --dts --clean",
 		"clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
 	}
 }

@@ -1,4 +1,4 @@
 import { defineConfig } from "tsup";
-import { baseOptions } from "@pronotron/config-tsup";
+import { packageConfig } from "@pronotron/config-tsup";
 
-export default defineConfig( baseOptions );
+export default defineConfig( packageConfig );
