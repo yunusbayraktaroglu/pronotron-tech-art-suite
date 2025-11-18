@@ -1,20 +1,38 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { IOVerticalOptions } from '@pronotron/io';
+import { useForm } from "@/app/hooks/useForm";
 import { IODispatcher } from "../components/IODispatcher";
 
-type TestScenario = {
-	testCount: number;
-	inViewport: boolean,
-	ioCount: number;
-	topEnter: boolean;
-	topExit: boolean;
-	bottomEnter: boolean;
-	bottomExit: boolean;
-	dispatchType: "modify_dom" | "console_log" | "never",
-	onFastForward: IOVerticalOptions[ "dispatch" ][ "onFastForward" ],
+// Collect all dispatchable events from type, exclude Fast-forward
+type PossibleEvents = Required<Omit<IOVerticalOptions[ "dispatch" ], "onFastForward">>;
+
+// EventName -> boolean
+type EventSelection = Record<keyof PossibleEvents, boolean>;
+
+// TestScenario configuration data
+type TestScenario = EventSelection & {
+	ioNodeCount: number;
+	dispatchType: "modify_dom" | "console_log" | "never";
+	onFastForward: IOVerticalOptions[ "dispatch" ][ "onFastForward" ];
 };
+
+const ALL_EVENTS: EventSelection = {
+	// Direction agnostic events
+	onEnter: true,
+	onExit: true,
+	onScrollProgress: true,
+	onInViewport: true,
+	// Directional events
+	onBottomEnter: true,
+	onBottomExit: true,
+	onTopEnter: true,
+	onTopExit: true,
+};
+
+// All the possible events as array
+const ALL_EVENTS_LIST = Object.keys( ALL_EVENTS ) as [ keyof PossibleEvents ];
 
 export default function StressTestPage()
 {
@@ -22,141 +40,53 @@ export default function StressTestPage()
 
 	return (
 		<div className="container mb-spacing-3xl">
-
 			<div className="bg-slate-200 p-spacing-lg rounded-lg">
-				{ testScenario ? (
-					<p className="text-green-800 mb-5">Created { testScenario.ioCount } node. Scroll down to see effects. Check starts for performance.</p>
-				) : null}
-				<TestForm runTestScenario={ setTestScenario } />
+				{ testScenario && <p className="text-green-800 mb-5">Created { testScenario.ioNodeCount } node. Scroll down to see effects. Check starts for performance.</p> }
+				<TestScenarioForm runTestScenario={ setTestScenario } />
 			</div>
-
-			{ testScenario ? ( 
-				Array.from({ length: testScenario.ioCount }).map(( item, index ) => {
-
-					const { dispatchType, inViewport, topEnter, topExit, bottomEnter, bottomExit, onFastForward } = testScenario;
-
-					switch( dispatchType ){
-						case "modify_dom": 
-							return (
-								<DomManipulator 
-									key={ `${ testScenario.testCount }_${ index }` }
-									index={ index } 
-									inViewport={ inViewport }
-									topEnter={ topEnter } 
-									topExit={ topExit }
-									bottomEnter={ bottomEnter } 
-									bottomExit={ bottomExit }
-									onFastForward={ onFastForward } 
-								/>
-							)
-						case "console_log": 
-							return (
-								<IODispatcher
-									key={ `${ testScenario.testCount }_${ index }` }
-									className={ `bg-green-500 my-[120vh]` }
-									offset={ 0 }
-									//@ts-expect-error - At least 1 event is required
-									dispatch={ logDispatcher({ index, inViewport, topEnter, topExit, bottomEnter, bottomExit, onFastForward }) }
-								>
-									<p className="text-center">{ index }</p>
-								</IODispatcher>
-							)
-						case "never": 
-							return (
-								<IODispatcher 
-									key={ `${ testScenario.testCount }_${ index }` }
-									className={ `bg-green-500 my-[120vh]` }
-									offset={ 0 }
-									//@ts-expect-error - At least 1 event is required
-									dispatch={ emptyDispatcher({ inViewport, topEnter, topExit, bottomEnter, bottomExit, onFastForward }) }
-								>
-									<p className="text-center">{ index }</p>
-								</IODispatcher>
-							);
-					}
-				}) 
-			) : null }
-
+			{ testScenario && <TestComponentCreator testScenario={ testScenario } /> }
 		</div>
 	);
 }
 
 interface TestFormProps {
-	runTestScenario: ( scenario: TestScenario ) => void
+	runTestScenario: ( scenario: TestScenario ) => void;
 };
 
-function TestForm({ runTestScenario }: TestFormProps)
+function TestScenarioForm({ runTestScenario }: TestFormProps)
 {
-	const testCount = useRef( 0 );
+	const {
+		values, 
+        handleInputChange, 
+        handleCheckboxChange, 
+        handleSelectChange, 
+	} = useForm<TestScenario>({ ioNodeCount: 1000, dispatchType: "modify_dom", onFastForward: "skip_both", ...ALL_EVENTS });
 
-	const [ warning, setWarning ] = useState( "" );
-	const [ testScenario, setTestScenario ] = useState<Omit<TestScenario, "testCount">>({
-		ioCount: 1000,
-		dispatchType: "modify_dom",
-		inViewport: true,
-		topEnter: true,
-		topExit: true,
-		bottomEnter: true,
-		bottomExit: true,
-		onFastForward: "skip_both",
-	});
+	const handleSubmit = useCallback( ( event: React.FormEvent ) => {
+        event.preventDefault();
+		runTestScenario( values );
+    }, [ values ] );
 
-	// Handle change for numeric input
-	const handleInputChange = ( event: React.ChangeEvent<HTMLInputElement> ) => {
-		const { name, value } = event.target;
-		setTestScenario(( prev ) => ({
-			...prev,
-			[ name ]: Number( value ),
-		}));
-	};
-
-	// Handle change for checkbox inputs
-	const handleCheckboxChange = ( event: React.ChangeEvent<HTMLInputElement> ) => {
-		const { name, checked } = event.target;
-		setTestScenario(( prev ) => ({
-			...prev,
-			[ name ]: checked,
-		}));
-	};
-
-	// Handle change for numeric input
-	const handleSelectChange = ( event: React.ChangeEvent<HTMLSelectElement> ) => {
-		const { name, value } = event.target;
-		setTestScenario(( prev ) => ({
-			...prev,
-			[ name ]: value,
-		}));
-	};
-
-	const startTest = () => {
-		const { inViewport, topEnter, topExit, bottomEnter, bottomExit } = testScenario;
-		if ( ! inViewport && ! topEnter && ! topExit && ! bottomEnter && ! bottomExit ){
-			setWarning( "Please select at least 1 event" );
-			return;
-		}
-		testCount.current += 1;
-		runTestScenario({ testCount: testCount.current, ...testScenario });
-		setWarning( "" );
-	};
+	const disabled = useMemo( () => {
+		return ALL_EVENTS_LIST.every( eventName => values[ eventName ] === false );
+	}, [ values ] );
 
 	return (
 		<div className="form">
 
-			{ warning && <p className="text-red-500 mb-spacing-sm">{ warning }</p> }
-			
 			<fieldset className="flex flex-col landscape:flex-row justify-between items-start gap-5">
 
 				<fieldset className="grid grid-rows-1 grid-cols-1 landscape:grid-cols-4 landscape:grid-rows-1 gap-5">
 
 					<fieldset>
-						<label htmlFor="ioCount">IO Node count</label>
+						<label htmlFor="ioNodeCount">IO Node count</label>
 						<input
 							className="w-full"
 							type="number"
 							min={ 100 }
-							name="ioCount"
-							id="ioCount"
-							value={ testScenario.ioCount }
+							name="ioNodeCount"
+							id="ioNodeCount"
+							value={ values.ioNodeCount }
 							onChange={ handleInputChange }
 						/>
 					</fieldset>
@@ -182,62 +112,29 @@ function TestForm({ runTestScenario }: TestFormProps)
 					<fieldset>
 						<label>Track events</label>
 						<fieldset className="checkbox">
-							<fieldset>
-								<input
-									type="checkbox"
-									name="inViewport"
-									id="in-viewport"
-									checked={ testScenario.inViewport }
-									onChange={ handleCheckboxChange }
-								/>
-								<label htmlFor="in-viewport">In viewport</label>
-							</fieldset>
-							<fieldset>
-								<input
-									type="checkbox"
-									name="topEnter"
-									id="top-enter"
-									checked={ testScenario.topEnter }
-									onChange={ handleCheckboxChange }
-								/>
-								<label htmlFor="top-enter">Top-enter</label>
-							</fieldset>
-							<fieldset>
-								<input
-									type="checkbox"
-									name="topExit"
-									id="top-exit"
-									checked={ testScenario.topExit }
-									onChange={ handleCheckboxChange }
-								/>
-								<label htmlFor="top-exit">Top-exit</label>
-							</fieldset>
-							<fieldset>
-								<input
-									type="checkbox"
-									name="bottomEnter"
-									id="bottom-enter"
-									checked={ testScenario.bottomEnter }
-									onChange={ handleCheckboxChange }
-								/>
-								<label htmlFor="bottom-enter">Bottom-enter</label>
-							</fieldset>
-							<fieldset>
-								<input
-									type="checkbox"
-									name="bottomExit"
-									id="bottom-exit"
-									checked={ testScenario.bottomExit }
-									onChange={ handleCheckboxChange }
-								/>
-								<label htmlFor="bottom-exit">Bottom-exit</label>
-							</fieldset>
+							{ ALL_EVENTS_LIST.map( eventName => (
+								<fieldset key={ `${ eventName }` }>
+									<input
+										type="checkbox"
+										name={ eventName }
+										id={ `${ eventName }_id` }
+										checked={ values[ eventName ] }
+										onChange={ handleCheckboxChange }
+									/>
+									<label htmlFor={ `${ eventName }_id` }>{ eventName }</label>
+								</fieldset>
+							) ) }
 						</fieldset>
 					</fieldset>
 
 				</fieldset>
 
-				<button onClick={ startTest } className="block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full transition-colors">Create IO nodes</button>
+				<button 
+					aria-disabled={ disabled }
+					disabled={ disabled } 
+					onClick={ handleSubmit } 
+					className="block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full transition-colors disabled:bg-slate-400"
+				>Create IO nodes</button>
 
 			</fieldset>
 
@@ -245,64 +142,158 @@ function TestForm({ runTestScenario }: TestFormProps)
 	)
 }
 
-interface logDispatcherProps {
-	index: number,
-	inViewport: boolean;
-	topEnter: boolean;
-	topExit: boolean;
-	bottomEnter: boolean;
-	bottomExit: boolean;
-	onFastForward: IOVerticalOptions[ "dispatch" ][ "onFastForward" ],
-}
+interface TestComponentCreatorProps {
+	testScenario: TestScenario;
+};
 
-function logDispatcher({ index, inViewport, topEnter, topExit, bottomEnter, bottomExit, onFastForward }: logDispatcherProps )
+function TestComponentCreator({ testScenario }: TestComponentCreatorProps)
 {
-	return {
-		...( inViewport && { onInViewport: ( normalizedPosition: number ) => console.log( `${ index }: Normalized position: ${ normalizedPosition }` ) } ),
-		...( topEnter && { onTopEnter: () => console.log( `${ index }: top-enter` ) } ),
-		...( topExit && { onTopExit: () => console.log( `${ index }: top-exit` ) } ),
-		...( bottomEnter && { onBottomEnter: () => console.log( `${ index }: bottom-enter` ) } ),
-		...( bottomExit && { onBottomExit: () => console.log( `${ index }: bottom-exit` ) } ),
-		onFastForward
+	const { ioNodeCount, dispatchType, ...ioNodeData } = testScenario;
+
+	switch ( dispatchType )
+	{
+		case 'modify_dom': {
+			return Array.from({ length: ioNodeCount }).map( ( item, index ) => (
+				<DomManipulator 
+					key={ `${ index }` }
+					index={ index }
+					{ ...ioNodeData }
+				/>
+			))
+		};
+
+		case 'console_log': {
+			return Array.from({ length: ioNodeCount }).map( ( item, index ) => (
+				<IODispatcher 
+					key={ `${ index }` }
+					className={ `bg-green-500 my-[120vh]` }
+					offset={ 0 }
+					dispatch={ {
+						onFastForward: ioNodeData.onFastForward, 
+						...getLogDispatcher( index, ioNodeData )
+					} }
+				>
+					<p className="text-center py-spacing-lg">{ index }</p>
+				</IODispatcher>
+			) );
+		};
+
+		case 'never': {
+			break;
+		}
 	}
 }
 
-function emptyDispatcher({ inViewport, topEnter, topExit, bottomEnter, bottomExit, onFastForward }: logDispatcherProps )
-{
-	return {
-		...( inViewport && { onInViewport: () => {} } ),
-		...( topEnter && { onTopEnter: () => {} } ),
-		...( topExit && { onTopExit: () => {} } ),
-		...( bottomEnter && { onBottomEnter: () => {} } ),
-		...( bottomExit && { onBottomExit: () => {} } ),
-		onFastForward
-	}
-}
+type DomManipulatorProps2 = EventSelection & {
+	index: number;
+	onFastForward: IOVerticalOptions[ "dispatch" ][ "onFastForward" ];
+};
 
-function DomManipulator({ index, inViewport, topEnter, topExit, bottomEnter, bottomExit, onFastForward }: logDispatcherProps )
+function DomManipulator( { index, onFastForward, ...events }: DomManipulatorProps2 )
 {
-	const [ pos, setPos ] = useState<number>( 0 );
+	const [ position, setPosition ] = useState( 0 );
+	const [ scrollProgress, setScrollProgress ] = useState( 0 );
 	const [ state, setState ] = useState<false | string>( false );
+
+	const dispatch = useMemo(() => {
+		return getDispatcher( events, { setScrollProgress, setPosition, setState } );
+	}, [] );
 
 	return (
 		<div className="my-[120vh] text-center">
 			<p><strong>#{ index }:</strong> Last recorded event: { state ? state : null }</p>
 			<IODispatcher 
-				className={ `bg-green-500 my-5 py-2` }
+				className={ `bg-green-500 my-spacing-sm py-spacing-xl` }
 				offset={ 0 }
-				//@ts-expect-error - At least 1 event is required
-				dispatch={{
-					...( inViewport === true && { onInViewport: ( normalizedPosition: number ) => setPos( normalizedPosition ) } ),
-					...( topEnter === true && { onTopEnter: () => setState( "Top-enter" ) } ),
-					...( topExit === true && { onTopExit: () => setState( "Top-exit" ) } ),
-					...( bottomEnter === true && { onBottomEnter: () => setState( "Bottom-enter" ) } ),
-					...( bottomExit === true && { onBottomExit: () => setState( "Bottom-exit" ) } ),
-					onFastForward
-				}}
+				dispatch={ {
+					onFastForward,
+					...dispatch
+				} }
 			>
-				<p>Normalized Position: { pos.toFixed( 2 ) }</p>
+				<p>Scroll Progress: { scrollProgress.toFixed( 2 ) }</p>
+				<p>Normalized Position: { position.toFixed( 2 ) }</p>
 			</IODispatcher>
 			<p><strong>#{ index }:</strong> Last recorded event: { state ? state : null }</p>
 		</div>
 	)
+}
+
+
+
+type DispatcherFunctions = {
+    setScrollProgress: ( position: number ) => void;
+    setPosition: ( normalizedPosition: number ) => void;
+    setState: ( message: string ) => void;
+};
+
+/**
+ * Returns dispatch object that modifies react states
+ * 
+ * @param eventSelection
+ * @param param1 
+ * @returns 
+ */
+function getDispatcher( eventSelection: EventSelection, { setScrollProgress, setPosition, setState }: DispatcherFunctions )
+{
+    // Define the full map of possible event handlers.
+    const eventHandlersMap: PossibleEvents = {
+        onScrollProgress: ( position: number ) => setScrollProgress( position ),
+        onInViewport: ( normalizedPosition: number ) => setPosition( normalizedPosition ),
+        onEnter: () => setState( "Enter!" ),
+        onExit: () => setState( "Exit!" ),
+        onTopEnter: () => setState( "Top-enter!" ),
+        onTopExit: () => setState( "Top-exit!" ),
+        onBottomEnter: () => setState( "Bottom-enter!" ),
+        onBottomExit: () => setState( "Bottom-exit!" ),
+    };
+
+    const dispatcher = {} as typeof eventHandlersMap;
+
+    // Iterate over the input props (EventSelection).
+    for ( const [ key, isEnabled ] of Object.entries( eventSelection ) as [ keyof EventSelection, boolean ][] ){
+        
+        if ( isEnabled ){
+            const handler = eventHandlersMap[ key as keyof typeof eventHandlersMap ];
+            Object.assign( dispatcher, { [ key ]: handler });
+        }
+
+    }
+
+    return dispatcher;
+}
+
+/**
+ * Returns dispatch object that logs
+ * 
+ * @param nodeIndex 
+ * @param eventSelection 
+ * @returns 
+ */
+function getLogDispatcher( nodeIndex: number, eventSelection: EventSelection )
+{
+    // Define the full map of possible event handlers.
+    const eventHandlersMap: PossibleEvents = {
+        onScrollProgress: ( position: number ) => console.log( `Node ${ nodeIndex } scroll-progress: ${ position }` ),
+        onInViewport: ( normalizedPosition: number ) => console.log( `Node ${ nodeIndex } viewport-position: ${ normalizedPosition }` ),
+        onEnter: () => console.log( "Enter!" ),
+        onExit: () => console.log( "Exit!" ),
+        onTopEnter: () => console.log( "Top-enter!" ),
+        onTopExit: () => console.log( "Top-exit!" ),
+        onBottomEnter: () => console.log( "Bottom-enter!" ),
+        onBottomExit: () => console.log( "Bottom-exit!" ),
+    };
+
+    const dispatcher = {} as typeof eventHandlersMap;
+
+    // Iterate over the input props (EventSelection).
+    for ( const [ key, isEnabled ] of Object.entries( eventSelection ) as [ keyof EventSelection, boolean ][] ){
+        
+        if ( isEnabled ){
+            const handler = eventHandlersMap[ key as keyof typeof eventHandlersMap ];
+            Object.assign( dispatcher, { [ key ]: handler });
+        }
+
+    }
+
+    return dispatcher;
 }

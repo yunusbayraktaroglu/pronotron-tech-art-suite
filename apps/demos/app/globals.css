@@ -1,6 +1,68 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+/* We use a custom container */
+@source not inline("container");
+
+@layer base {
+	button:not(:disabled),
+	[role="button"]:not(:disabled) {
+		cursor: pointer;
+	}
+}
+
+@theme {
+	/* Fluid Typeography */
+	--fluid-1: calc(10px + (12 - 10) * ((100vw - 320px) / (1650 - 320)));
+	--fluid-2: calc(12px + (15 - 12) * ((100vw - 320px) / (1650 - 320)));
+	--fluid-3: calc(15px + (20 - 15) * ((100vw - 320px) / (1650 - 320)));
+	--fluid-4: calc(20px + (26 - 20) * ((100vw - 320px) / (1650 - 320)));
+	--fluid-5: calc(26px + (34 - 26) * ((100vw - 320px) / (1650 - 320)));
+	--fluid-6: calc(34px + (43 - 34) * ((100vw - 320px) / (1650 - 320)));
+	--fluid-7: calc(43px + (54 - 43) * ((100vw - 320px) / (1650 - 320)));
+	--fluid-8: calc(54px + (66 - 54) * ((100vw - 320px) / (1650 - 320)));
+	--fluid-9: calc(66px + (80 - 66) * ((100vw - 320px) / (1650 - 320)));
+}
+
+@theme {
+	/* Orientation based breakpoints */
+	--screen-portrait: (orientation: portrait);
+	--screen-landscape: (orientation: landscape);
+
+	/* Spacing tokens */
+	--spacing-content-outside-width: var(--content-outside-width);
+	--spacing-spacing-xs: var(--spacing-xs);
+	--spacing-spacing-sm: var(--spacing-sm);
+	--spacing-spacing-base: var(--spacing-base);
+	--spacing-spacing-lg: var(--spacing-lg);
+	--spacing-spacing-xl: var(--spacing-xl);
+	--spacing-spacing-2xl: var(--spacing-2xl);
+	--spacing-spacing-3xl: var(--spacing-3xl);
+
+	/* Colors */
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+
+	/* Font sizes */
+	--text-xs: var(--fluid-1);
+	--text-sm: var(--fluid-2);
+	/* base */
+	--text-base: var(--fluid-3);
+	--text-base--letter-spacing: -0.025em;
+	/* lg */
+	--text-lg: var(--fluid-4);
+	/* xl */
+	--text-xl: var(--fluid-5);
+	--text-xl--letter-spacing: -0.02em;
+	--text-xl--line-height: 2.1rem;
+	/* 2xl */
+	--text-2xl: var(--fluid-6);
+	/* 3xl */
+	--text-3xl: var(--fluid-7);
+	--text-3xl--letter-spacing: -0.05em;
+	--text-3xl--line-height: 2.5rem;
+	/* 4xl */
+	--text-4xl: var(--fluid-8);
+
+}
 
 /**
 	Create content width
@@ -34,6 +96,7 @@
 	--spacing-2xl: calc( 4 * var( --spacing-base ) );
 	--spacing-3xl: calc( 5 * var( --spacing-base ) );
 }
+
 @media ( orientation: landscape ){
     :root {
         --width: 75vw;
@@ -55,7 +118,7 @@ body {
 }
 
 body.custom-cursor * {
-	cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23000000" width="6px" height="6px" viewBox="0 0 6 6"><circle cx="3" cy="3" r="2.5"/></svg>') 3 3, auto !important;
+	cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23000000" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" stroke="%23FFFFFF" stroke-width="1" /></svg>') 12 12, auto !important;
 }
 
 
@@ -78,7 +141,6 @@ body.custom-cursor * {
 	h4 {
 		@apply text-lg;
 	}
-
 }
 
 /** 
@@ -99,8 +161,7 @@ body.custom-cursor * {
 }
 
 [data-holded] {
-}
-[data-holded="0"] {
+	pointer-events: auto;
 }
 [data-holded="1"] {
 	pointer-events: none;
@@ -136,12 +197,12 @@ body.custom-cursor * {
 	}
 
 	.pointer {
-		--cursor-size: max( 25px, calc( 100vw / 40 ) );
+		--cursor-size: max( 60px, calc( 100vw / 30 ) );
 		--cursor-half-size: calc( var( --cursor-size ) / 2 );
 		--scale: 1;
 		--transition-duration: 0.4s;
 		--background-color: transparent;
-		--border-color: black;
+		--border-color: white;
 		--animation: none;
 		background-color: transparent;
 		position: fixed;
@@ -151,6 +212,7 @@ body.custom-cursor * {
 		pointer-events: none;
 		touch-action: none;
 		user-select: none;
+		mix-blend-mode: difference;
 		z-index: 9999;
 	}
 
@@ -175,13 +237,13 @@ body.custom-cursor * {
 	}
 
 	.pointer[ data-state="PENDING" ] {
-		--scale: 0.75;
+		--scale: 0.85;
 		--animation: pulse-bg 1.5s infinite;
 	}
 
 	.pointer[ data-state="HOLDING" ],
 	.pointer[ data-state="HOLD_DRAGGING" ] {
-		--background-color: rgba( 255, 255, 255, 0.5 );
+		--background-color: rgba( 255, 255, 255, 1.0 );
 		--scale: 1.25;
 	}
 
@@ -203,39 +265,41 @@ body.custom-cursor * {
 	.text-balance {
 		text-wrap: balance;
 	}
+	
 	.form label {
 		@apply
-		block mb-spacing-xs text-sm font-medium text-gray-900
+		block mb-spacing-xs text-sm
 	}
-	
+
+	/* Checkbox */
 	.form .checkbox {
 		@apply
-		flex flex-col mb-1
+		flex flex-col
 	}
-	
 	.form .checkbox > fieldset {
 		@apply
-		flex
+		flex flex-row
 	}
-	
 	.form .checkbox label {
 		@apply
-		ms-1 text-base font-medium text-gray-900 whitespace-nowrap
+		ml-spacing-xs text-base whitespace-nowrap
 	}
-	
 	.form input[ type=checkbox ] {
 		@apply
 		w-6 h-6 border border-gray-300 rounded bg-gray-50 focus:ring-blue-300
 	}
 	
-	.form input[ type=number ] {
-		@apply
-		p-2 text-base text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 leading-none
-	}
-	
+	/* Number/Select input */
+	.form input[ type=number ],
 	.form select {
 		@apply
-		block text-base bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full p-2
+		text-base text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 leading-none p-spacing-xs
+	}
+
+	/* Select input */
+	.form select {
+		@apply
+		block w-full
 	}
 	
 }

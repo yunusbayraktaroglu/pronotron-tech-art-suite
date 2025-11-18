@@ -1,8 +1,10 @@
 "use client";
 
 import { createContext, useContext, useEffect, useRef, useState } from "react";
-import { TouchController, MouseController } from "@pronotron/pointer";
+import { createBasePointer, createHoldablePointer } from "@pronotron/pointer";
 import { PronotronAnimator, PronotronClock, isTouchDevice } from "@pronotron/utils";
+
+type PointerController = ReturnType<typeof createBasePointer> | ReturnType<typeof createHoldablePointer>;
 
 export const defaultPointerSettings = {
 	tapThreshold: 0.25,
@@ -12,7 +14,7 @@ export const defaultPointerSettings = {
 };
 
 interface PointerContextProps {
-	pointerController: React.MutableRefObject<TouchController | MouseController>;
+	pointerController: PointerController;
 };
 
 const PointerContext = createContext<PointerContextProps | undefined>( undefined );
@@ -29,14 +31,28 @@ export function PronotronPointerProvider({ children }: { children: React.ReactNo
 {
 	const clock = useRef( new PronotronClock() );
 	const animator = useRef( new PronotronAnimator( clock.current ) );
-	const pointerController = useRef<TouchController | MouseController>( null ! );
+
+	const [ pointerController, setPointerController ] = useState<PointerController>( null ! );
 
 	/**
 	 * Pointer controller setup
 	 */
-	useEffect(() => {
+	useEffect( () => {
 
-		const baseSettings = {
+		/**
+		 * Uses isTouchDevice() internally and decides the model.
+		 * Can be created with:
+		 * 
+		 * createHoldablePointer( settings, "mouse" | "touch" );
+		 * createBasePointer( settings, "mouse" | "touch" );
+		 */
+		const POINTER_CONTROLLER = createHoldablePointer( {
+			...defaultPointerSettings,
+			// Start at screen center
+			startPosition: {
+				x: window.innerWidth / 2,
+				y: window.innerHeight / 2,
+			},
 			target: window.document.body,
 			animator: animator.current,
 			clock: clock.current,
@@ -49,17 +65,10 @@ export function PronotronPointerProvider({ children }: { children: React.ReactNo
 			},
 			isHoldable: ( target: HTMLElement ) => {
 				return target.dataset.holded ? true : false;
-			}
-		};
-		const settings = { ...baseSettings, ...defaultPointerSettings };
+			},
+		} );
 
-		if (  isTouchDevice() ){
-			pointerController.current = new TouchController( settings );
-		} else {
-			pointerController.current = new MouseController( settings );
-		}
-
-		pointerController.current.startEvents();
+		POINTER_CONTROLLER.startEvents();
 
 		let animationFrameId = 0;
 
@@ -81,18 +90,20 @@ export function PronotronPointerProvider({ children }: { children: React.ReactNo
 
 		document.addEventListener( 'visibilitychange', handleVisibilityChange );
 
+		setPointerController( POINTER_CONTROLLER );
+
 		return () => {
 			cancelAnimationFrame( animationFrameId );
 			document.removeEventListener( 'visibilitychange', handleVisibilityChange );
-			pointerController.current.stopEvents();
+			POINTER_CONTROLLER.stopEvents();
 		};
 		
-	}, []);
+	}, [] );
 
 	/**
-	 * CustomEvent listeners
+	 * CustomEvent listeners provided by PronotronPointer
 	 */
-	useEffect(() => {
+	useEffect( () => {
 
 		const holdHandler = ( event: CustomEvent ) => {
 			document.documentElement.classList.add( "holding" );
@@ -116,11 +127,16 @@ export function PronotronPointerProvider({ children }: { children: React.ReactNo
 			window.document.body.removeEventListener( "tap", tapHandler as EventListener );
 		}
 
-	}, []);
+	}, [] );
+
+	if ( ! pointerController ){
+		return null;
+	}
 
 	return (
 		<PointerContext.Provider value={{ pointerController }}>
 			{ children }
 		</PointerContext.Provider>
 	);
+
 }

@@ -5,6 +5,9 @@ import { usePathname } from 'next/navigation'
 import Link from "next/link";
 import { Expandable } from "@/app/components/Expandable";
 
+/**
+ * Primary navigation component for the PronotronIO demo application.
+ */
 export function IONavigation()
 {
 	const pathname = usePathname();

@@ -1,18 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Expandable } from "@/app/components/Expandable";
+
 import { PronotronPointerProvider, usePointerContext, defaultPointerSettings } from "./hooks/PointerProvider";
 import { PronotronPointerDataProvider, usePointerDataContext } from "./hooks/PointerDataProvider";
 
 export default function PointerDemoPage()
 {
-	useEffect(() => {
+	useEffect( () => {
 		document.body.classList.add( "custom-cursor" );
-		return () => {
-			document.body.classList.remove( "custom-cursor" );
-		}
-	}, []);
+		return () => document.body.classList.remove( "custom-cursor" );
+	}, [] );
 
 	return (
 		<>
@@ -54,23 +53,21 @@ function PointerSettings()
 	const { pointerController } = usePointerContext();
 	const [ pointerSettings, setPointerSettings ] = useState( defaultPointerSettings );
 
-	useEffect(() => {
-		if ( pointerController ){
-			pointerController.current.updateSettings( pointerSettings );
-		}
-	}, [ pointerSettings ]);
+	useEffect( () => {
+		pointerController.updateSettings( pointerSettings );
+	}, [ pointerSettings ] );
 
 	// Handle change for numeric inputs
-	const handleInputChange = ( event: React.ChangeEvent<HTMLInputElement> ) => {
+	const handleInputChange = useCallback( ( event: React.ChangeEvent<HTMLInputElement> ) => {
 		const { name, value } = event.target;
-		setPointerSettings(( prev ) => ({
+		setPointerSettings( ( prev ) => ( {
 			...prev,
 			[ name ]: Number( value ),
-		}));
-	};
+		} ) );
+	}, [] );
 
 	return (
-		<div className="form grid gap-spacing-sm grid-rows-2 grid-cols-2 landscape:grid-cols-4 landscape:grid-rows-1">
+		<div className="form grid gap-spacing-sm grid-rows-2 grid-cols-2 mt-spacing-xs landscape:grid-cols-4 landscape:grid-rows-1">
 			<fieldset>
 				<label htmlFor="tapThreshold">Tap Threshold <small>(sec)</small></label>
 				<input
@@ -129,14 +126,15 @@ function PointerSettings()
 
 function PointerDebugger()
 {
-	const { pointerPosition, pointerDelta, pointerState, pointerTargetInteractable } = usePointerDataContext();
+	const { pointerPosition, pointerDelta, pointerState, pointerDeltaAdditive, pointerTargetInteractable } = usePointerDataContext();
 
 	return (
-		<div className="grid grid-cols-4 mt-spacing-xs gap-spacing-xs text-xs text-center">
+		<div className="grid grid-cols-5 mt-spacing-xs gap-spacing-xs text-xs text-left">
 			<span>State: <br/>{ pointerState }</span>
 			<span>Interactable: <br/>{ pointerTargetInteractable ? "TRUE" : "FALSE" }</span>
 			<span>Position: <br/>{ pointerPosition.x.toFixed( 0 ) }, { pointerPosition.y.toFixed( 0 ) }</span>
-			<span>Delta: <br/>{ pointerDelta.x.toFixed( 0 ) }, { pointerDelta.y.toFixed( 0 ) }</span>
+			<span>Last Delta: <br/>{ pointerDelta.x.toFixed( 0 ) }, { pointerDelta.y.toFixed( 0 ) }</span>
+			<span>Delta Additive: <br/>{ pointerDeltaAdditive.x.toFixed( 0 ) }, { pointerDeltaAdditive.y.toFixed( 0 ) }</span>
 		</div>
 	)
 }
