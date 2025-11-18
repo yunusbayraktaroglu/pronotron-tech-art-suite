@@ -13,17 +13,17 @@
 		"test": "turbo test --filter=./packages/*",
 		"test:watch": "turbo test:watch --filter=./packages/*",
 		"lint": "turbo lint --filter=./packages/*",
-		"clean": "turbo clean && rm -rf node_modules",
+		"clean": "turbo clean && rm -rf .turbo && rm -rf node_modules",
 		"format": "prettier --write \"**/*.{ts,tsx,md}\"",
 		"changeset": "changeset",
 		"version-packages": "changeset version",
 		"release": "turbo build --filter=./packages/* && changeset publish"
 	},
 	"devDependencies": {
-		"@changesets/cli": "^2.27.8",
-		"eslint": "^9.38.0",
-		"prettier": "^3.2.5",
-		"turbo": "^2.1.2"
+		"@changesets/cli": "^2.29.7",
+		"@types/node": "^20.19.25",
+		"turbo": "^2.6.1",
+		"typescript": "^5.9.3"
 	},
 	"engines": {
 		"node": ">=18"

@@ -1,6 +1,6 @@
-import { PronotronIOVerticalObserver } from "../src/core/PronotronIOVertical";
+import { IOVerticalOptions, PronotronIOVerticalObserver } from "../src/core/PronotronIOVertical";
 import { IONodeStrideIndex, IONodePosition, FastForwardStrategy } from "../src/core/PronotronIOBase";
-import type { IONodeOptions } from "../types/global";
+import type { IODispatchOptions, IONodeOptions } from "../types/global";
 
 describe( "PronotronIOVerticalObserver (behavior)", () => {
 
@@ -8,6 +8,95 @@ describe( "PronotronIOVerticalObserver (behavior)", () => {
 
 	beforeEach( () => {
 		io = new PronotronIOVerticalObserver( 10, true );
+	} );
+
+
+	describe( 'Transition tests', () => {
+
+		let fullDispatch: IOVerticalOptions[ "dispatch" ];
+
+		beforeEach( () => {
+			fullDispatch = {
+				// Direction agnostic
+				onExit: jest.fn(),
+				onEnter: jest.fn(),
+				onScrollProgress: jest.fn(),
+				onInViewport: jest.fn(),
+				// Direction
+				onTopEnter: jest.fn(),
+				onTopExit: jest.fn(),
+				onBottomEnter: jest.fn(),
+				onBottomExit: jest.fn(),
+			};
+		} );
+		
+		it( "negative → viewport position transition triggers negative-enter handlers", () => {
+
+			io.updateViewportLayout( 0, 1000 );
+			io.setLastScroll( 1000 ); // Visible area is [1000, 2000]
+
+			const ref = {} as HTMLElement;
+
+			// Add node in negative area
+			const NODE_ID = io.addNode( { 
+				ref, 
+				dispatch: fullDispatch,
+				getBounds: () => ( { start: 900, end: 990 } ), 
+			} );
+
+			// Node still in the negative area
+			io.handleScroll( 991 );
+
+			// Now in the viewport
+			io.handleScroll( 990 );
+
+			// Now centered
+			io.handleScroll( 945 );
+
+			expect( fullDispatch.onScrollProgress ).toHaveBeenCalledTimes( 2 );
+			expect( fullDispatch.onInViewport ).toHaveBeenCalledTimes( 2 );
+			expect( fullDispatch.onEnter ).toHaveBeenCalledTimes( 1 );
+			expect( fullDispatch.onTopEnter ).toHaveBeenCalledTimes( 1 );
+
+			expect( fullDispatch.onTopExit ).not.toHaveBeenCalled();
+			expect( fullDispatch.onBottomExit ).not.toHaveBeenCalled();
+			expect( fullDispatch.onBottomEnter ).not.toHaveBeenCalled();
+			expect( fullDispatch.onExit ).not.toHaveBeenCalled();
+
+		} );
+
+		it( "viewport → positive position transition triggers positive-exit handlers", () => {
+
+			io.updateViewportLayout( 0, 1000 );
+			io.setLastScroll( 1000 ); // Visible area is [1000, 2000]
+
+			const ref = {} as HTMLElement;
+
+			// Add node in viewport
+			const NODE_ID = io.addNode( { 
+				ref, 
+				dispatch: fullDispatch,
+				getBounds: () => ( { start: 1100, end: 1200 } ), 
+			} );
+
+			// Node in the viewport
+			io.handleScroll( 110 );
+
+			// Now in positive area (exited)
+			io.handleScroll( 99 );
+
+			expect( fullDispatch.onScrollProgress ).toHaveBeenCalledTimes( 1 );
+			expect( fullDispatch.onInViewport ).toHaveBeenCalledTimes( 1 );
+			expect( fullDispatch.onExit ).toHaveBeenCalledTimes( 1 );
+			expect( fullDispatch.onBottomExit ).toHaveBeenCalledTimes( 1 );
+
+			expect( fullDispatch.onBottomEnter ).not.toHaveBeenCalled();
+			expect( fullDispatch.onEnter ).not.toHaveBeenCalled();
+			expect( fullDispatch.onTopExit ).not.toHaveBeenCalled();
+			expect( fullDispatch.onTopEnter ).not.toHaveBeenCalled();
+
+		} );
+
 	} );
 
 	test( "addNode() registers node", () => {
@@ -69,7 +158,7 @@ describe( "PronotronIOVerticalObserver (behavior)", () => {
 
 	} );
 
-	test( "negative -> viewport position transition triggers negative-enter handler", () => {
+	test( "negative → viewport position transition triggers negative-enter handler", () => {
 
 		io.updateViewportLayout( 0, 1000 );
 		io.setLastScroll( 1000 ); // Visible area is [1000, 2000]
@@ -115,7 +204,7 @@ describe( "PronotronIOVerticalObserver (behavior)", () => {
 
 	} );
 
-	test( "negative -> positive, fast-forward executes both events when strategy = execute_both", () => {
+	test( "negative → positive, fast-forward executes both events when strategy = execute_both", () => {
 
 		io.updateViewportLayout( 0, 100 );
 
@@ -144,12 +233,12 @@ describe( "PronotronIOVerticalObserver (behavior)", () => {
 			getBounds: () => ( { start: 150, end: 160 } ), 
 		} );
 
-		// Jump viewport to 500 in a single step -> node will be InNegativeArea (fast-forward)
+		// Jump viewport to 500 in a single step → node will be InNegativeArea (fast-forward)
 		io.handleScroll( 500 );
 		expect( onBottomEnter ).toHaveBeenCalled();
 		expect( onTopExit ).toHaveBeenCalled();
 
-		// Jump viewport to 0 in a single step -> node will be InPositiveArea (fast-forward)
+		// Jump viewport to 0 in a single step → node will be InPositiveArea (fast-forward)
 		io.handleScroll( 0 );
 		expect( onTopEnter ).toHaveBeenCalled();
 		expect( onBottomExit ).toHaveBeenCalled();
@@ -174,7 +263,7 @@ describe( "PronotronIOVerticalObserver (behavior)", () => {
 			}
 		} );
 
-		// initial handleScroll: NotReady -> InViewport, onInViewport should be executed
+		// initial handleScroll: NotReady → InViewport, onInViewport should be executed
 		io.handleScroll( 0 );
 		expect( onInViewport ).toHaveBeenCalledTimes( 1 );
 
@@ -213,7 +302,7 @@ describe( "PronotronIOVerticalObserver (behavior)", () => {
 		io.handleScroll( 0 );
 		io.handleScroll( 200 );
 
-		// First time: limit goes 2 -> 1 and flag remains 1
+		// First time: limit goes 2 → 1 and flag remains 1
 		expect( onTopExit ).toHaveBeenCalled();
 
 		io.handleScroll( 0 );

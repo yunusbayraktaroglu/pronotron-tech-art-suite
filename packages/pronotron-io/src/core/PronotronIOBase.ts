@@ -7,6 +7,13 @@ import {
 } from "../../types/global";
 
 /**
+ * @IMPORTANT
+ * 
+ * Calculating IONodeData size with code, causes to make it constant. 
+ * The size of IONode data is fixed.
+ */
+const IO_NODE_DATA_SIZE = 14;
+/**
  * IONode data is stored in a flattened NativeArray.
  * This enum defines the index of each IONode property in the stride.
  */
@@ -37,6 +44,10 @@ export enum IONodeStrideIndex
 	 */
 	HasInViewportEvent,
 	/**
+	 * 1 or 0 – Whether the node has an event handler for scroll progress.
+	 */
+	HasScrollProgressEvent,
+	/**
 	 * 1 or 0 – Whether the node has an event handler for entering the viewport from {@link IONodePosition.InNegativeArea}
 	 */
 	HasNegativeEnterEvent,
@@ -53,16 +64,18 @@ export enum IONodeStrideIndex
 	 */
 	HasPositiveExitEvent,
 	/**
+	 * 1 or 0 – Whether the node has an event handler for entering the viewport regardless of direction
+	 */
+	HasEnterEvent,
+	/**
+	 * 1 or 0 – Whether the node has an event handler for leaving the viewport regardless of direction
+	 */
+	HasExitEvent,
+	/**
 	 * Stores the {@link FastForwardStrategy} option for this node.
 	 */
 	OnFastForward
 };
-
-/**
- * Calculating IONodeData size with code, causes to make it constant. 
- * The size of IONode data is fixed.
- */
-const IO_NODE_DATA_SIZE = 11;
 
 /**
  * Jumpy scroll might cause an element "fast forward", 
@@ -256,13 +269,19 @@ export abstract class PronotronIOBase<TEvents extends string>
 				[ IONodeStrideIndex.EndPosition ]: 0,
 				[ IONodeStrideIndex.InViewport ]: 0,
 				[ IONodeStrideIndex.LastPosition ]: IONodePosition.NotReady,
+				// Direction agnostic events
+				[ IONodeStrideIndex.HasEnterEvent ]: newNodeOptions.dispatch.onEnter ? 1 : 0,
+				[ IONodeStrideIndex.HasExitEvent ]: newNodeOptions.dispatch.onExit ? 1 : 0,
 				[ IONodeStrideIndex.HasInViewportEvent ]: newNodeOptions.dispatch.onInViewport ? 1 : 0,
+				[ IONodeStrideIndex.HasScrollProgressEvent ]: newNodeOptions.dispatch.onScrollProgress ? 1 : 0,
+				// Direction based events
 				[ IONodeStrideIndex.HasNegativeEnterEvent ]: newNodeOptions.dispatch[ this._eventNames._negativeEnterEvent ] ? 1 : 0,
 				[ IONodeStrideIndex.HasNegativeExitEvent ]: newNodeOptions.dispatch[ this._eventNames._negativeExitEvent ] ? 1 : 0,
 				[ IONodeStrideIndex.HasPositiveEnterEvent ]: newNodeOptions.dispatch[ this._eventNames._positiveEnterEvent ] ? 1 : 0,
 				[ IONodeStrideIndex.HasPositiveExitEvent ]: newNodeOptions.dispatch[ this._eventNames._positiveExitEvent ] ? 1 : 0,
+				// Fast forward resolve
 				[ IONodeStrideIndex.OnFastForward ]: fastForwardOption
-			});
+			} );
 
 			// IONode has been created successfully, consume ID
 			this._idPool.consume( internalID );
@@ -358,8 +377,9 @@ export abstract class PronotronIOBase<TEvents extends string>
 	/**
 	 * Calculates current position of an IONode.
 	 * 
-	 * @param nodeStart IONode start position
-	 * @param nodeEnd IONode end position
+	 * @param nodeStart IONode start position.
+	 * @param nodeEnd IONode end position.
+	 * 
 	 * @internal
 	 */
 	protected _calculatePosition( nodeStart: number, nodeEnd: number ): Exclude<IONodePosition, IONodePosition.NotReady>
@@ -379,6 +399,7 @@ export abstract class PronotronIOBase<TEvents extends string>
 	 * Removes IONodes by their internal IDs.
 	 *
 	 * @param nodeIDs - Internal node IDs previously assigned.
+	 * 
 	 * @internal
 	 */
 	protected _removeNodeByIds( nodeIDs: number[] ): void
@@ -404,6 +425,7 @@ export abstract class PronotronIOBase<TEvents extends string>
 	 *
 	 * @param nodeID - Internal node ID.
 	 * @param nodeSettings - Node creation options.
+	 * 
 	 * @internal
 	 */
 	private _updateNodeBounds( nodeID: number, nodeSettings: IONodeOptions<TEvents> ):  { nodeStart: number, nodeEnd: number }
@@ -427,6 +449,7 @@ export abstract class PronotronIOBase<TEvents extends string>
 	 *
 	 * @param option - Human-readable fast-forward option.
 	 * @returns The corresponding {@link FastForwardStrategy}.
+	 * 
 	 * @internal
 	 */
 	private _getFastForwardOption( option?: FastForwardOptions ): FastForwardStrategy

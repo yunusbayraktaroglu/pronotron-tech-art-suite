@@ -1,6 +1,6 @@
 {
 	"name": "@pronotron/io",
-	"version": "0.0.1-beta.6",
+	"version": "1.0.1",
 	"description": "Reliable viewport tracking without missed targets, unlike the default IntersectionObserver API.",
 	"author": "Yunus Bayraktaroglu <yunus.bayraktaroglu@gmail.com>",
 	"main": "./dist/index.js",
@@ -28,22 +28,19 @@
 	"scripts": {
 		"test": "jest",
 		"test:watch": "jest --watch",
-		"build": "tsup src/index.ts --format esm,cjs --dts --minify terser",
-		"dev": "tsup src/index.ts --format esm,cjs --watch --dts",
+		"dev": "tsup --watch",
+		"build": "tsup --minify terser",
 		"lint": "eslint .",
 		"lint:fix": "eslint . --max-warnings 0 --fix",
-		"clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+		"clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist && rm -rf coverage"
 	},
 	"devDependencies": {
+		"@pronotron/config-jest": "*",
 		"@pronotron/config-eslint": "*",
-		"@pronotron/config-ts": "*",
-		"@types/jest": "^30.0.0",
-		"jest": "^30.2.0",
-		"terser": "^5.33.0",
-		"tsup": "^8.5.0",
-		"typescript": "^5.9.3"
+		"@pronotron/config-tsup": "*",
+		"@pronotron/config-ts": "*"
 	},
 	"dependencies": {
-		"@pronotron/utils": "0.0.1-beta.6"
+		"@pronotron/utils": "1.0.0"
 	}
 }

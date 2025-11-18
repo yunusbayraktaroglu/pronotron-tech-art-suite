@@ -1,0 +1,17 @@
+{
+	"extends": "@pronotron/config-ts/base.json",
+	"compilerOptions": {
+		"allowJs": true,
+		"incremental": false,
+		"module": "commonjs",
+		"moduleResolution": "Node10",
+		"outDir": "dist",
+		"baseUrl": "src"
+	},
+	"include": [
+		"src"
+	],
+	"exclude": [
+		"dist",
+	]
+}

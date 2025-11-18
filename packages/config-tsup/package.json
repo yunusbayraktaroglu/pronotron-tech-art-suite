@@ -1,0 +1,24 @@
+{
+	"name": "@pronotron/config-tsup",
+	"version": "0.0.0",
+	"private": true,
+	"publishConfig": {
+		"access": "public"
+	},
+	"main": "./dist/index.js",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.ts",
+	"files": [
+		"dist/**"
+	],
+	"devDependencies": {
+		"@pronotron/config-ts": "*",
+		"tsup": "^8.5.1",
+		"terser": "^5.44.1"
+	},
+	"scripts": {
+		"dev": "tsup index.ts --format esm,cjs --watch --dts",
+		"build": "tsup index.ts --format esm,cjs --dts --clean",
+		"clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+	}
+}
