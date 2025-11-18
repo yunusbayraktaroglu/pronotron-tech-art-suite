@@ -11,6 +11,7 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
 				className='bg-blue-500 py-[50px] flex flex-col'
 				offset={ 0 }
 				dispatch={{
+					onExit: () => console.log( "Shared node #0 Exit" ),
 					onTopEnter: () => console.log( "Shared node #0 Top-enter" ),
 					onTopExit: () => console.log( "Shared node #0 Top-exit" ),
 					onBottomEnter: () => console.log( "Shared node #0 Bottom-enter" ),

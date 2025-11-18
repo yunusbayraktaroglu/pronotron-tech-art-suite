@@ -3,9 +3,9 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { usePerformanceStats } from "../hooks/usePerformanceStats";
 import { SingleAnimation } from "./components/SingleAnimation";
+import { useForm } from "../hooks/useForm";
 
 type TestScenario = {
-	testCount: number;
 	animationCount: number;
 	autoPause: boolean;
 	delay: number;
@@ -14,30 +14,34 @@ type TestScenario = {
 export default function AnimatorDemoPage()
 {
 	const { setShowStats } = usePerformanceStats();
-	const [ testScenario, setTestScenario ] = useState<TestScenario>({
-		testCount: 0,
-		animationCount: 50,
-		autoPause: true,
-		delay: 0
-	});
+	const [ testScenario, setTestScenario ] = useState<TestScenario | false>( false );
+	const [ scenarioEpoch, setTestScenarioEpoch ] = useState( 0 );
 
-	useEffect(() => {
+	useEffect( () => {
+		// Open performance stats on page load
 		setShowStats( true );
-	}, []);
+	}, [] );
+
+	useEffect( () => {
+		// Helps to giving different keys to flush animation component
+		setTestScenarioEpoch( prev => prev + 1 );
+	}, [ testScenario ] );
 
 	return (
 		<div className="container">
 			<AnimationStressTestForm runTestScenario={ setTestScenario } />
-			<div className="grid grid-cols-3 landscape:grid-cols-4 gap-spacing-xs my-spacing-base">
-				{ Array.from({ length: testScenario.animationCount }).map(( _item, index ) => (
-					<SingleAnimation 
-						key={ `${ testScenario.testCount }_${ index }` } 
-						id={ `${ index }` }
-						autoPause={ testScenario.autoPause }
-						delay={ testScenario.delay }
-					/> 
-				) )}
-			</div>
+			{ testScenario && (
+				<div className="grid grid-cols-3 landscape:grid-cols-4 gap-spacing-xs my-spacing-base">
+					{ Array.from({ length: testScenario.animationCount }).map(( _item, index ) => (
+						<SingleAnimation 
+							key={ `${ index }_${ scenarioEpoch }` } 
+							id={ `${ index }` }
+							autoPause={ testScenario.autoPause }
+							delay={ testScenario.delay }
+						/> 
+					) )}
+				</div>
+			) }
 		</div>
 	);
 }
@@ -48,41 +52,25 @@ interface TestFormProps {
 
 function AnimationStressTestForm({ runTestScenario }: TestFormProps)
 {
-	const testCount = useRef( 0 );
-	const [ testScenario, setTestScenario ] = useState<Omit<TestScenario, "testCount">>({
+	const { values, handleInputChange, handleCheckboxChange } = useForm<TestScenario>( {
 		animationCount: 1000,
 		autoPause: true,
 		delay: 0
-	});
+	} );
 
-	const handleInputChange = useCallback(( event: React.ChangeEvent<HTMLInputElement> ) => {
-		const { name, value } = event.target;
-		setTestScenario(( prev ) => ({
-			...prev,
-			[ name ]: Number( value ),
-		}));
-	}, []);
+	// Add 50 animations on page start
+	useEffect( () => {
+		runTestScenario( {	
+			animationCount: 50,
+			autoPause: true,
+			delay: 0
+		} );
+	}, [] );
 
-	const handleSelectChange = useCallback(( event: React.ChangeEvent<HTMLSelectElement> ) => {
-		const { name, value } = event.target;
-		setTestScenario(( prev ) => ({
-			...prev,
-			[ name ]: value,
-		}));
-	}, []);
-
-	const handleCheckboxChange = useCallback(( event: React.ChangeEvent<HTMLInputElement> ) => {
-		const { name, checked } = event.target;
-		setTestScenario(( prev ) => ({
-			...prev,
-			[ name ]: checked,
-		}));
-	}, []);
-
-	const startTest = useCallback(() => {
-		testCount.current += 1;
-		runTestScenario({ testCount: testCount.current, ...testScenario });
-	}, [ testScenario ]);
+	const handleSubmit = useCallback( ( event: React.FormEvent ) => {
+        event.preventDefault();
+		runTestScenario( values );
+    }, [ values ] );
 
 	return (
 		<div className="form flex flex-col landscape:flex-row items-start gap-5 bg-slate-200 p-spacing-lg mt-spacing-base rounded-lg">
@@ -93,20 +81,11 @@ function AnimationStressTestForm({ runTestScenario }: TestFormProps)
 					min={ 100 }
 					name="animationCount"
 					id="animationCount"
-					value={ testScenario.animationCount }
+					value={ values.animationCount }
 					onChange={ handleInputChange }
 				/>
 			</fieldset>
-			<fieldset>
-				<label htmlFor="autoPause">Auto pause</label>
-				<input 
-					type="checkbox"
-					name="autoPause"
-					id="autoPause"
-					checked={ testScenario.autoPause }
-					onChange={ handleCheckboxChange }
-				/>
-			</fieldset>
+
 			<fieldset>
 				<label htmlFor="delay">Delay</label>
 				<input
@@ -115,11 +94,30 @@ function AnimationStressTestForm({ runTestScenario }: TestFormProps)
 					step={ 0.1 }
 					name="delay"
 					id="delay"
-					value={ testScenario.delay }
+					value={ values.delay }
 					onChange={ handleInputChange }
 				/>
+				<p className="text-gray-500 text-xs leading-none mt-spacing-xs">(in seconds)</p>
 			</fieldset>
-			<button onClick={ startTest } className="block text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-full transition-colors landscape:ml-auto">Create Animations</button>
+
+			<fieldset>
+				<label htmlFor="autoPause">Auto Pause</label>
+				<fieldset className="checkbox">
+					<fieldset>
+						<input 
+							type="checkbox"
+							name="autoPause"
+							id="autoPause"
+							checked={ values.autoPause }
+							onChange={ handleCheckboxChange }
+						/>
+						<label htmlFor="autoPause">Active</label>
+					</fieldset>
+				</fieldset>
+				<p className="text-gray-500 text-xs leading-none">(when the screen/tab is unfocused)</p>
+			</fieldset>
+
+			<button onClick={ handleSubmit } className="block text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-full transition-colors landscape:ml-auto">Create Animations</button>
 		</div>
 	)
 }

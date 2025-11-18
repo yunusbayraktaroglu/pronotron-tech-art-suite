@@ -4,8 +4,16 @@ import { useEffect, useRef, useState } from 'react';
 import { IOVerticalOptions } from '@pronotron/io';
 import { usePronotronIOContext } from "../hooks/PronotronIOProvider";
 
+/**
+ * Defines the properties for the IODispatcher components.
+ */
 type PronotronIODispatcherProps = React.ComponentProps<"div"> & Omit<IOVerticalOptions, "ref" | "getBounds">;
 
+/**
+ * The core Scroll/Viewport Event Observer Node. This component wraps any content
+ * and registers its containing <div> element with the global PronotronIO scroll
+ * observation system.
+ */
 export function IODispatcher({ dispatch, offset, onRemoveNode, ...divProps }: PronotronIODispatcherProps)
 {
 	const divRef = useRef<HTMLDivElement>( null ! );
@@ -43,7 +51,9 @@ export function IODispatcher({ dispatch, offset, onRemoveNode, ...divProps }: Pr
 }
 
 /**
- * Appends circles at the top and bottom positions
+ * An enhanced, visual debugging utility for the IODispatcher. It performs the same scroll observation registration as IODispatcher 
+ * but adds visual markers (red circles and coordinates) to the page to show the exact absolute 
+ * scroll positions (top and bottom) that the observer is tracking.
  */
 export function IODispatcherDebug({ dispatch, offset, onRemoveNode, ...divProps }: PronotronIODispatcherProps)
 {

@@ -4,6 +4,10 @@ import { useEffect, useState } from "react";
 import { Expandable } from "@/app/components/Expandable";
 import { usePronotronIOContext } from "../hooks/PronotronIOProvider";
 
+/**
+ * A debug component that displays real-time scroll and viewport metrics 
+ * monitoring the environment data that feeds the PronotronIO library.
+ */
 export function PageData()
 {
 	const PronotronIO = usePronotronIOContext( context => context.io );
