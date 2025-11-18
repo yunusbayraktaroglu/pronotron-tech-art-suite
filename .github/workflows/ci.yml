@@ -3,8 +3,14 @@ name: Continuous Integration
 on:
   push:
     branches: [ main ]
+    # Skip CI on push if changes not occurs in the packages directory
+    paths:
+      - 'packages/**'
   pull_request:
     branches: [ main ]
+    # Skip CI on push if changes not occurs in the packages directory
+    paths:
+      - 'packages/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
