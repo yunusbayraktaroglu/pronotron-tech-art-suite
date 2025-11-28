@@ -32,6 +32,7 @@ const createMockModel = () => ( {
 	_updatePointer: jest.fn(),
 
 	// Properties
+	pointerTarget: null,
 	_currentState: PointerState.IDLE,
 	_canInteract: true,
 	_pointerStart: { x: 10, y: 20, set: jest.fn() },
@@ -269,8 +270,7 @@ describe( 'MouseController Test Suite', () => {
 
 		it( 'should handle _onDragStart by adding listeners and setting state', () => {
 
-			const event = {} as Event; // DragEvent is complex, generic Event is fine
-			controller._onDragStart( event );
+			controller._onDragStart();
 
 			expect( mockModel._addEventListeners ).toHaveBeenCalledWith(
 				[ 'dragover', controller._onPointerMove ],
@@ -282,8 +282,7 @@ describe( 'MouseController Test Suite', () => {
 
 		it( 'should handle _onDragEnd by removing listeners and setting state', () => {
 
-			const event = {} as Event;
-			controller._onDragEnd( event );
+			controller._onDragEnd();
 
 			expect( mockModel._removeEventListeners ).toHaveBeenCalledWith(
 				[ 'dragover', controller._onPointerMove ],

@@ -33,6 +33,7 @@ const createMockModel = () => ( {
 	_updatePointer: jest.fn(),
 
 	// Properties
+	pointerTarget: null,
 	_currentState: PointerState.IDLE,
 	_canInteract: true,
 	_pointerStart: { x: 10, y: 20, set: jest.fn() },
