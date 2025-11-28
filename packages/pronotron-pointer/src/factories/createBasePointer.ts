@@ -12,8 +12,6 @@ type Model = "touch" | "mouse";
  * @param settings {@link PointerBaseDependencies}
  * @param model {@link Model}
  * 
- * @returns 
- * 
  * @example
  * const clock = new PronotronClock();
  * const animator = new PronotronAnimator( clock );
