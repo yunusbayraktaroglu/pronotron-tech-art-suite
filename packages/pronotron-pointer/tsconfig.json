@@ -1,10 +1,10 @@
 {
 	"extends": "@pronotron/config-ts/js-library.json",
 	"compilerOptions": {
-		"stripInternal": true
+		"stripInternal": true,
 	},
 	"include": [
-		"."
+		"./src"
 	],
 	"exclude": [
 		"dist",
