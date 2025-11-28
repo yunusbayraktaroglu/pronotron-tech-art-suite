@@ -4,4 +4,4 @@
 :HL["https://img.shields.io/npm/v/@pronotron/pointer","image"]
 :HL["https://img.shields.io/bundlephobia/minzip/@pronotron/pointer","image"]
 :HL["https://codecov.io/gh/yunusbayraktaroglu/pronotron-tech-art-suite/branch/main/graph/badge.svg?flag=pronotron-pointer&precision=1","image"]
-0:{"buildId":"SLEoRl1WZHKIH7ZYdh_SM","tree":{"name":"","paramType":null,"paramKey":"","hasRuntimePrefetch":false,"slots":{"children":{"name":"pointer","paramType":null,"paramKey":"pointer","hasRuntimePrefetch":false,"slots":{"children":{"name":"__PAGE__","paramType":null,"paramKey":"__PAGE__","hasRuntimePrefetch":false,"slots":null,"isRootLayout":false}},"isRootLayout":false}},"isRootLayout":true},"staleTime":300}
+0:{"buildId":"6_RtutvUSBLe6_xjGTbK-","tree":{"name":"","paramType":null,"paramKey":"","hasRuntimePrefetch":false,"slots":{"children":{"name":"pointer","paramType":null,"paramKey":"pointer","hasRuntimePrefetch":false,"slots":{"children":{"name":"__PAGE__","paramType":null,"paramKey":"__PAGE__","hasRuntimePrefetch":false,"slots":null,"isRootLayout":false}},"isRootLayout":false}},"isRootLayout":true},"staleTime":300}
