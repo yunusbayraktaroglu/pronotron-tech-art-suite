@@ -24,8 +24,6 @@ jest.mock( '../src/core/interaction/PointerHoldable', () => ( {
  */
 const createMockModel = () => ( {
 	_updateSettings: jest.fn(),
-	_startEvents: jest.fn( () => true ), // Default to success
-	_stopEvents: jest.fn(),
 	_addEventListeners: jest.fn(),
 	_removeEventListeners: jest.fn(),
 	_onPointerStart: jest.fn(),
@@ -33,6 +31,7 @@ const createMockModel = () => ( {
 	_onPointerEnd: jest.fn(),
 	_updatePointer: jest.fn(),
 	// Properties
+	pointerTarget: null,
 	_currentState: PointerState.IDLE,
 	_canInteract: true,
 	_pointerStart: { x: 10, y: 20, set: jest.fn() },
@@ -51,6 +50,8 @@ type MockModel = ReturnType<typeof createMockModel>;
 class TestableModelController extends ModelController
 {
 	// Satisfy the abstract requirement with a mock
+	_startEvents = jest.fn();
+	_stopEvents = jest.fn();
 	_getPointerPosition = jest.fn( () => ( { x: 0, y: 0 } ) );
 }
 
@@ -69,6 +70,55 @@ describe( 'ModelController Test Suite', () => {
 			mockModel as unknown as PointerBase | PointerHoldable,
 		);
 
+	} );
+
+	describe( 'Initialization and State Check', () => {
+
+		it( 'should initialize in "IDLE" state', () => {
+
+			expect( controller._isRunning ).toBe( false );
+
+			controller.startEvents();
+
+			expect( controller._model.pointerTarget ).toBe( null );
+			expect( controller._model._currentState ).toBe( PointerState.IDLE );
+			expect( controller._isRunning ).toBe( true );
+			
+		} );
+
+		it( 'should warn and return false if startEvents() is called twice', () => {
+
+			// Spy on console.warn to ensure it's called
+			const consoleWarnSpy = jest.spyOn( console, 'warn' ).mockImplementation( () => {} );
+
+			// --- First call (the "happy path") ---
+			const firstCallResult = controller.startEvents();
+			expect( firstCallResult ).toBe( true );
+			expect( controller._isRunning ).toBe( true );
+
+			// --- Second call (the test for the uncovered lines) ---
+			const secondCallResult = controller.startEvents();
+
+			// Check that it returned false (Line 232)
+			expect( secondCallResult ).toBe( false );
+
+			// Check that console.warn was called (Line 231)
+			expect( consoleWarnSpy ).toHaveBeenCalledWith( "PronotronPointer: Already started." );
+
+			// Clean up the spy
+			consoleWarnSpy.mockRestore();
+
+		} );
+
+		it( 'stopEvents() should the reset state', () => {
+
+			controller.stopEvents();
+
+			expect( controller._isRunning ).toBe( false );
+			expect( controller._model._currentState ).toBe( PointerState.IDLE );
+			expect( controller._model.pointerTarget ).toBe( null );
+			
+		} );
 	} );
 
 	it( 'should store the model on construction', () => {

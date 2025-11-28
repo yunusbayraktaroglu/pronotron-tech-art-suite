@@ -1,13 +1,19 @@
-import { PronotronAnimator, PronotronClock } from '@pronotron/utils';
+import { PronotronAnimator, PronotronClock, Vector2 } from '@pronotron/utils';
+
+jest.mock( '@pronotron/utils', () => {
+	// Keep Vector2 as it is
+	const actual = jest.requireActual( '@pronotron/utils' );
+	const auto = jest.createMockFromModule<typeof actual>( '@pronotron/utils' );
+	auto.PronotronClock.prototype.getTime = jest.fn().mockReturnValue( { elapsedTime: 0 } );
+	return {
+		...actual,
+		PronotronAnimator: auto.PronotronAnimator,
+		PronotronClock: auto.PronotronClock,
+	};
+} );
 
 import { PointerState } from '../../src/core/interaction/PointerBase';
-import { PointerHoldable } from '../../src/core/interaction/PointerHoldable';
-
-jest.mock( '@pronotron/utils' );
-
-const MockedAnimator = PronotronAnimator as jest.MockedClass<typeof PronotronAnimator>;
-const MockedClock = PronotronClock as jest.MockedClass<typeof PronotronClock>;
-MockedClock.prototype.getTime = jest.fn().mockReturnValue( { elapsedTime: 0 } );
+import { PointerHoldable, type HoldEventDetail, type ReleaseEventDetail } from '../../src/core/interaction/PointerHoldable';
 
 describe( 'PointerHoldable Test Suite', () => {
 
@@ -16,9 +22,10 @@ describe( 'PointerHoldable Test Suite', () => {
 	let mockClock: PronotronClock;
 	let pointerHoldable: PointerHoldable;
 	
+	// We will test isInteractable with PointerBase tests
 	const isInteractable: jest.Mock = jest.fn().mockImplementation( ( target: HTMLElement ) => false );
-	const isHoldable: jest.Mock = jest.fn().mockImplementation( ( target: HTMLElement ) => target.tagName === 'BUTTON' );
 
+	const isHoldable: jest.Mock = jest.fn().mockImplementation( ( target: HTMLElement ) => target.tagName === 'BUTTON' );
 	const holdableElement = document.createElement( 'button' );
 	const nonHoldableElement = document.createElement( 'div' );
 
@@ -27,11 +34,19 @@ describe( 'PointerHoldable Test Suite', () => {
 	const movingDeltaLimit = 20;
 	const holdThreshold = 0.5;
 
+	// Utility to create a synthetic DOM event with mocked propagation methods
+	const createMockEvent = ( target: EventTarget ) => ( {
+		target,
+		preventDefault: jest.fn(),
+		stopPropagation: jest.fn(),
+		stopImmediatePropagation: jest.fn(),
+	} ) as unknown as Event;
+
 	beforeAll( () => {
 
 		mockTarget = document.body;
-		mockClock = new MockedClock();
-		mockAnimator = new MockedAnimator( mockClock );
+		mockClock = new PronotronClock();
+		mockAnimator = new PronotronAnimator( mockClock );
 		
 		pointerHoldable = new PointerHoldable( {
 			target: mockTarget,
@@ -47,24 +62,10 @@ describe( 'PointerHoldable Test Suite', () => {
 
 	} );
 
-	// Utility to create a synthetic DOM event with mocked propagation methods
-	const createMockEvent = ( target: EventTarget ) => ( {
-		target,
-		preventDefault: jest.fn(),
-		stopPropagation: jest.fn(),
-		stopImmediatePropagation: jest.fn(),
-	} ) as unknown as Event;
-
 	describe( 'Initialization', () => {
-
-		beforeAll( () => {
-			jest.restoreAllMocks();
-			jest.spyOn( mockTarget, 'dispatchEvent' );
-		} );
 
 		it( 'should initialize with correct default state values', () => {
 
-			expect( pointerHoldable._isRunning ).toBe( false );
 			expect( pointerHoldable._canHold ).toBe( false );
 			expect( pointerHoldable._currentState ).toBe( PointerState.IDLE );
 
@@ -72,13 +73,14 @@ describe( 'PointerHoldable Test Suite', () => {
 
 		it( 'should ignore on non-holdable targets', () => {
 
-			pointerHoldable._startEvents();
 			pointerHoldable._onPointerStart( createMockEvent( nonHoldableElement ) );
-			
 			expect( pointerHoldable._canHold ).toBe( false );
 
-			pointerHoldable._onPointerEnd( createMockEvent( nonHoldableElement ) );
-			pointerHoldable._stopEvents();
+			pointerHoldable._onPointerStart( createMockEvent( holdableElement ) );
+			expect( pointerHoldable._canHold ).toBe( true );
+
+			pointerHoldable._onPointerEnd( createMockEvent( holdableElement ) );
+			expect( pointerHoldable._canHold ).toBe( false );
 
 		} );
 
@@ -90,44 +92,25 @@ describe( 'PointerHoldable Test Suite', () => {
 
 			jest.restoreAllMocks();
 			jest.spyOn( mockTarget, 'dispatchEvent' );
-			
-			pointerHoldable._startEvents();
 
 			// Start pointer on a holdable, sets pointer start position as [0, 0], pointer start time as 0
 			pointerHoldable._onPointerStart( createMockEvent( holdableElement ) );
+
+			// Now PointerState is PENDING
 
 		} );
 
 		it( 'should schedule HOLD animation when target is holdable', () => {
 			
-			expect( pointerHoldable._isRunning ).toBe( true );
 			expect( pointerHoldable._currentState ).toBe( PointerState.PENDING );
-			expect( mockAnimator.add ).toHaveBeenCalledWith( expect.objectContaining( { id: 'HOLD', duration: holdThreshold } ) );
+			expect( mockAnimator.add ).toHaveBeenCalledWith( expect.objectContaining( { id: 'HOLD', delay: holdThreshold } ) );
 			expect( pointerHoldable._canHold ).toBe( true );
 
 		} );
 
-		// Add this test to cover the `forced = true` case
-		it( 'should not convert to hold if animation is forced to end', () => {
-
-			// Spy on _convertToHold to ensure it's NOT called
-			const convertToHoldSpy = jest.spyOn( pointerHoldable as any, '_convertToHold' );
-			
-			// Start the pointer on a holdable element
-			pointerHoldable._onPointerStart( createMockEvent( holdableElement ) );
-
-			// Get the onEnd callback
-			const scheduledAnimationOptions = jest.mocked( mockAnimator.add ).mock.lastCall![ 0 ];
-
-			// Simulate the animation being forced to end (e.g., by another animation)
-			scheduledAnimationOptions.onEnd!( true ); // forced = true
-
-			expect( pointerHoldable._currentState ).toBe( PointerState.PENDING );
-			expect( convertToHoldSpy ).not.toHaveBeenCalled();
-			
-		} );
-
 		it( 'should dispatch "HOLD" event when holdThreshold is exceeded', () => {
+
+			pointerHoldable._onPointerStart( createMockEvent( holdableElement ) );
 
 			// Advance time by more than the hold threshold
 			mockClock.getTime = jest.fn().mockReturnValue( { elapsedTime: holdThreshold + 0.01 } );
@@ -136,25 +119,27 @@ describe( 'PointerHoldable Test Suite', () => {
 			 * HOLD Animation options passed to animator
 			 * {
 			 * 	id: 'HOLD',
-			 * 	duration: number,
+			 * 	delay: number,
 			 * 	autoPause: false,
-			 * 	onEnd: [Function: onEnd]
+			 * 	onBegin: [Function: onBegin]
 			 * }
 			 */
 			const scheduledAnimationOptions = jest.mocked( mockAnimator.add ).mock.lastCall![ 0 ];
 
-			// Manually invoke the onEnd callback to simulate animation completion
-			scheduledAnimationOptions.onEnd!( false );
+			// Manually invoke the onBegin callback to simulate animation
+			scheduledAnimationOptions.onBegin!();
 
 			// The "hold" event should be dispatched
 			expect( mockTarget.dispatchEvent ).toHaveBeenCalledWith( expect.any( CustomEvent ) );
 
 			const dispatchedEvent = jest.mocked( mockTarget.dispatchEvent ).mock.lastCall![ 0 ] as CustomEvent;
-			
+			const eventDetail = dispatchedEvent.detail as HoldEventDetail;
+
 			expect( pointerHoldable._currentState ).toBe( PointerState.HOLDING );
 			expect( dispatchedEvent.type ).toBe( 'hold' );
-			expect( dispatchedEvent.detail.target ).toBe( holdableElement );
-			expect( holdableElement.dataset.holded ).toBe( '1' );
+			
+			expect( eventDetail.holdTarget ).toBe( holdableElement );
+			expect( eventDetail.position ).toEqual( { x: 0, y: 0 } );
 			
 		} );
 
@@ -171,8 +156,8 @@ describe( 'PointerHoldable Test Suite', () => {
 
 			expect( pointerHoldable._currentState ).toBe( PointerState.HOLD_DRAGGING );
 			expect( event.preventDefault ).toHaveBeenCalled();
-			expect( event.stopImmediatePropagation ).toHaveBeenCalled();
 			// expect( event.stopPropagation ).toHaveBeenCalled();
+			// expect( event.stopImmediatePropagation ).toHaveBeenCalled();
 
 		} );
 
@@ -183,11 +168,17 @@ describe( 'PointerHoldable Test Suite', () => {
 
 			// Verify if event has been dispatched on our target
 			expect( mockTarget.dispatchEvent ).toHaveBeenCalledWith( expect.any( CustomEvent ) );
-			const holdEndEvent = jest.mocked( mockTarget.dispatchEvent ).mock.lastCall![ 0 ];
 
-			expect( holdEndEvent.type ).toBe( 'holdend' );
-			expect( holdableElement.dataset.holded ).toBe( '0' );
+			const holdEndEvent = jest.mocked( mockTarget.dispatchEvent ).mock.lastCall![ 0 ] as CustomEvent;
+			const eventDetail = holdEndEvent.detail as ReleaseEventDetail;
+
 			expect( pointerHoldable._currentState ).toBe( PointerState.IDLE );
+			expect( holdEndEvent.type ).toBe( 'holdend' );
+
+			expect( eventDetail.holdTarget ).toBe( holdableElement );
+			expect( eventDetail.releaseTarget ).toBe( mockTarget );
+			expect( eventDetail.position ).toEqual( { x: 20, y: 20 } );
+
 		} );
 		
 	} );

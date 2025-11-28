@@ -1,6 +1,6 @@
 import { PronotronAnimator, PronotronClock, Vector2 } from '@pronotron/utils';
 
-import { PointerBase, PointerState } from '../../src/core/interaction/PointerBase';
+import { PointerBase, PointerState, TapEventDetail } from '../../src/core/interaction/PointerBase';
 
 const MockedAnimator = PronotronAnimator as jest.MockedClass<typeof PronotronAnimator>;
 MockedAnimator.prototype.add = jest.fn();
@@ -17,6 +17,14 @@ describe( 'PointerBase Test Suite', () => {
 	const idleThreshold = 0.50;
 	const movingDeltaLimit = 20;
 	const startPosition = { x: 300, y: 120 };
+
+	// Helper to create a mock DOM event
+	const createMockEvent = ( target: EventTarget ) => ( {
+		target,
+		preventDefault: jest.fn(),
+		stopPropagation: jest.fn(),
+		stopImmediatePropagation: jest.fn(),
+	} ) as unknown as Event;
 
 	beforeEach( () => {
 
@@ -43,90 +51,20 @@ describe( 'PointerBase Test Suite', () => {
 	} );
 
 	afterEach( () => {
-		pointerBase._stopEvents();
+		// Reset pointer state
+		pointerBase.pointerTarget = null;
+		pointerBase._currentState = PointerState.IDLE;
+		pointerBase._canInteract = false;
 	} );
-
-	// Helper to create a mock DOM event
-	const createMockEvent = ( target: EventTarget ) => ( {
-		target,
-		preventDefault: jest.fn(),
-		stopPropagation: jest.fn(),
-		stopImmediatePropagation: jest.fn(),
-	} ) as unknown as Event;
 
 	describe( 'Initialization and State Check', () => {
 
-		const eventTarget = document.createElement( 'div' );
-		const mockedEvent = createMockEvent( eventTarget );
-
 		it( 'should initialize in "IDLE" state', () => {
 
-			expect( pointerBase._isRunning ).toBe( false );
-
-			pointerBase._startEvents();
-
-			expect( pointerBase._isRunning ).toBe( true );
+			expect( pointerBase.pointerTarget ).toBe( null );
 			expect( pointerBase._currentState ).toBe( PointerState.IDLE );
+			expect( pointerBase._canInteract ).toBe( false );
 			
-		} );
-
-		it( 'should transition to "IDLE → PENDING" on pointerStart()', () => {
-
-			pointerBase._startEvents();
-			pointerBase._onPointerStart( mockedEvent );
-
-			expect( pointerBase._currentState ).toBe( PointerState.PENDING );
-
-		} );
-
-		it( 'should transition to "PENDING → IDLE" on pointerEnd()', () => {
-
-			pointerBase._startEvents();
-			pointerBase._onPointerStart( mockedEvent );
-
-			// Should dispatch a "tap" event
-			pointerBase._onPointerEnd( mockedEvent );
-
-			expect( pointerBase._currentState ).toBe( PointerState.IDLE );
-
-		} );
-
-		it( 'should not dispatch any events before startEvents()', () => {
-
-			/**
-			 * _onPointerStart converts state to PENDING, 
-			 * but it is a private property
-			 * 
-			 * expect( pointerBase._currentState ).toBe( PointerState.IDLE );
-			 */
-			pointerBase._onPointerStart( mockedEvent );
-
-			expect( pointerBase._isRunning ).toBe( false );
-
-		} );
-
-		it( 'should warn and return false if _startEvents is called twice', () => {
-
-			// Spy on console.warn to ensure it's called
-			const consoleWarnSpy = jest.spyOn( console, 'warn' ).mockImplementation( () => {} );
-
-			// --- First call (the "happy path") ---
-			const firstCallResult = pointerBase._startEvents();
-			expect( firstCallResult ).toBe( true );
-			expect( pointerBase._isRunning ).toBe( true );
-
-			// --- Second call (the test for the uncovered lines) ---
-			const secondCallResult = pointerBase._startEvents();
-
-			// Check that it returned false (Line 232)
-			expect( secondCallResult ).toBe( false );
-
-			// Check that console.warn was called (Line 231)
-			expect( consoleWarnSpy ).toHaveBeenCalledWith( "Already running" );
-
-			// Clean up the spy
-			consoleWarnSpy.mockRestore();
-
 		} );
 
 	} );
@@ -139,7 +77,7 @@ describe( 'PointerBase Test Suite', () => {
 		const moveValueToReachLimit = Math.sqrt( movingDeltaLimit / 2 );
 
 		beforeEach( () => {
-			pointerBase._startEvents();
+			
 			// Sets pointer start position as [0, 0], pointer start time as 0
 			pointerBase._onPointerStart( mockedEvent );
 
@@ -156,6 +94,8 @@ describe( 'PointerBase Test Suite', () => {
 			pointerBase._updatePointer( currentPosition.x + moveValueToNotReachLimit, currentPosition.y );
 			pointerBase._onPointerMove( mockedEvent );
 
+			// Target should be set correctly
+			expect( pointerBase.pointerTarget ).toBe( eventTarget );
 			// Despite movement it should still be PENDING
 			expect( pointerBase._currentState ).toBe( PointerState.PENDING );
 
@@ -185,7 +125,6 @@ describe( 'PointerBase Test Suite', () => {
 		const tapThresholdNotExceed = tapThreshold + 0.01;
 
 		beforeEach( () => {
-			pointerBase._startEvents();
 			// Sets pointer start position as [0, 0], pointer start time as 0
 			pointerBase._onPointerStart( mockedEvent );
 		} );
@@ -200,8 +139,10 @@ describe( 'PointerBase Test Suite', () => {
 
 			const dispatchedEvent = jest.mocked( mockTarget.dispatchEvent ).mock.lastCall![ 0 ] as CustomEvent;
 			
+			const eventDetail = dispatchedEvent.detail as TapEventDetail;
+
 			expect( dispatchedEvent.type ).toBe( 'tap' );
-			expect( dispatchedEvent.detail.target ).toBe( eventTarget );
+			expect( eventDetail.tapTarget ).toBe( eventTarget );
 
 		} );
 
@@ -223,7 +164,7 @@ describe( 'PointerBase Test Suite', () => {
 		const mockedEvent = createMockEvent( eventTarget );
 
 		beforeEach( () => {
-			pointerBase._startEvents();
+			// Sets pointer start position as [0, 0], pointer start time as 0
 			pointerBase._onPointerStart( mockedEvent );
 		} );
 
@@ -232,7 +173,7 @@ describe( 'PointerBase Test Suite', () => {
 			pointerBase._updatePointer( 10, 10 );
 			pointerBase._onPointerMove( mockedEvent );
 
-			expect( mockAnimator.add ).toHaveBeenCalledWith( expect.objectContaining( { id: 'IDLE', duration: idleThreshold } ) );
+			expect( mockAnimator.add ).toHaveBeenCalledWith( expect.objectContaining( { id: 'IDLE', delay: idleThreshold } ) );
 
 		} );
 
@@ -257,7 +198,7 @@ describe( 'PointerBase Test Suite', () => {
 			const scheduledAnimationOptions = jest.mocked( mockAnimator.add ).mock.lastCall![ 0 ];
 
 			// Manually trigger the animation end callback
-			scheduledAnimationOptions!.onEnd!( false );
+			scheduledAnimationOptions.onBegin!();
 
 			expect( pointerBase._currentState ).toBe( PointerState.IDLE );
 
@@ -273,8 +214,6 @@ describe( 'PointerBase Test Suite', () => {
 		it( 'should update _canInteract on pointer start and move', () => {
 
 			isInteractable.mockImplementation( target => target.tagName === 'BUTTON' );
-
-			pointerBase._startEvents();
 
 			// Test on pointer start
 			pointerBase._onPointerStart( createMockEvent( interactableElement ) );
