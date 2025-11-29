@@ -129,7 +129,6 @@ export class PointerHoldable extends PointerBase<"hold" | "holdend">
 			this._animator.add( {
 				id: "HOLD",
 				delay: this._holdThreshold,
-				duration: 0,
 				autoPause: false,
 				onBegin: () => {
 					// Covert to hold if still PENDING

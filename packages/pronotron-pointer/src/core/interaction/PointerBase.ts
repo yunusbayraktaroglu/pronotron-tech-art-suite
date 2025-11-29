@@ -302,7 +302,6 @@ export class PointerBase<TDispatchableEvents extends string = string> extends Ev
 		this._animator.add( {
 			id: "IDLE",
 			delay: this._idleThreshold,
-			duration: 0,
 			autoPause: false,
 			onBegin: () => {
 				if ( this._currentState === PointerState.MOVING ){
