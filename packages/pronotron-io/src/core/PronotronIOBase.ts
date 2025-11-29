@@ -125,7 +125,8 @@ export enum IONodePosition
 export abstract class PronotronIOBase<TEvents extends string>
 {
 	/**
-	 * @internal
+	 * Handles scroll events and updates the scroll direction and positions.
+	 * @param scrollValue - The current scroll value
 	 */
 	abstract handleScroll( scrollValue: number ): void;
 
@@ -138,20 +139,11 @@ export abstract class PronotronIOBase<TEvents extends string>
 	 * Human readable event names
 	 * @internal
 	 */
-	abstract readonly _eventNames: {
+	protected abstract readonly _eventNames: {
 		_negativeEnterEvent: TEvents;
 		_negativeExitEvent: TEvents;
 		_positiveEnterEvent: TEvents;
 		_positiveExitEvent: TEvents;
-	};
-
-	/**
-	 * Human readable scroll direction names
-	 * @internal
-	 */
-	abstract readonly _scrollDirectionNames: {
-		_negative: string;
-		_positive: string;
 	};
 
 	/**
@@ -318,10 +310,23 @@ export abstract class PronotronIOBase<TEvents extends string>
 		const nodeID = this._nodeReferences.get( existingNodeRef );
 
 		if ( nodeID !== undefined ){
-			this._removeNodeByIds([ nodeID ]);
+			this._removeNodeByIds( [ nodeID ] );
 		} else {
 			console.warn( `IONode is not found in the list.`, existingNodeRef );
 		}
+	}
+
+	/**
+	 * Returns the last known position of an IONode. 
+	 * For external usage.
+	 * 
+	 * @param nodeID 
+	 * @returns IONodePosition
+	 */
+	getNodePosition( nodeID: PronotronIONodeID ): IONodePosition
+	{
+		const nodePosition = this._controlTable.getData( nodeID, IONodeStrideIndex.LastPosition ) as IONodePosition;
+		return nodePosition;
 	}
 
 	/**
@@ -348,7 +353,7 @@ export abstract class PronotronIOBase<TEvents extends string>
 		this._totalPageHeight = maximumValue;
 		this._expandTableIfNeeded();
 
-		this._nodes.forEach(( nodeSettings, nodeID ) => this._updateNodeBounds( nodeID, nodeSettings ));
+		this._nodes.forEach( ( nodeSettings, nodeID ) => this._updateNodeBounds( nodeID, nodeSettings ) );
 	}
 
 	/**
