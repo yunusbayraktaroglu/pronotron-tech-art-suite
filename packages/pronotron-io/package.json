@@ -1,6 +1,6 @@
 {
 	"name": "@pronotron/io",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "Reliable viewport tracking without missed targets, unlike the default IntersectionObserver API.",
 	"author": "Yunus Bayraktaroglu <yunus.bayraktaroglu@gmail.com>",
 	"main": "./dist/index.js",
@@ -41,6 +41,6 @@
 		"@pronotron/config-ts": "*"
 	},
 	"dependencies": {
-		"@pronotron/utils": "1.0.0"
+		"@pronotron/utils": "1.0.1"
 	}
 }

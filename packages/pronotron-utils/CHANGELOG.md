@@ -1,5 +1,14 @@
 # @pronotron/utils
 
+## 1.0.1
+
+### Patch Changes
+
+- 50b470c:
+  - Improved animation types.
+  - `Clock` now expects a `now()` function via dependency injection.
+  - Improved test coverage.
+
 ## 1.0.0
 
 ### Major Changes
