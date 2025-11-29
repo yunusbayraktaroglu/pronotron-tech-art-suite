@@ -13,9 +13,12 @@ export type IOVerticalOptions = IONodeOptions<VerticalEvent>;
  * pronotronIO.addNode({
  * 	ref: HTMLElement,
  * 	dispatch: {
+ * 		// Direction-agnostic events
  * 		onEnter: () => console.log( "Element entered regardless of direction" ),
  * 		onExit: () => console.log( "Element exited regardless of direction" ),
  * 		onInViewport: ( normalizedPosition: number ) => console.log( "Element is in viewport", normalizedPosition ),
+ * 		onScrollProgress: ( progress: number ) => console.log( "Element scroll progress", progress ),
+ * 		// Direction-specific events
  * 		onTopEnter: () => console.log( "Element entered from the top" ),
  * 		onTopExit: {
  * 			dispatch: () => console.log( "Element exited from the top" ),
@@ -39,12 +42,14 @@ export class PronotronIOVerticalObserver extends PronotronIOEventDispatcher<Vert
 {
 	direction: "up" | "down" = "down";
 
-	_scrollDirectionNames = { 
+	/** @internal */
+	protected _scrollDirectionNames = { 
 		_negative: "down",
 		_positive: "up" 
 	};
 
-	_eventNames = {
+	/** @internal */
+	protected _eventNames = {
 		_negativeEnterEvent: "onTopEnter",
 		_negativeExitEvent: "onTopExit",
 		_positiveEnterEvent: "onBottomEnter",
