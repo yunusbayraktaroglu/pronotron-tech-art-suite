@@ -32,6 +32,8 @@
  */
 export class PronotronClock 
 {
+	private _now: () => number;
+
 	/**
 	 * Indicates whether the clock has started ticking.
 	 * @internal
@@ -75,6 +77,16 @@ export class PronotronClock
 	private _activeElapsed = 0;
 
 	/**
+	 * Create a PronotronClock instance.
+	 *
+	 * @param now - A callback that returns the current time as a number. Typically this is performance.now()
+	 */
+	constructor( now?: () => number )
+	{
+		this._now = now || ( () => performance.now() );
+	}
+
+	/**
 	 * Advances the clock by one frame and computes the delta time.
 	 * Call this once per render frame
 	 * 
@@ -92,7 +104,7 @@ export class PronotronClock
 	 */
 	pause(): void
 	{
-		this._pauseStartTime = now();
+		this._pauseStartTime = this._now();
 	}
 
 	/**
@@ -101,7 +113,7 @@ export class PronotronClock
 	 */
 	resume(): void
 	{
-		this._totalPausedDuration += ( now() - this._pauseStartTime ) / 1000;
+		this._totalPausedDuration += ( this._now() - this._pauseStartTime ) / 1000;
 	}
 
 	/**
@@ -121,7 +133,7 @@ export class PronotronClock
 	 */
 	private _start(): void
 	{
-		this._startTime = now();
+		this._startTime = this._now();
 		this._lastTickTime = this._startTime;
 		this._running = true;
 	}
@@ -132,7 +144,7 @@ export class PronotronClock
 	 */
 	private _getDelta(): number
 	{
-		const newTime = now();
+		const newTime = this._now();
 		const diff = ( newTime - this._lastTickTime ) / 1000;
 		
 		this._lastTickTime = newTime;
@@ -143,12 +155,4 @@ export class PronotronClock
 		return diff;
 	}
 
-}
-
-/**
- * Returns the current high-resolution timestamp in milliseconds.
- */
-function now(): number
-{
-	return performance.now();
 }
