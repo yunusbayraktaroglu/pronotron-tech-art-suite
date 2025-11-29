@@ -62,9 +62,71 @@ type AnimationClientID = string;
 type AnimationInternalID = number;
 
 /**
+ * Describes an animation that can be scheduled and driven by the animator.
+ *
+ * The animator calls `onRender` each frame while the animation is active and
+ * manages start, optional delay, and termination. Implementations should use
+ * the provided timing arguments to compute progress and apply interpolated
+ * values.
+ */
+type RenderableAnimation = {
+	/**
+	 * Animation duration in seconds.
+	 */
+	duration: number;
+	/**
+	 * Called each frame if defined.
+	 * Provides timing information relative to the animation start and duration.
+	 */
+	onRender: ( currentTime: number, startTime: number, duration: number ) => void;
+	/**
+	 * Optional delay before the animation begins, in seconds. 
+	 * If omitted or `0`, the animation begins immediately when scheduled.
+	 */
+	delay?: number;
+	/**
+	 * Called when the animation finishes.
+	 * @param forced Indicates whether the animation was forcibly terminated (via removeAnimation()).
+	 */
+	onEnd?: ( forced: boolean ) => void;
+	/**
+	 * Optional callback invoked once when the animation begins. 
+	 * Useful for any one-time setup required at animation start.
+	 */ 
+	onBegin?: () => void
+};
+
+/**
+ * Represents a non-renderable animation: a timing/lifecycle-only animation that does not perform
+ * per-frame rendering. Use this type for animations that need start callbacks or scheduling but
+ * must not expose a render callback.
+ */
+type NonRenderableAnimation = {
+	/**
+	 * Delay before animation start, in seconds.
+	 */
+	delay: number;
+	/**
+	 * Called when the animation begins.
+	 */ 
+	onBegin: () => void
+	/**
+	 * Called when the animation finishes.
+	 * @param forced Indicates whether the animation was forcibly terminated (via removeAnimation()).
+	 */
+	onEnd?: ( forced: boolean ) => void;
+	// Explicitly disallowed for this type.
+    onRender?: never;
+	// Explicitly disallowed for this type.
+	duration?: never;
+};
+
+type AnimationType = RenderableAnimation | NonRenderableAnimation;
+
+/**
  * Describes the configuration of an animation instance.
  */
-export type AnimationOption = RequireAtLeastOne<CallbackOption> & {
+export type AnimationOption = AnimationType & {
 	/**
 	 * Unique client-provided identifier.
 	 * Adding an animation with the same ID forcibly finishes the previous one.
@@ -76,31 +138,6 @@ export type AnimationOption = RequireAtLeastOne<CallbackOption> & {
 	 * false → continues ticking
 	 */
 	autoPause: boolean;
-	/**
-	 * Animation duration in seconds.
-	 */
-	duration: number ;
-	/**
-	 * Optional delay before animation start, in seconds.
-	 */
-	delay?: number;
-};
-
-type CallbackOption = {
-	/**
-	 * Called when the animation begins.
-	 */ 
-	onBegin: () => void
-	/**
-	 * Called when the animation finishes.
-	 * @param forced Indicates whether the animation was forcibly terminated (via removeAnimation()).
-	 */
-	onEnd: ( forced: boolean ) => void;
-	/**
-	 * Called each frame if defined.
-	 * Provides timing information relative to the animation start and duration.
-	 */
-	onRender: ( currentTime: number, startTime: number, duration: number ) => void;
 };
 
 /**
@@ -227,7 +264,7 @@ export class PronotronAnimator
 
 		} else {
 
-			console.warn( `AnimationID: '${ animationID }' does not exist.` );
+			console.warn( `PronotronAnimator: ID: '${ animationID }' does not exist.` );
 
 		}
 	}
