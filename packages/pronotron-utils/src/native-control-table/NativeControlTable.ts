@@ -128,7 +128,7 @@ export class NativeControlTable<EnumType extends number>
 	 * 
 	 * @param ID Slot ID to remove.
 	 */
-	remove( ID: SlotID ): void | Error
+	remove( ID: SlotID ): void
 	{
 		/**
 		 * Does not actually remove data; instead, it shifts the last slot's data to the removed slot,
@@ -177,7 +177,7 @@ export class NativeControlTable<EnumType extends number>
 	 * @param dataKey Enum key corresponding to the desired value.
 	 * @returns The numeric value stored for that key in the slot, or undefined if the ID does not exist.
 	 */
-	getData( ID: SlotID, dataKey: EnumType ): number | Error
+	getData( ID: SlotID, dataKey: EnumType ): number
 	{
 		const slotPosition = this._getSlotPositionOrThrowError( ID );
 		const offset = slotPosition * this.stride;
@@ -192,7 +192,7 @@ export class NativeControlTable<EnumType extends number>
 	 * @param data Object with at least one property defined
 	 * @returns 
 	 */
-	modifyByID( ID: SlotID, data: RequireAtLeastOne<EnumValueMap<EnumType>> ): void | Error
+	modifyByID( ID: SlotID, data: RequireAtLeastOne<EnumValueMap<EnumType>> ): void
 	{
 		const slotPosition = this._getSlotPositionOrThrowError( ID );
 		this.modifyByPosition( slotPosition, data );
