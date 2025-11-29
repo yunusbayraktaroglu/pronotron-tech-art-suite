@@ -1,5 +1,40 @@
 import { PointerBase, PointerBaseDependencies, PointerState, type BaseSettings } from "./PointerBase";
 
+/**
+ * Details about a pointer hold event.
+ */
+export interface HoldEventDetail {
+	position: {
+		x: number;
+		y: number;
+	};
+	holdTarget: HTMLElement;
+};
+
+/**
+ * Details about a pointer hold release event.
+ */
+export interface ReleaseEventDetail {
+	position: {
+		x: number;
+		y: number;
+	};
+	holdTarget: HTMLElement;
+	releaseTarget: HTMLElement;
+};
+
+/**
+ * Settings for a holdable pointer interaction.
+ *
+ * Extends BaseSettings with a threshold that determines how long a pointer
+ * must be continuously pressed to be recognized as a "hold" gesture.
+ *
+ * @remarks
+ * The holdThreshold is specified in seconds.
+ *
+ * @property holdThreshold - Duration in seconds required to trigger a hold gesture.
+ * @default holdThreshold - 0.35
+ */
 export type HoldableSettings = BaseSettings & {
 	/**
 	 * Duration in seconds required to trigger a hold gesture.
@@ -90,17 +125,18 @@ export class PointerHoldable extends PointerBase<"hold" | "holdend">
 		if ( event.target && this._isHoldable( event.target as HTMLElement ) ){
 
 			this._canHold = true;
-			this._animator.add({
+
+			this._animator.add( {
 				id: "HOLD",
-				duration: this._holdThreshold,
+				delay: this._holdThreshold,
 				autoPause: false,
-				onEnd: ( forced ) => {
-					// If id: "HOLD" animation not overriden and state is still "PENDING"
-					if ( ! forced && this._currentState === PointerState.PENDING ){
+				onBegin: () => {
+					// Covert to hold if still PENDING
+					if ( this._currentState === PointerState.PENDING ){
 						this._convertToHold( event );
 					}
 				}
-			});
+			} );
 			
 		}
 		
@@ -119,11 +155,23 @@ export class PointerHoldable extends PointerBase<"hold" | "holdend">
 	 */
 	_onPointerMove( event: Event ): void
 	{
-		if ( this._currentState === PointerState.HOLDING || this._currentState === PointerState.HOLD_DRAGGING ){
+		if ( this._currentState === PointerState.HOLD_DRAGGING || this._currentState === PointerState.HOLDING ){
 			
-			// Disable touch scroll if holding
-			event.stopImmediatePropagation();
+			/**
+			 * Disable touch scroll on HOLD_DRAGGING
+			 * 
+			 * @challenges
+			 * Only works if touchstart event listener is prevented.
+			 * It doesn't aborts touch scroll on Android Chrome, need further investigation.
+			 * 
+			 * As a workaround, 'overflow: hidden' can be applied to body on hold start.
+			 * Its recommended by MDN.
+			 * 
+			 * @see https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault
+			 */
 			event.preventDefault();
+			//event.stopPropagation();
+			//event.stopImmediatePropagation();
 
 			this._currentState = PointerState.HOLD_DRAGGING;
 		}
@@ -142,8 +190,10 @@ export class PointerHoldable extends PointerBase<"hold" | "holdend">
 	 * @param event Current event object
 	 * @internal
 	 */
-	_onPointerEnd( event: Event )
+	_onPointerEnd( event: Event ): void
 	{
+		this._canHold = false;
+
 		/**
 		 * To be safely release holded element, 
 		 * Eg: if the screen becomes inactive while an element is holded
@@ -174,18 +224,17 @@ export class PointerHoldable extends PointerBase<"hold" | "holdend">
 	{
 		this._currentState = PointerState.HOLDING;
 
-		this._dispatchCustomEvent( "hold", { 
-			target: event.target,
+		const holdEvent: HoldEventDetail = {
 			position: { 
-				x: this._pointerStart.x, 
-				y: this._pointerStart.y 
-			}
-		} );
-		this._holdedElement = event.target as HTMLElement;
-		this._holdedElement.dataset.holded = "1";
+				x: this._pointerStart.x,
+				y: this._pointerStart.y
+			},
+			holdTarget: event.target as HTMLElement
+		};
+		
+		this._dispatchCustomEvent( "hold", holdEvent )
 
-		// Removes the pointer selection if exist
-		// (this._target as Window).getSelection()!.removeAllRanges();
+		this._holdedElement = event.target as HTMLElement;
 	}
 
 	/**
@@ -195,15 +244,17 @@ export class PointerHoldable extends PointerBase<"hold" | "holdend">
 	 */
 	private _releaseHold( event: Event ): void
 	{
-		this._dispatchCustomEvent( "holdend", {
-			target: this._holdedElement,
-			endTarget: event.target,
+		const releaseEventDetail: ReleaseEventDetail = {
 			position: { 
-				x: this._pointerStart.x, 
-				y: this._pointerStart.y 
-			}
-		} );
-		this._holdedElement!.dataset.holded = "0";
+				x: this._pointerStart.x,
+				y: this._pointerStart.y
+			},
+			holdTarget: this._holdedElement!,
+			releaseTarget: event.target as HTMLElement,
+		};
+
+		this._dispatchCustomEvent( "holdend", releaseEventDetail );
+
 		this._holdedElement = null;
 	}
 }

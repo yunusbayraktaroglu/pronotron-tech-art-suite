@@ -1,5 +1,17 @@
 # @pronotron/io
 
+## 1.0.2
+
+### Patch Changes
+
+- 50b470c:
+  - Improved test coverage.
+  - Added `getNodePosition()`, which returns the position enum of the `IONode`.
+  - Documented `onScrollProgress`.
+  - Excluded `_eventNames` and `_scrollDirectionNames` from the `.d.ts` output.
+- Updated dependencies [50b470c]
+  - @pronotron/utils@1.0.1
+
 ## 1.0.1
 
 ### Patch Changes

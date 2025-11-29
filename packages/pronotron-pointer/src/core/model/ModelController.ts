@@ -7,20 +7,75 @@ import { PointerHoldable, HoldableSettings } from "../interaction/PointerHoldabl
 export abstract class ModelController
 {
 	/**
-	 * Possible models
+	 * Every pointer model has its own event listener starters
 	 * @internal
 	 */
-	readonly _model: PointerBase | PointerHoldable;
-
+	protected abstract _startEvents(): void;
+	/**
+	 * Every pointer model has its own event listener stoppers
+	 * @internal
+	 */
+	protected abstract _stopEvents(): void;
 	/**
 	 * Every pointer model has its own pointer position getter model
 	 * @internal
 	 */
-	abstract _getPointerPosition( event: MouseEvent | TouchEvent ): { x: number; y: number }
+	protected abstract _getPointerPosition( event: MouseEvent | TouchEvent ): { x: number; y: number };
+	
+	/**
+	 * The underlying pointer model instance used by this controller.
+	 * @internal
+	 */
+	protected readonly _model: PointerBase | PointerHoldable;
+	
+	/**
+	 * True while event listeners are active
+	 * @internal
+	 */
+	private _isRunning: boolean = false;
 
+	/**
+	 * Creates an instance of the ModelController with the provided model.
+	 *
+	 * @param model - The pointer model to be controlled. Can be either a `PointerBase` or a `PointerHoldable`.
+	 */
 	constructor( model: PointerBase | PointerHoldable )
 	{
 		this._model = model;
+	}
+
+	/**
+	 * Start listening for pointer events and initialize the pointer state.
+	 *
+	 * If the controller is already running, this method is a no-op and logs a warning.
+	 * Otherwise, it attaches the event handlers, sets the model's current state to
+	 * PointerState.IDLE, and marks the controller as running.
+	 */
+	startEvents(): boolean
+	{
+		if ( this._isRunning ){
+			console.warn( 'PronotronPointer: Already started.' );
+			return false;
+		}
+
+		this._startEvents();
+
+		this._isRunning = true;
+		return true;
+	}
+
+	/**
+	 * Stops and removes all registered event listeners.
+	 * Should be called during cleanup or disposal.
+	 */
+	stopEvents(): void
+	{
+		this._stopEvents();
+
+		// Reset state
+		this._model.pointerTarget = null;
+		this._model._currentState = PointerState.IDLE;
+		this._isRunning = false;
 	}
 
 	/**
@@ -29,7 +84,7 @@ export abstract class ModelController
 	 */
 	updateSettings( settings: BaseSettings | HoldableSettings ): void
 	{
-		//@ts-expect-error - Property 'holdThreshold' is missing in type 'BaseSettings', harmless warning.
+		//@ts-expect-error - Property 'holdThreshold' is missing in type 'BaseSettings'
 		this._model._updateSettings( settings );
 	}
 

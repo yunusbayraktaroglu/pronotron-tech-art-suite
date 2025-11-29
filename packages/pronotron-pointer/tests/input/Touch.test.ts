@@ -25,8 +25,6 @@ jest.mock( '../../src/core/interaction/PointerHoldable', () => ( {
  */
 const createMockModel = () => ( {
 	_updateSettings: jest.fn(),
-	_startEvents: jest.fn( () => true ), // Default to success
-	_stopEvents: jest.fn(),
 	_addEventListeners: jest.fn(),
 	_removeEventListeners: jest.fn(),
 	_onPointerStart: jest.fn(),
@@ -35,6 +33,7 @@ const createMockModel = () => ( {
 	_updatePointer: jest.fn(),
 
 	// Properties
+	pointerTarget: null,
 	_currentState: PointerState.IDLE,
 	_canInteract: true,
 	_pointerStart: { x: 10, y: 20, set: jest.fn() },
@@ -43,19 +42,6 @@ const createMockModel = () => ( {
 	_pointerDeltaAdditive: { x: 520, y: 150 },
 } );
 
-/**
- * Creates a mock MouseEvent.
- */
-const createMockTouchEvent = ( props = {} ) =>
-( {
-	touches: [
-		{
-			clientX: 100,
-			clientY: 200,
-			...props
-		},
-	]
-} as unknown as TouchEvent );
 
 // Define a type for our mock model for better intellisense
 type MockModel = ReturnType<typeof createMockModel>;
@@ -64,6 +50,20 @@ describe( 'TouchController Test Suite', () => {
 
 	let mockModel: MockModel;
 	let controller: TouchController;
+
+	/**
+	 * Creates a mock MouseEvent.
+	 */
+	const createMockTouchEvent = ( props = {} ) =>
+	( {
+		touches: [
+			{
+				clientX: 100,
+				clientY: 200,
+				...props
+			},
+		]
+	} as unknown as TouchEvent );
 
 	beforeEach( () => {
 
@@ -75,14 +75,12 @@ describe( 'TouchController Test Suite', () => {
 
 	} );
 
-	describe( 'startEvents', () => {
+	describe( 'Initialization', () => {
 
-		it( 'should add pointer listeners if model._startEvents returns true', () => {
+		it( 'should add pointer listeners if startEvents() returns true', () => {
 
-			mockModel._startEvents.mockReturnValue( true );
 			controller.startEvents();
 
-			expect( mockModel._startEvents ).toHaveBeenCalledTimes( 1 );
 			expect( mockModel._addEventListeners ).toHaveBeenCalledTimes( 1 );
 			expect( mockModel._addEventListeners ).toHaveBeenCalledWith(
 				[ 'touchstart', controller._onPointerStart ],
@@ -90,57 +88,69 @@ describe( 'TouchController Test Suite', () => {
 
 		} );
 
-		it( 'should NOT add listeners if model._startEvents returns false', () => {
+		it( 'should NOT add listeners if startEvents() returns false', () => {
 
-			mockModel._startEvents.mockReturnValue( false );
 			controller.startEvents();
 
-			expect( mockModel._startEvents ).toHaveBeenCalledTimes( 1 );
-			expect( mockModel._addEventListeners ).not.toHaveBeenCalled();
+			expect( mockModel._addEventListeners ).toHaveBeenCalledTimes( 1 );
+
+			controller.startEvents();
+
+			expect( mockModel._addEventListeners ).toHaveBeenCalledTimes( 1 );
+
+		} );
+
+		it( 'should remove all event listeners on stopEvents', () => {
+
+			controller.stopEvents();
+
+			expect( mockModel._removeEventListeners ).toHaveBeenCalledTimes( 1 );
+			expect( mockModel._removeEventListeners ).toHaveBeenCalledWith(
+				[ "touchstart", controller._onPointerStart ],
+				[ "touchmove", controller._onPointerMove ],
+				[ "touchend", controller._onPointerEnd ],
+			);
 
 		} );
 
 	} );
 
-	it( 'should remove all event listeners on stopEvents', () => {
+	describe( '_getPointerPosition', () => {
 
-		controller.stopEvents();
+		it( 'should get correct pointer position from a MouseEvent', () => {
 
-		expect( mockModel._stopEvents ).toHaveBeenCalledTimes( 1 );
-		expect( mockModel._removeEventListeners ).toHaveBeenCalledTimes( 1 );
-		expect( mockModel._removeEventListeners ).toHaveBeenCalledWith(
-			[ "touchstart", controller._onPointerStart ],
-			[ "touchmove", controller._onPointerMove ],
-			[ "touchend", controller._onPointerEnd ],
-		);
+			const randomX = Math.random() * 500;
+			const randomY = Math.random() * 500;
 
-	} );
+			const event = createMockTouchEvent( { clientX: randomX, clientY: randomY } );
+			const pos = controller._getPointerPosition( event );
 
-	it( 'should get correct pointer position from a MouseEvent', () => {
+			expect( pos ).toEqual( { x: randomX, y: randomY } );
 
-		const event = createMockTouchEvent( { clientX: 123, clientY: 456 } );
-		const pos = controller._getPointerPosition( event );
-
-		expect( pos ).toEqual( { x: 123, y: 456 } );
+		} );
 
 	} );
 
-	it( 'should handle _onPointerStart by adding listeners and delegating', () => {
+	describe( '_onPointerStart', () => {
 
-		const event = createMockTouchEvent();
-		controller._onPointerStart( event );
+		it( 'should handle _onPointerStart by adding listeners and delegating', () => {
 
-		expect( mockModel._addEventListeners ).toHaveBeenCalledWith(
-			[ 'touchmove', controller._onPointerMove ],
-			[ 'touchend', controller._onPointerEnd ],
-		);
-		expect( mockModel._onPointerStart ).toHaveBeenCalledWith( event );
+			const event = createMockTouchEvent();
+			controller._onPointerStart( event );
+
+			expect( mockModel._addEventListeners ).toHaveBeenCalledWith(
+				[ 'touchmove', controller._onPointerMove ],
+				[ 'touchend', controller._onPointerEnd ],
+			);
+			expect( mockModel._onPointerStart ).toHaveBeenCalledWith( event );
+
+		} );
 
 	} );
 
 	describe( '_onPointerEnd', () => {
 		
-		it( 'should handle pointer end, removing listeners, and delegating', () => {
+		it( 'should handle pointerend, removing listeners, and delegating', () => {
 
 			const event = createMockTouchEvent();
 
@@ -162,13 +172,16 @@ describe( 'TouchController Test Suite', () => {
 
 		it( 'should update pointer and delegate if state is MOVING', () => {
 
-			const event = createMockTouchEvent( { clientX: 300, clientY: 400 } );
+			const randomX = Math.random() * 500;
+			const randomY = Math.random() * 500;
+
+			const event = createMockTouchEvent( { clientX: randomX, clientY: randomY } );
 			mockModel._currentState = PointerState.MOVING;
 
 			controller._onPointerMove( event );
 
 			expect( mockModel._pointerStart.set ).not.toHaveBeenCalled();
-			expect( mockModel._updatePointer ).toHaveBeenCalledWith( 300, 400 );
+			expect( mockModel._updatePointer ).toHaveBeenCalledWith( randomX, randomY );
 			expect( mockModel._onPointerMove ).toHaveBeenCalledWith( event );
 
 		} );

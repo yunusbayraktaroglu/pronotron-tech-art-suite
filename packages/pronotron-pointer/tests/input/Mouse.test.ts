@@ -18,15 +18,12 @@ jest.mock( '../../src/core/interaction/PointerHoldable', () => ( {
 	HoldableSettings: jest.fn(), // Mock the type/interface
 } ) );
 
-
 /**
  * Creates a comprehensive mock of the `_model` (PointerBase or PointerHoldable)
  * that our controllers will interact with.
  */
 const createMockModel = () => ( {
 	_updateSettings: jest.fn(),
-	_startEvents: jest.fn( () => true ), // Default to success
-	_stopEvents: jest.fn(),
 	_addEventListeners: jest.fn(),
 	_removeEventListeners: jest.fn(),
 	_onPointerStart: jest.fn(),
@@ -35,6 +32,7 @@ const createMockModel = () => ( {
 	_updatePointer: jest.fn(),
 
 	// Properties
+	pointerTarget: null,
 	_currentState: PointerState.IDLE,
 	_canInteract: true,
 	_pointerStart: { x: 10, y: 20, set: jest.fn() },
@@ -42,16 +40,6 @@ const createMockModel = () => ( {
 	_pointerDelta: { x: 1, y: 2 },
 	_pointerDeltaAdditive: { x: 520, y: 150 },
 } );
-
-/**
- * Creates a mock MouseEvent.
- */
-const createMockMouseEvent = ( props = {} ) =>
-( {
-	clientX: 100,
-	clientY: 200,
-	...props,
-} as unknown as MouseEvent );
 
 // Define a type for our mock model for better intellisense
 type MockModel = ReturnType<typeof createMockModel>;
@@ -61,6 +49,16 @@ describe( 'MouseController Test Suite', () => {
 	let mockModel: MockModel;
 	let controller: MouseController;
 
+	/**
+	 * Creates a mock MouseEvent.
+	 */
+	const createMockMouseEvent = ( props = {} ) =>
+	( {
+		clientX: 100,
+		clientY: 200,
+		...props,
+	} as unknown as MouseEvent );
+
 	beforeEach( () => {
 		jest.clearAllMocks(); // Clear all mock states
 		mockModel = createMockModel();
@@ -69,14 +67,12 @@ describe( 'MouseController Test Suite', () => {
 		);
 	} );
 
-	describe( 'startEvents', () => {
+	describe( 'Initialization', () => {
 
-		it( 'should add pointer listeners if model._startEvents returns true', () => {
+		it( 'should add pointer listeners on startEvents()', () => {
 
-			mockModel._startEvents.mockReturnValue( true );
 			controller.startEvents();
 
-			expect( mockModel._startEvents ).toHaveBeenCalledTimes( 1 );
 			expect( mockModel._addEventListeners ).toHaveBeenCalledTimes( 1 );
 			expect( mockModel._addEventListeners ).toHaveBeenCalledWith(
 				[ 'pointerdown', controller._onPointerStart ],
@@ -87,57 +83,67 @@ describe( 'MouseController Test Suite', () => {
 
 		} );
 
-		it( 'should NOT add listeners if model._startEvents returns false', () => {
+		it( 'should NOT add listeners if events previously stated', () => {
 
-			mockModel._startEvents.mockReturnValue( false );
 			controller.startEvents();
+			expect( mockModel._addEventListeners ).toHaveBeenCalledTimes( 1 );
 
-			expect( mockModel._startEvents ).toHaveBeenCalledTimes( 1 );
-			expect( mockModel._addEventListeners ).not.toHaveBeenCalled();
+			controller.startEvents();
+			expect( mockModel._addEventListeners ).toHaveBeenCalledTimes( 1 );
+
+		} );
+
+		it( 'should remove all event listeners on stopEvents()', () => {
+
+			controller.stopEvents();
+
+			expect( mockModel._removeEventListeners ).toHaveBeenCalledTimes( 1 );
+			expect( mockModel._removeEventListeners ).toHaveBeenCalledWith(
+				[ 'pointerdown', controller._onPointerStart ],
+				[ 'pointermove', controller._onPointerMove ],
+				[ 'pointerup', controller._onPointerEnd ],
+				[ 'pointercancel', controller._onPointerEnd ],
+				[ 'pointerleave', controller._onPointerLeave ],
+				[ 'dragstart', controller._onDragStart ],
+				[ 'dragover', controller._onPointerMove ],
+				[ 'dragend', controller._onDragEnd ],
+			);
 
 		} );
 
 	} );
 
-	it( 'should remove all event listeners on stopEvents', () => {
+	describe( '_getPointerPosition', () => {
 
-		controller.stopEvents();
+		it( 'should get correct pointer position from a MouseEvent', () => {
 
-		expect( mockModel._stopEvents ).toHaveBeenCalledTimes( 1 );
-		expect( mockModel._removeEventListeners ).toHaveBeenCalledTimes( 1 );
-		expect( mockModel._removeEventListeners ).toHaveBeenCalledWith(
-			[ 'pointerdown', controller._onPointerStart ],
-			[ 'pointermove', controller._onPointerMove ],
-			[ 'pointerup', controller._onPointerEnd ],
-			[ 'pointercancel', controller._onPointerEnd ],
-			[ 'pointerleave', controller._onPointerLeave ],
-			[ 'dragstart', controller._onDragStart ],
-			[ 'dragover', controller._onPointerMove ],
-			[ 'dragend', controller._onDragEnd ],
-		);
+			const randomX = Math.random() * 500;
+			const randomY = Math.random() * 500;
+
+			const event = createMockMouseEvent( { clientX: randomX, clientY: randomY } );
+			const pos = controller._getPointerPosition( event );
+
+			expect( pos ).toEqual( { x: randomX, y: randomY } );
+
+		} );
 
 	} );
+	
+	describe( '_onPointerStart', () => {
 
-	it( 'should get correct pointer position from a MouseEvent', () => {
+		it( 'should handle _onPointerStart by adding listeners and delegating', () => {
 
-		const event = createMockMouseEvent( { clientX: 123, clientY: 456 } );
-		const pos = controller._getPointerPosition( event );
+			const event = createMockMouseEvent();
+			controller._onPointerStart( event );
 
-		expect( pos ).toEqual( { x: 123, y: 456 } );
+			expect( mockModel._addEventListeners ).toHaveBeenCalledWith(
+				[ 'pointerup', controller._onPointerEnd ],
+				[ 'pointercancel', controller._onPointerEnd ],
+			);
+			expect( mockModel._onPointerStart ).toHaveBeenCalledWith( event );
 
-	} );
-
-	it( 'should handle _onPointerStart by adding listeners and delegating', () => {
-
-		const event = createMockMouseEvent();
-		controller._onPointerStart( event );
-
-		expect( mockModel._addEventListeners ).toHaveBeenCalledWith(
-			[ 'pointerup', controller._onPointerEnd ],
-			[ 'pointercancel', controller._onPointerEnd ],
-		);
-		expect( mockModel._onPointerStart ).toHaveBeenCalledWith( event );
-
+		} );
+	
 	} );
 
 	describe( '_onPointerEnd', () => {
@@ -260,29 +266,31 @@ describe( 'MouseController Test Suite', () => {
 		
 	} );
 
-	it( 'should handle _onDragStart by adding listeners and setting state', () => {
+	describe( '_onDragStart', () => {
 
-		const event = {} as Event; // DragEvent is complex, generic Event is fine
-		controller._onDragStart( event );
+		it( 'should handle _onDragStart by adding listeners and setting state', () => {
 
-		expect( mockModel._addEventListeners ).toHaveBeenCalledWith(
-			[ 'dragover', controller._onPointerMove ],
-			[ 'dragend', controller._onDragEnd ],
-		);
-		expect( mockModel._currentState ).toBe( PointerState.DRAGGING );
+			controller._onDragStart();
 
-	} );
+			expect( mockModel._addEventListeners ).toHaveBeenCalledWith(
+				[ 'dragover', controller._onPointerMove ],
+				[ 'dragend', controller._onDragEnd ],
+			);
+			expect( mockModel._currentState ).toBe( PointerState.DRAGGING );
 
-	it( 'should handle _onDragEnd by removing listeners and setting state', () => {
+		} );
 
-		const event = {} as Event;
-		controller._onDragEnd( event );
+		it( 'should handle _onDragEnd by removing listeners and setting state', () => {
 
-		expect( mockModel._removeEventListeners ).toHaveBeenCalledWith(
-			[ 'dragover', controller._onPointerMove ],
-			[ 'dragend', controller._onDragEnd ],
-		);
-		expect( mockModel._currentState ).toBe( PointerState.IDLE );
+			controller._onDragEnd();
+
+			expect( mockModel._removeEventListeners ).toHaveBeenCalledWith(
+				[ 'dragover', controller._onPointerMove ],
+				[ 'dragend', controller._onDragEnd ],
+			);
+			expect( mockModel._currentState ).toBe( PointerState.IDLE );
+
+		} );
 
 	} );
 

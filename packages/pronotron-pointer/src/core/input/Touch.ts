@@ -1,6 +1,4 @@
 import { ModelController } from "../model/ModelController";
-import { PointerBase } from "../interaction/PointerBase";
-import { PointerHoldable } from "../interaction/PointerHoldable";
 
 /**
  * TouchController
@@ -9,25 +7,15 @@ import { PointerHoldable } from "../interaction/PointerHoldable";
  */
 export class TouchController extends ModelController
 {
-	constructor( model: PointerBase | PointerHoldable )
-	{
-		super( model );
-
-		this._onPointerStart = this._onPointerStart.bind( this );
-		this._onPointerMove = this._onPointerMove.bind( this );
-		this._onPointerEnd = this._onPointerEnd.bind( this );
-	}
-
 	/**
 	 * Starts listening for touch events.
 	 * Must be called before interaction can be tracked.
+	 * 
+	 * @abstract
+	 * @internal
 	 */
-	startEvents()
+	protected _startEvents()
 	{
-		if ( ! this._model._startEvents() ){
-			return;
-		}
-
 		this._model._addEventListeners(
 			[ "touchstart", this._onPointerStart ],
 		);
@@ -36,16 +24,17 @@ export class TouchController extends ModelController
 	/**
 	 * Stops and removes all registered touch event listeners.
 	 * Should be called during cleanup or disposal.
+	 * 
+	 * @abstract
+	 * @internal
 	 */
-	stopEvents()
+	protected _stopEvents()
 	{
 		this._model._removeEventListeners(
 			[ "touchstart", this._onPointerStart ],
 			[ "touchmove", this._onPointerMove ],
 			[ "touchend", this._onPointerEnd ],
 		);
-
-		this._model._stopEvents();
 	}
 
 	/**
@@ -54,9 +43,10 @@ export class TouchController extends ModelController
 	 * @param event - Native touch event
 	 * @returns The pointer’s x and y position in client coordinates, based on the first active touch
 	 *
+	 * @abstract
 	 * @internal
 	 */
-	_getPointerPosition( event: TouchEvent ): { x: number; y: number }
+	protected _getPointerPosition( event: TouchEvent ): { x: number; y: number }
 	{
 		return { 
 			x: event.touches[ 0 ].clientX, 
@@ -73,7 +63,7 @@ export class TouchController extends ModelController
 	 *
 	 * @internal
 	 */
-	_onPointerStart( event: TouchEvent ): void
+	protected _onPointerStart = ( event: TouchEvent ): void =>
 	{
 		this._model._addEventListeners(
 			[ "touchmove", this._onPointerMove ],
@@ -82,11 +72,9 @@ export class TouchController extends ModelController
 
 		const { x, y } = this._getPointerPosition( event );
 
-		// Set pointerStart manually in "touch"
 		this._model._pointerStart.set( x, y );
-
 		this._model._onPointerStart( event );
-	}
+	};
 
 	/**
 	 * Handles `touchend`:
@@ -95,7 +83,7 @@ export class TouchController extends ModelController
 	 *
 	 * @internal
 	 */
-	_onPointerEnd( event: TouchEvent ): void
+	protected _onPointerEnd = ( event: TouchEvent ): void =>
 	{
 		this._model._removeEventListeners(
 			[ "touchmove", this._onPointerMove ],
@@ -103,7 +91,7 @@ export class TouchController extends ModelController
 		);
 
 		this._model._onPointerEnd( event );
-	}
+	};
 
 	/**
 	 * Handles `touchmove`:
@@ -112,12 +100,11 @@ export class TouchController extends ModelController
 	 *
 	 * @internal
 	 */
-	_onPointerMove( event: TouchEvent ): void
+	protected _onPointerMove = ( event: TouchEvent ): void =>
 	{
 		const { x, y } = this._getPointerPosition( event );
 
 		this._model._updatePointer( x, y );
 		this._model._onPointerMove( event );
-	}
-
+	};
 }

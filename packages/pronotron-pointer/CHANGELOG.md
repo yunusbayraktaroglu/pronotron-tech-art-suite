@@ -1,5 +1,15 @@
 # @pronotron/io
 
+## 1.0.1
+
+### Patch Changes
+
+- 50b470c:
+  - Exposed the pointer target publicly.
+  - Exported the `BaseSettings` type.
+- Updated dependencies [50b470c]
+  - @pronotron/utils@1.0.1
+
 ## 1.0.0
 
 ### Major Changes

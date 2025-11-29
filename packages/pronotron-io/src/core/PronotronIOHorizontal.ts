@@ -13,9 +13,12 @@ export type IOHorizontalOptions = IONodeOptions<HorizontalEvent>;
  * pronotronIO.addNode({
  * 	ref: HTMLElement,
  * 	dispatch: {
+ * 		// Direction-agnostic events
  * 		onEnter: () => console.log( "Element entered regardless of direction" ),
  * 		onExit: () => console.log( "Element exited regardless of direction" ),
  * 		onInViewport: ( normalizedPosition: number ) => console.log( "Element is in viewport", normalizedPosition ),
+ * 		onScrollProgress: ( progress: number ) => console.log( "Element scroll progress", progress ),
+ * 		// Direction-specific events
  * 		onLeftEnter: () => console.log( "Element entered from the left" ),
  * 		onLeftExit: {
  * 			dispatch: () => console.log( "Element exited from the left" ),
@@ -39,12 +42,14 @@ export class PronotronIOHorizontalObserver extends PronotronIOEventDispatcher<Ho
 {
 	direction: "left" | "right" = "right";
 
-	_scrollDirectionNames = { 
+	/** @internal */
+	protected _scrollDirectionNames = { 
 		_negative: "left",
 		_positive: "right" 
 	};
 
-	_eventNames = {
+	/** @internal */
+	protected _eventNames = {
 		_negativeEnterEvent: "onLeftEnter",
 		_negativeExitEvent: "onLeftExit",
 		_positiveEnterEvent: "onRightEnter",

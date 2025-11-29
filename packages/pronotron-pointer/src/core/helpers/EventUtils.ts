@@ -1,11 +1,7 @@
-type CustomEventDetail = {
-	target: HTMLElement | null;
-	endTarget?: HTMLElement | null;
-	position: { 
-		x: number; 
-		y: number;
-	};
-};
+import { TapEventDetail } from "../interaction/PointerBase";
+import { HoldEventDetail, ReleaseEventDetail } from "../interaction/PointerHoldable";
+
+type CustomEventDetail = TapEventDetail | HoldEventDetail | ReleaseEventDetail;
 
 /**
  * Helps to trigger {@link CustomEvent} with inferred event names.
@@ -47,7 +43,7 @@ export abstract class EventUtils<TEvent extends string>
 	 * @param detail Custom event detail
 	 * @internal
 	 */
-	_dispatchCustomEvent( customEvent: TEvent, detail: Object ): void
+	_dispatchCustomEvent( customEvent: TEvent, detail: CustomEventDetail ): void
 	{
 		this._target.dispatchEvent( new CustomEvent( customEvent, { detail } ) );
 	}

@@ -6,7 +6,22 @@ import {
 	IONodePosition
 } from "./PronotronIOBase";
 
+/**
+ * Represents a valid node position for IO operations, excluding the NotReady state.
+ * Valid positions indicate that a node is ready for processing and positioned appropriately
+ * within the IO graph.
+ */
 type ValidNodePosition = Exclude<IONodePosition, IONodePosition.NotReady>;
+
+/**
+ * Maps valid node positions to event handlers.
+ * 
+ * Each key represents a source node position, and its value is a record of
+ * target node positions to their corresponding event handler functions.
+ * 
+ * @property {number} offset - The offset value passed to the event handler
+ * @property {number} nodeID - The node identifier passed to the event handler
+ */
 type EventMap = Record<ValidNodePosition, Partial<Record<ValidNodePosition, ( offset: number, nodeID: number ) => void>>>;
 
 /**
@@ -15,11 +30,37 @@ type EventMap = Record<ValidNodePosition, Partial<Record<ValidNodePosition, ( of
  */
 type EventFlagIndex = IONodeStrideIndex.HasNegativeEnterEvent | IONodeStrideIndex.HasNegativeExitEvent | IONodeStrideIndex.HasPositiveEnterEvent | IONodeStrideIndex.HasPositiveExitEvent | IONodeStrideIndex.HasEnterEvent | IONodeStrideIndex.HasExitEvent; 
 
+/**
+ * Abstract base class for dispatching I/O events based on element scroll position and visibility.
+ * 
+ * Manages the lifecycle of scroll-based events including enter/exit events for positive and negative
+ * viewport areas, scroll progress tracking, and normalized viewport positioning. Handles fast-forward
+ * scenarios where elements rapidly transition through multiple viewport zones.
+ */
 export abstract class PronotronIOEventDispatcher<TEvents extends string> extends PronotronIOBase<TEvents>
 {
 	/**
+	 * Human readable scroll direction names
+	 * @internal
+	 */
+	protected abstract readonly _scrollDirectionNames: {
+		_negative: string;
+		_positive: string;
+	};
+
+	/**
 	 * Maps position transitions (previous → current) to their corresponding event handlers.
 	 * {@link IONodePosition}
+	 * 
+	 * @example
+	 * const map = {
+	 * 	// from InViewport 
+	 * 	[ 2 ]: {
+	 * 		[ 1 ]: ( offset: number, nodeID: number ) => {} // → to InNegativeArea
+	 * 		[ 3 ]: ( offset: number, nodeID: number ) => {} // → to InPositiveArea
+	 * 	},
+	 * 	...
+	 * }
 	 * 
 	 * @internal
 	 */
@@ -82,10 +123,8 @@ export abstract class PronotronIOEventDispatcher<TEvents extends string> extends
 	}
 
 	/**
-	 * Handles scroll events and updates the current scroll direction,
-	 * then recalculates intersections.
-	 * 
-	 * @param scrollValue Current scroll value
+	 * Handles scroll events and updates the scroll direction and positions.
+	 * @param scrollValue - The current scroll value
 	 */
 	handleScroll( scrollValue: number ): void 
 	{
@@ -118,6 +157,10 @@ export abstract class PronotronIOEventDispatcher<TEvents extends string> extends
 			// Triggers related event if IONode's position has changed
 			if ( previousPosition !== currentPosition ){
 
+				/**
+				 * @todo
+				 * Add information about NotReady state in the documentation
+				 */
 				if ( previousPosition !== IONodePosition.NotReady ){
 					this._transitionHandlers[ previousPosition ][ currentPosition ]!( offset, nodeID );
 				}
@@ -237,6 +280,7 @@ export abstract class PronotronIOEventDispatcher<TEvents extends string> extends
 	 * @param scrollValue The vertical scroll position of the window (window.scrollY).
 	 * @param viewportSize The height of the visible viewport (window.innerHeight).
 	 * @returns The scroll percentage (0 to 100).
+	 * @internal
 	 */
 	private _getScrollProgress( elementStart: number, elementEnd: number, scrollValue: number, viewportSize: number ): number
 	{
@@ -269,6 +313,14 @@ export abstract class PronotronIOEventDispatcher<TEvents extends string> extends
 		return percentage;
 	}
 
+	/**
+	 * Dispatches a scroll-progress update to the specified node's event handler.
+	 *
+	 * @param nodeID - Unique identifier of the node whose scroll progress should be updated.
+	 * @param scrollProgress - Scroll progress value to dispatch (typically a normalized value in the range 0 to 1).
+	 * 
+	 * @internal
+	 */
 	private _executeOnScrollProgressCallback( nodeID: number, scrollProgress: number ): void
 	{
 		const nodeSettings = this._nodes.get( nodeID );

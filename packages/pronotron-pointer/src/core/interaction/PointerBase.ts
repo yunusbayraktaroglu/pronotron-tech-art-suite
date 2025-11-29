@@ -37,9 +37,29 @@ export enum PointerState
 };
 
 /**
+ * Details of a tap event.
+ */
+export interface TapEventDetail {
+	/**
+	 * The HTML element that was tapped.
+	 */
+	tapTarget: HTMLElement;
+	/**
+	 * The coordinates where the tap occurred.
+	 */
+	position: {
+		x: number;
+		y: number;
+	};
+};
+
+/**
  * Elements or globals that can receive pointer events.
  */
 export type PossibleTarget = Window | Document | HTMLElement;
+/**
+ * Configuration options for pointer interaction behavior.
+ */
 export type BaseSettings = {
 	/**
 	 * Seconds of inactivity before auto-transition to IDLE.
@@ -47,7 +67,7 @@ export type BaseSettings = {
 	 */
 	idleThreshold: number;
 	/**
-	 * Seconds of tap event.
+	 * Maximum duration (in seconds) for a tap event.
 	 * @default 0.25 sec.
 	 */
 	tapThreshold: number;
@@ -58,7 +78,8 @@ export type BaseSettings = {
 	 */
 	movingDeltaLimit: number;
 	/**
-	 * Start position of the pointer, instead of top-left corner
+	 * Optional initial position of the pointer, specified as `{ x, y }`. 
+	 * If omitted, defaults to the top-left corner.
 	 */
 	startPosition?: {
 		x: number;
@@ -89,17 +110,19 @@ export type PointerBaseDependencies = BaseSettings & {
 };
 
 /**
- * Base class for pointer input (mouse/touch) that normalizes
+ * Base class for pointer input (mouse|touch) that normalizes
  * state transitions (idle, waiting, moving, holding) and
  * emits high-level events like "tap".
  */
 export class PointerBase<TDispatchableEvents extends string = string> extends EventUtils<TDispatchableEvents | "tap">
 {
 	/**
-	 * True while event listeners are active
-	 * @internal
+	 * Current element under the pointer
+	 * 
+	 * - `Touch`: This is the element that received the initial *touchstart* event
+	 * - `Mouse`: This is the element currently under the cursor
 	 */
-	_isRunning: boolean = false;
+	public pointerTarget: HTMLElement | null = null;
 
 	/**
 	 * Defines if the current event target is interactable,
@@ -108,23 +131,27 @@ export class PointerBase<TDispatchableEvents extends string = string> extends Ev
 	 */
 	_canInteract: boolean = false;
 
-	/** @internal */
-	readonly _clock: PronotronClock;
-
-	/** @internal */
-	readonly _animator: PronotronAnimator;
+	/**
+	 * Defines current pointer state
+	 * @internal
+	 */
+	_currentState: PointerState = PointerState.IDLE;
 
 	/**
 	 * Pointer events target
 	 * @internal
 	 */
 	readonly _target: PossibleTarget;
-	
 	/**
-	 * Defines current pointer state
+	 * Clock instance used to drive and timestamp pointer interactions.
 	 * @internal
 	 */
-	_currentState: PointerState = PointerState.IDLE;
+	readonly _clock: PronotronClock;
+	/**
+	 * The animator instance used to manage animations for pointer interactions.
+	 * @internal
+	 */
+	readonly _animator: PronotronAnimator;
 
 	/**
 	 * Start position of the pointer
@@ -210,42 +237,11 @@ export class PointerBase<TDispatchableEvents extends string = string> extends Ev
 	 * 
 	 * @internal
 	 */
-	_updateSettings( settings: BaseSettings )
+	_updateSettings( baseSettings: BaseSettings ): void
 	{
-		this._idleThreshold = settings.idleThreshold;
-		this._tapThreshold = settings.tapThreshold;
-		this._movingDeltaLimit = settings.movingDeltaLimit;
-	}
-
-	/**
-	 * Initializes pointer tracking and sets the state to `IDLE`.
-	 * Call once when attaching listeners.
-	 * Warns and returns early if already running.
-	 * 
-	 * @internal
-	 */
-	_startEvents(): boolean
-	{
-		if ( this._isRunning ){
-			console.warn( "Already running" );
-			return false;
-		}
-
-		this._isRunning = true;
-		this._currentState = PointerState.IDLE;
-		return true;
-	}
-
-	/**
-	 * Stops pointer tracking and forces the state back to `IDLE`.
-	 * Call when removing listeners or disposing the instance.
-	 * 
-	 * @internal
-	 */
-	_stopEvents(): void
-	{
-		this._isRunning = false;
-		this._currentState = PointerState.IDLE;
+		this._idleThreshold = baseSettings.idleThreshold;
+		this._tapThreshold = baseSettings.tapThreshold;
+		this._movingDeltaLimit = baseSettings.movingDeltaLimit;
 	}
 
 	/**
@@ -261,15 +257,15 @@ export class PointerBase<TDispatchableEvents extends string = string> extends Ev
 		// Pending for transition
 		this._currentState = PointerState.PENDING;
 
-		const { elapsedTime } = this._clock.getTime();
-
-		this._pointerStartTime = elapsedTime;
+		this._pointerStartTime = this._clock.getTime().elapsedTime;
 
 		// Reset pointer delta to calculate movement limit correct in _onMove
 		this._pointerDelta.set( 0, 0 );
 		
 		// Is pointer current target is interactable
 		this._canInteract = this._isInteractable( event.target as HTMLElement );
+		
+		this.pointerTarget = event.target as HTMLElement;
 	}
 
 	/**
@@ -293,20 +289,26 @@ export class PointerBase<TDispatchableEvents extends string = string> extends Ev
 			};
 		}
 
+		/**
+		 * @fix
+		 * On touch input, pointermove event target is always the element that received pointerdown(touchstart).
+		 * So it is only valid with mouse input.
+		 */
 		// Moving or Waiting, control if the target is interactable(button, a, custom class)
 		this._canInteract = this._isInteractable( event.target as HTMLElement );
+		this.pointerTarget = event.target as HTMLElement;
 
 		// Refresh idle timer so the state only flips to IDLE after the user truly stops moving.
-		this._animator.add({
+		this._animator.add( {
 			id: "IDLE",
-			duration: this._idleThreshold,
+			delay: this._idleThreshold,
 			autoPause: false,
-			onEnd: ( forced ) => {
-				if ( ! forced && this._currentState === PointerState.MOVING ){
+			onBegin: () => {
+				if ( this._currentState === PointerState.MOVING ){
 					this._currentState = PointerState.IDLE;
 				}
 			}
-		});
+		} );
 	}
 	
 	/**
@@ -319,19 +321,23 @@ export class PointerBase<TDispatchableEvents extends string = string> extends Ev
 	 */
 	_onPointerEnd( event: Event )
 	{
-		const { elapsedTime } = this._clock.getTime();
+		const currentTime = this._clock.getTime().elapsedTime;
 		
-		if ( this._currentState === PointerState.PENDING && elapsedTime < this._pointerStartTime + this._tapThreshold ){
-			this._dispatchCustomEvent( "tap", {
-				target: event.target,
+		if ( this._currentState === PointerState.PENDING && currentTime < this._pointerStartTime + this._tapThreshold ){
+
+			const tapEventDetail: TapEventDetail = {
+				tapTarget: event.target as HTMLElement,
 				position: { 
 					x: this._pointerStart.x, 
 					y: this._pointerStart.y 
 				}
-			} );
+			};
+
+			this._dispatchCustomEvent( "tap", tapEventDetail );
 		}
 
 		this._currentState = PointerState.IDLE;
+		this.pointerTarget = event.target as HTMLElement;
 	}
 
 	/**
