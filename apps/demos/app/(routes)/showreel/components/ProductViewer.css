@@ -1,0 +1,138 @@
+/* Media part */
+.controls-media picture,
+.controls-media img {
+    width: 100%;
+    height: 100%;
+}
+.controls-media img {
+    object-fit: cover
+}
+.product-picture {
+	opacity: 0;
+	transition: opacity 0.5s ease-in-out;
+	pointer-events: none;
+	position: absolute;
+	inset: 0;
+}
+.product-picture[ data-isactive="true" ]{
+	opacity: 1;
+	pointer-events: auto;
+}
+
+/* UI part */
+.controls {
+	--blur-amount: 10px;
+	--app-transition-time: 0.5s;
+	--app-resize-time: 1.0s;
+    --app-contracted-height: 60px;
+    --app-border-radius: 28px;
+	--app-bg-color: rgba( 73, 73, 77, 0.4 );
+    --app-bg-color-hover: rgba( 95, 95, 95, 0.7 );
+	--app-bg-transition-duration: 100ms;
+    --app-icon-fill: #ffffff;
+	--app-box-shadow: inset 0 0 5px 0 rgba( 255, 255, 255, 0.1 );
+	position: relative;
+    width: fit-content;
+}
+.controls::-webkit-scrollbar {
+    display: none;
+}
+
+.controls ul.control-group {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: center;
+}
+.control-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    position: relative;
+	width: var( --target-width, fit-content ); 
+	height: var( --app-contracted-height );
+	transition: height, width, var( --app-resize-time ) cubic-bezier( .47, 1.6, .41, .8 );
+}
+.control-item.expanded {
+	width: var( --app-expanded-width ); 
+	height: var( --target-height ); /* will be assigned by JS */
+}
+
+
+
+.control-item-bg {
+	backdrop-filter: blur( var( --blur-amount ) );
+    background-color: var( --app-bg-color );
+    border-radius: var( --app-border-radius );
+    box-shadow: var( --app-box-shadow );
+    display: block;
+    width: 100%;
+    height: 100%;
+	position: absolute;
+    transition: background-color var( --app-bg-transition-duration ) linear;
+    z-index: -1;
+}
+.control-item:not( .expanded ):hover .control-item-bg {
+    background-color: var( --app-bg-color-hover );
+}
+
+.control-item > button {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+	padding: var( --app-padding );
+	padding-right: calc( var( --app-padding ) * 1.5 );
+    height: var( --app-contracted-height );
+}
+.control-item.expanded > button {
+	opacity: 0;
+}
+.control-item-label {
+    align-items: center;
+    color: var( --sk-headline-text-color );
+    display: flex;
+    white-space: nowrap;
+}
+.control-item-label svg {
+    margin-inline-end: calc( var( --app-padding ) / 2 );
+}
+.plus-icon circle {
+	stroke: var( --app-icon-fill );
+	fill: none;
+}
+.plus-icon g {
+	stroke: none;
+	fill: var( --app-icon-fill );
+}
+
+.control-item-content {
+	box-sizing: border-box;
+    color: var( --sk-headline-text-color );
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+.control-item-content-mask {
+    border-radius: var( --app-border-radius );
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+.control-item-content-inner {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    max-width: var( --app-expanded-width );
+    opacity: 0;
+    padding: var( --app-padding );
+    width: max-content;
+	transition: opacity var( --app-transition-time );
+}
+.expanded .control-item-content-inner {
+    opacity: 1;
+    pointer-events: auto;
+}

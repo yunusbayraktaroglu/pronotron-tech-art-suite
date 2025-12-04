@@ -12,8 +12,8 @@
 	},
 	"dependencies": {
 		"@juggle/resize-observer": "^3.4.0",
-		"@pronotron/io": "1.0.1",
-		"@pronotron/pointer": "1.0.0",
+		"@pronotron/io": "1.0.2",
+		"@pronotron/pointer": "1.0.1",
 		"lodash.throttle": "^4.1.1",
 		"next": "^16.0.3",
 		"react": "^19.2.0",
