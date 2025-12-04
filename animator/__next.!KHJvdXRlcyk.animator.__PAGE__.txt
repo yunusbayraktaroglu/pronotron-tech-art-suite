@@ -3,7 +3,7 @@
 3:I[45749,["/pronotron-tech-art-suite/_next/static/chunks/491c601db608a738.js","/pronotron-tech-art-suite/_next/static/chunks/62575597858d87c5.js","/pronotron-tech-art-suite/_next/static/chunks/eca0e179c0f2ef02.js"],"default"]
 6:I[97367,["/pronotron-tech-art-suite/_next/static/chunks/ff1a16fafef87110.js","/pronotron-tech-art-suite/_next/static/chunks/247eb132b7f7b574.js"],"OutletBoundary"]
 7:"$Sreact.suspense"
-0:{"buildId":"3TIfdZ6omTzbp3zftM1Nr","rsc":["$","$1","c",{"children":[["$","$L2",null,{"Component":"$3","serverProvidedParams":{"searchParams":{},"params":{},"promises":["$@4","$@5"]}}],[["$","script","script-0",{"src":"/pronotron-tech-art-suite/_next/static/chunks/eca0e179c0f2ef02.js","async":true}]],["$","$L6",null,{"children":["$","$7",null,{"name":"Next.MetadataOutlet","children":"$@8"}]}]]}],"loading":null,"isPartial":false}
+0:{"buildId":"36_JGKsw2XznZzqXwHZG5","rsc":["$","$1","c",{"children":[["$","$L2",null,{"Component":"$3","serverProvidedParams":{"searchParams":{},"params":{},"promises":["$@4","$@5"]}}],[["$","script","script-0",{"src":"/pronotron-tech-art-suite/_next/static/chunks/eca0e179c0f2ef02.js","async":true}]],["$","$L6",null,{"children":["$","$7",null,{"name":"Next.MetadataOutlet","children":"$@8"}]}]]}],"loading":null,"isPartial":false}
 4:{}
 5:{}
 8:null
