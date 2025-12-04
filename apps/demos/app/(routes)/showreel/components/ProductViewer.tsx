@@ -197,10 +197,10 @@ function UnibodyPicture()
 {
 	return (
 		<picture>
-			<source srcSet="/unibody__eublzdgtajo2_small.jpg, /unibody__eublzdgtajo2_small_2x.jpg 2x" media="(max-width:734px)" />
-			<source srcSet="/unibody__eublzdgtajo2_medium.jpg, /unibody__eublzdgtajo2_medium_2x.jpg 2x" media="(max-width:1068px)" />
-			<source srcSet="/unibody__eublzdgtajo2_large.jpg, /unibody__eublzdgtajo2_large_2x.jpg 2x" media="(min-width:0px)" />
-			<img src="/unibody__eublzdgtajo2_large.jpg" alt="" className="w-full" />
+			<source srcSet="unibody__eublzdgtajo2_small.jpg, unibody__eublzdgtajo2_small_2x.jpg 2x" media="(max-width:734px)" />
+			<source srcSet="unibody__eublzdgtajo2_medium.jpg, unibody__eublzdgtajo2_medium_2x.jpg 2x" media="(max-width:1068px)" />
+			<source srcSet="unibody__eublzdgtajo2_large.jpg, unibody__eublzdgtajo2_large_2x.jpg 2x" media="(min-width:0px)" />
+			<img src="unibody__eublzdgtajo2_large.jpg" alt="" className="w-full" />
 		</picture>
 	)
 }
@@ -209,10 +209,10 @@ function CameraControlPicture()
 {
 	return (
 		<picture>
-			<source srcSet="/camera_control__cy5kilwa0kwi_small.jpg, /camera_control__cy5kilwa0kwi_small_2x.jpg 2x" media="(max-width:734px)" />
-			<source srcSet="/camera_control__cy5kilwa0kwi_medium.jpg, /camera_control__cy5kilwa0kwi_medium_2x.jpg 2x" media="(max-width:1068px)" />
-			<source srcSet="/camera_control__cy5kilwa0kwi_large.jpg, /camera_control__cy5kilwa0kwi_large_2x.jpg 2x" media="(min-width:0px)" />
-			<img src="/camera_control__cy5kilwa0kwi_large.jpg" alt="" className="w-full" />
+			<source srcSet="camera_control__cy5kilwa0kwi_small.jpg, camera_control__cy5kilwa0kwi_small_2x.jpg 2x" media="(max-width:734px)" />
+			<source srcSet="camera_control__cy5kilwa0kwi_medium.jpg, camera_control__cy5kilwa0kwi_medium_2x.jpg 2x" media="(max-width:1068px)" />
+			<source srcSet="camera_control__cy5kilwa0kwi_large.jpg, camera_control__cy5kilwa0kwi_large_2x.jpg 2x" media="(min-width:0px)" />
+			<img src="camera_control__cy5kilwa0kwi_large.jpg" alt="" className="w-full" />
 		</picture>
 	)
 }
@@ -220,10 +220,10 @@ function CameraControlPicture()
 function CeramicPicture() {
 	return (
 		<picture>
-			<source srcSet="/ceramic_shield__de0653vp43cm_small.jpg, /ceramic_shield__de0653vp43cm_small_2x.jpg 2x" media="(max-width:734px)" />
-			<source srcSet="/ceramic_shield__de0653vp43cm_medium.jpg, /ceramic_shield__de0653vp43cm_medium_2x.jpg 2x" media="(max-width:1068px)" />
-			<source srcSet="/ceramic_shield__de0653vp43cm_large.jpg, /ceramic_shield__de0653vp43cm_large_2x.jpg 2x" media="(min-width:0px)" />
-			<img src="/ceramic_shield__de0653vp43cm_large.jpg" alt="" className="w-full" />
+			<source srcSet="ceramic_shield__de0653vp43cm_small.jpg, ceramic_shield__de0653vp43cm_small_2x.jpg 2x" media="(max-width:734px)" />
+			<source srcSet="ceramic_shield__de0653vp43cm_medium.jpg, ceramic_shield__de0653vp43cm_medium_2x.jpg 2x" media="(max-width:1068px)" />
+			<source srcSet="ceramic_shield__de0653vp43cm_large.jpg, ceramic_shield__de0653vp43cm_large_2x.jpg 2x" media="(min-width:0px)" />
+			<img src="ceramic_shield__de0653vp43cm_large.jpg" alt="" className="w-full" />
 		</picture>
 	)
 }
@@ -232,10 +232,10 @@ function ProDisplayPicture()
 {
 	return (
 		<picture>
-			<source srcSet="/pro_display__c0jmzc5emcae_small, /pro_display__c0jmzc5emcae_small_2x.jpg 2x" media="(max-width:734px)" />
-			<source srcSet="/pro_display__c0jmzc5emcae_medium.jpg, /pro_display__c0jmzc5emcae_medium_2x.jpg 2x" media="(max-width:1068px)" />
-			<source srcSet="/pro_display__c0jmzc5emcae_large.jpg, /pro_display__c0jmzc5emcae_large_2x.jpg 2x" media="(min-width:0px)" />
-			<img src="/pro_display__c0jmzc5emcae_large.jpg" alt="" className="w-full" />
+			<source srcSet="pro_display__c0jmzc5emcae_small.jpg, pro_display__c0jmzc5emcae_small_2x.jpg 2x" media="(max-width:734px)" />
+			<source srcSet="pro_display__c0jmzc5emcae_medium.jpg, pro_display__c0jmzc5emcae_medium_2x.jpg 2x" media="(max-width:1068px)" />
+			<source srcSet="pro_display__c0jmzc5emcae_large.jpg, pro_display__c0jmzc5emcae_large_2x.jpg 2x" media="(min-width:0px)" />
+			<img src="pro_display__c0jmzc5emcae_large.jpg" alt="" className="w-full" />
 		</picture>
 	)
 }
