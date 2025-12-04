@@ -22,14 +22,20 @@ export function SiteSVG() {
 					<path d="M19 16l3 3l-3 3"></path>
 				</symbol>
 				<symbol id="comment_icon">
-					<path d="M7 8H17M7 11H17M7 14H11M3 18V6C3 4.89543 3.89543 4 5 4H19C20.1046 4 21 4.89543 21 6V16C21 17.1046 20.1046 18 19 18H7.66667C7.23393 18 6.81286 18.1404 6.46667 18.4L3 21V18Z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"/>
+					<path d="M7 8H17M7 11H17M7 14H11M3 18V6C3 4.89543 3.89543 4 5 4H19C20.1046 4 21 4.89543 21 6V16C21 17.1046 20.1046 18 19 18H7.66667C7.23393 18 6.81286 18.1404 6.46667 18.4L3 21V18Z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
 				</symbol>
 				<symbol id="expand_icon">
 					<g>
-						<polyline points="3 17.3 3 21 6.7 21"></polyline>
-						<line x1="10" x2="3.8" y1="14" y2="20.2"></line>
-						<line x1="14" x2="20.2" y1="10" y2="3.8"></line>
-						<polyline points="21 6.7 21 3 17.3 3"></polyline>
+						<polyline points="3 17.3 3 21 6.7 21" />
+						<line x1="10" x2="3.8" y1="14" y2="20.2" />
+						<line x1="14" x2="20.2" y1="10" y2="3.8" />
+						<polyline points="21 6.7 21 3 17.3 3" />
+					</g>
+				</symbol>
+				<symbol id="plus_icon" className="plus-icon">
+					<circle cx="12" cy="12" r="11.3" />
+					<g transform="translate(7 7)">
+						<path d="m9 4h-3v-3c0-0.553-0.447-1-1-1s-1 0.447-1 1v3h-3c-0.553 0-1 0.447-1 1s0.447 1 1 1h3v3c0 0.553 0.447 1 1 1s1-0.447 1-1v-3h3c0.553 0 1-0.447 1-1s-0.447-1-1-1" />
 					</g>
 				</symbol>
 			</defs>
@@ -41,7 +47,7 @@ export function SiteSVG() {
 export function GithubIcon( props: React.ComponentProps<"svg"> )
 {
 	return (
-		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" { ...props }>
+		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" { ...props }>
 			<use href="#github_icon" /> 
 		</svg>
 	)
@@ -49,7 +55,7 @@ export function GithubIcon( props: React.ComponentProps<"svg"> )
 export function CommentIcon( props: React.ComponentProps<"svg"> )
 {
 	return (
-		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" { ...props }>
+		<svg width="16" height="16" viewBox="0 0 24 24"  fill="none" stroke="currentColor" { ...props }>
 			<use href="#comment_icon" /> 
 		</svg>
 	)
@@ -87,6 +93,15 @@ export function ExpandIcon( props: React.ComponentProps<"svg"> )
 	return (
 		<svg width="24" height="24" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round" { ...props }>
 			<use href="#expand_icon" /> 
+		</svg>
+	)
+}
+
+export function PlusIcon( props: React.ComponentProps<"svg"> )
+{
+	return (
+		<svg width="24" height="24" viewBox="0 0 24 24" { ...props }>
+			<use href="#plus_icon" /> 
 		</svg>
 	)
 }

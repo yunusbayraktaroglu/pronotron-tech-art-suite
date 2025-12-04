@@ -1,7 +1,9 @@
 @import "tailwindcss";
+
 /* We use a custom container */
 @source not inline("container");
 
+/* Buttons use the default cursor. @see https://tailwindcss.com/docs/upgrade-guide#buttons-use-the-default-cursor */
 @layer base {
 	button:not(:disabled),
 	[role="button"]:not(:disabled) {
@@ -9,8 +11,14 @@
 	}
 }
 
+@theme inline {
+	--font-sans: var(--font-geist-sans);
+	--font-mono: var(--font-geist-mono);
+}
+
 @theme {
 	/* Fluid Typeography */
+	--fluid-0: calc(8px + (10 - 8) * ((100vw - 320px) / (1650 - 320)));
 	--fluid-1: calc(10px + (12 - 10) * ((100vw - 320px) / (1650 - 320)));
 	--fluid-2: calc(12px + (15 - 12) * ((100vw - 320px) / (1650 - 320)));
 	--fluid-3: calc(15px + (20 - 15) * ((100vw - 320px) / (1650 - 320)));
@@ -20,9 +28,7 @@
 	--fluid-7: calc(43px + (54 - 43) * ((100vw - 320px) / (1650 - 320)));
 	--fluid-8: calc(54px + (66 - 54) * ((100vw - 320px) / (1650 - 320)));
 	--fluid-9: calc(66px + (80 - 66) * ((100vw - 320px) / (1650 - 320)));
-}
 
-@theme {
 	/* Orientation based breakpoints */
 	--screen-portrait: (orientation: portrait);
 	--screen-landscape: (orientation: landscape);
@@ -42,6 +48,7 @@
 	--color-foreground: var(--foreground);
 
 	/* Font sizes */
+	--text-2xs: var(--fluid-0);
 	--text-xs: var(--fluid-1);
 	--text-sm: var(--fluid-2);
 	/* base */
@@ -61,6 +68,9 @@
 	--text-3xl--line-height: 2.5rem;
 	/* 4xl */
 	--text-4xl: var(--fluid-8);
+	/* 5xl */
+	--text-5xl: var(--fluid-9);
+	--text-5xl--letter-spacing: -0.05em;
 
 }
 
@@ -115,6 +125,7 @@ body {
 	background: var( --background );
 	color: var( --foreground );
 	font-family: Arial, Helvetica, sans-serif;
+	font-size: var( --text-base );
 }
 
 body.custom-cursor * {
@@ -167,6 +178,15 @@ body.custom-cursor * {
 	pointer-events: none;
 	background-color: black;
 }
+
+/* Disable touch scroll when holding on touch devices */
+.holding.touch body {
+	height: 100vh;
+	overflow: hidden;
+	touch-action: none;
+	-ms-touch-action: none;
+}
+
 
 @layer components {
 
@@ -255,7 +275,6 @@ body.custom-cursor * {
 		--animation: pulse-bg 1.5s infinite;
 		--transition-duration: 1s;
 	}
-
 
 }
 

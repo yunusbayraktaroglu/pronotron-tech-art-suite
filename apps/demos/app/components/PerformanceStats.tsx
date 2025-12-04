@@ -186,10 +186,11 @@ export const stats = new PronotronStats();
 
 export function PronotronStatsComponent()
 {
-	const containerRef = useRef<HTMLDivElement>( null ! );
 	const { showStats } = usePerformanceStats();
 
-	useEffect(() => {
+	const containerRef = useRef<HTMLDivElement>( null ! );
+
+	useEffect( () => {
 
 		stats.build();
 		
@@ -203,7 +204,7 @@ export function PronotronStatsComponent()
 		
 		panels.forEach( canvas => container.appendChild( canvas ) );
 
-	}, []);
+	}, [] );
 
 	return (
 		<div 

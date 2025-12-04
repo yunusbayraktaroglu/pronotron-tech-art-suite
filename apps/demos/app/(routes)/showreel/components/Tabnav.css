@@ -1,0 +1,210 @@
+.tabnav * {
+    box-sizing: border-box;
+    -webkit-user-select: none;
+    user-select: none;
+    /* -webkit-tap-highlight-color: rgba(0, 0, 0, 0); */
+}
+
+.tabnav {
+	font-size: 14px;
+	line-height: 1.2857742857;
+	font-weight: 400;
+	letter-spacing: -0.016em;
+	font-family: SF Pro Text, SF Pro Icons, Helvetica Neue, Helvetica, Arial, sans-serif;
+	--tabnav-line-height: 18px;
+	--tabnav-height: 44px;
+	--tabnav-scale: 1;
+	--tabnav-inner-height: 36px;
+	--tabnav-platter-padding: 4px;
+	--tabnav-platter-background: rgb(232, 232, 237);
+	--tabnav-platter-blur: 20px;
+	--tabnav-mask-gradient-width: 22px;
+	--tabnav-mask-opaque-width: calc(var(--tabnav-paddle-width) - var(--tabnav-platter-padding));
+	--tabnav-mask-offset: calc(var(--tabnav-mask-opaque-width) + var(--tabnav-mask-gradient-width));
+	--tabnav-mask-color-left: transparent;
+	--tabnav-mask-color-right: transparent;
+	--tabnav-mask-gradient: linear-gradient(90deg, var(--tabnav-mask-color-left) 0, var(--tabnav-mask-color-left) var(--tabnav-mask-opaque-width), black calc(var(--tabnav-mask-opaque-width) + var(--tabnav-mask-gradient-width)), black calc(100% - var(--tabnav-mask-opaque-width) - var(--tabnav-mask-gradient-width)), var(--tabnav-mask-color-right) calc(100% - var(--tabnav-mask-opaque-width)), var(--tabnav-mask-color-right));
+	--tabnav-items-offset: 0px;
+	--tabnav-item-padding: 16px;
+	--tabnav-item-color: rgb(0, 0, 0);
+	--tabnav-item-color-active: rgb(255, 255, 255);
+	--tabnav-paddle-width: calc(var(--tabnav-inner-height) + var(--tabnav-platter-padding));
+	--tabnav-paddle-height: var(--tabnav-inner-height);
+	--tabnav-paddle-color: rgba(0, 0, 0, .56);
+	--tabnav-paddle-color-hover: rgba(0, 0, 0, .64);
+	--tabnav-paddle-icon-opacity-disabled: 0.42;
+	--tabnav-indicator-background: rgb(29, 29, 31);
+	--tabnav-indicator-start: var(--tabnav-platter-padding);
+	--tabnav-indicator-width: 0px;
+	--tabnav-focus-color: var(--sk-focus-color, #0071e3);
+	--tabnav-motion-scroll-duration: 320ms;
+	--tabnav-motion-indicator-transform-duration: 320ms;
+	--r-tabnav-scaling-font-size: 14px;
+	position: relative;
+	width: -moz-fit-content;
+	width: fit-content;
+	max-width: 100%;
+	box-sizing: border-box
+}
+
+.tabnav-indicator {
+	position: absolute;
+	top: var( --tabnav-platter-padding );
+	left: var( --tabnav-indicator-start );
+	bottom: var( --tabnav-platter-padding );
+	width: var( --tabnav-indicator-width );
+	height: calc( 100% - var( --tabnav-platter-padding ) * 2 );
+	background-color: var( --tabnav-indicator-background );
+	border-radius: 999px;
+	transition-property: left, width;
+	transition-duration: var( --tabnav-motion-indicator-transform-duration );
+	transition-timing-function: cubic-bezier( 0.5, 1.8, 0.3, 0.8 );
+	pointer-events: none;
+}
+
+.tabnav-platter {
+	height: calc( var( --tabnav-height ) * var( --tabnav-scale ) );
+	padding: var( --tabnav-platter-padding );
+	background-color: var( --tabnav-platter-background );
+	border-radius: 999px;
+	overflow: hidden;
+	-webkit-backdrop-filter: blur( var( --tabnav-platter-blur ) );
+	backdrop-filter: blur( var( --tabnav-platter-blur ) );
+}
+
+.tabnav-item, .tabnav-items {
+    white-space: nowrap;
+    position: relative;
+    height: 100%;
+}
+
+.tabnav-items {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    width: -moz-fit-content;
+    width: fit-content;
+    list-style: none;
+    z-index: 1;
+}
+
+.tabnav-item {
+    color: var( --tabnav-item-color );
+    transition-duration: 120ms;
+    transition-property: color;
+    transition-timing-function: ease-out;
+}
+
+.tabnav-item .tabnav-link {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 var( --tabnav-item-padding );
+    background: rgba(0, 0, 0, 0);
+    border: none;
+    color: inherit;
+    text-decoration: none;
+    letter-spacing: inherit;
+    opacity: .8;
+    transition-property: opacity;
+    transition-duration: 100ms;
+    transition-timing-function: ease-in-out;
+    border-radius: 999px;
+}
+
+
+
+.tabnav-item.tabnav-item-active {
+    color: var( --tabnav-item-color-active );
+    transition-delay: 160ms;
+    transition-duration: 160ms;
+    transition-timing-function: ease-in
+}
+
+.tabnav-item.tabnav-item-active .tabnav-link {
+    opacity: 1;
+    cursor: auto
+}
+
+.tabnav.tabnav-focus-split .tabnav-item-active .tabnav-link {
+    background-color: var( --tabnav-indicator-background )
+}
+
+
+
+.tabnav-mask {
+	position: relative;
+	height: 100%;
+	z-index: 1;
+	width: 100%;
+	overflow-x: hidden;
+	mask-image: var(--tabnav-mask-gradient);
+	overscroll-behavior: none;
+}
+
+
+
+
+
+
+.tabnav-paddle {
+    position: absolute;
+    display: block;
+    transform: translateZ(0);
+    top: var(--tabnav-platter-padding);
+    bottom: var(--tabnav-platter-padding);
+    width: var(--tabnav-paddle-width);
+    min-height: var(--tabnav-paddle-height);
+    background-color: rgba(0,0,0,0);
+    border: none;
+    color: var(--tabnav-paddle-color);
+    cursor: pointer;
+    z-index: 2;
+    transition-delay: 0ms,40ms,40ms;
+    transition-duration: 100ms,80ms,80ms;
+    transition-property: color,opacity,visibility;
+    transition-timing-function: ease-in-out,ease-out,step-start
+}
+
+.tabnav-paddle-icon {
+    position: absolute;
+    translate: -50% 50%;
+    bottom: 50%
+}
+
+.tabnav-paddle-left {
+    left: 0
+}
+
+.tabnav-paddle-left .tabnav-paddle-icon {
+    left: calc(50% - 2px + var(--tabnav-platter-padding))
+}
+
+.tabnav-paddle-right {
+    right: 0
+}
+
+.tabnav-paddle-right .tabnav-paddle-icon {
+    left: calc(50% + 2px - var(--tabnav-platter-padding))
+}
+
+.tabnav-paddle:hover {
+    color: var(--tabnav-paddle-color-hover)
+}
+
+.tabnav-paddle.tabnav-paddle-hidden {
+    opacity: 0;
+    visibility: hidden;
+    transition-delay: 200ms;
+    transition-duration: 80ms;
+    transition-property: opacity,visibility;
+    transition-timing-function: ease-out,step-end
+}
+
+.tabnav-paddle:disabled:not(.tabnav-paddle-hidden) .tabnav-paddle-icon {
+    opacity: var(--tabnav-paddle-icon-opacity-disabled)
+}
+
+.tabnav.tabnav-no-property .tabnav-paddle {
+    transition: none!important
+}

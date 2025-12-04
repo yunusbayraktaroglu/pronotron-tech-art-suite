@@ -9,21 +9,21 @@ interface IPerformanceStatsContext {
 
 const PerformanceStatsContext = createContext<IPerformanceStatsContext>( null ! );
 
-export function PerformanceStatsProvider({ children }: { children: React.ReactNode })
+export function PerformanceStatsProvider( { children }: { children: React.ReactNode } )
 {
 	const [ showStats, setShowStats ] = useState( false );
 
 	return (
-		<PerformanceStatsContext.Provider value={{ showStats, setShowStats }}>
+		<PerformanceStatsContext value={ { showStats, setShowStats } }>
 			{ children }
-		</PerformanceStatsContext.Provider>
+		</PerformanceStatsContext>
 	);
 }
 
 export const usePerformanceStats = () => {
 	const context = useContext( PerformanceStatsContext );
 	if ( ! context ){
-	  	throw new Error( "useAppTicker must be used within an AppTickerProvider" );
+	  	throw new Error( "usePerformanceStats must be used within an PerformanceStatsContext" );
 	}
 	return context;
 }
