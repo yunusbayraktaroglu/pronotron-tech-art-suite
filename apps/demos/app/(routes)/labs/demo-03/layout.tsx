@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { PronotronPointerProvider } from "../pointer/hooks/PointerProvider";
-import { PronotronPointerDataProvider } from "../pointer/hooks/PointerDataProvider";
-import { PointerView } from "../pointer/page";
-import { PronotronIOProvider } from "../io/hooks/PronotronIOProvider";
+import { PronotronPointerProvider } from "../../pointer/hooks/PointerProvider";
+import { PronotronPointerDataProvider } from "../../pointer/hooks/PointerDataProvider";
+import { PointerView } from "../../pointer/page";
+import { PronotronIOProvider } from "../../io/hooks/PronotronIOProvider";
 
 export const metadata: Metadata = {
 	title: "Pronotron Tech-Art Showreel",

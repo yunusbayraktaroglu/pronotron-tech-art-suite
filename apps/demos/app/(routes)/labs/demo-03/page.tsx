@@ -21,13 +21,13 @@ export default function HomePage()
 	return (
 		<>
 			<div className='h-screen flex items-center justify-center bg-slate-900 border-b-4 border-white border-dashed'>
-				<div className="container max-w-[50%] font-sans text-center text-white space-y-spacing-xl">
+				<div className="container max-w-[50%] font-sans text-center text-white space-y-spacing-base">
 					<h1 className="text-xl">Components Recreated:</h1>
 					<div className='text-slate-500'>
 						<p>Iphone 17 Landing Page</p>
 						<Link href="https://www.apple.com/iphone-17-pro" target='_blank' className='text-link'>see original</Link>
 					</div>
-					<p>Scroll down ↓</p>
+					<p className='animate-pulse'>Scroll down ↓</p>
 				</div>
 			</div>
 			<HardwareZoom />
