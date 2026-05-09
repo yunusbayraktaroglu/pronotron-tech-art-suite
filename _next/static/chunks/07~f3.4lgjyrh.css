@@ -1,0 +1,1 @@
+.card{transform:translate3d(0, calc(var(--card-progress) * -100vh), 0) rotate(calc(10deg * calc(var(--scroll-progress) * var(--total-cards) - var(--card-id))));z-index:calc(10 - var(--card-id));background-color:#fff;position:absolute;box-shadow:0 0 20px #00000040}

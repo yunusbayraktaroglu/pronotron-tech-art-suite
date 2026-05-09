@@ -1,7 +1,7 @@
-:HL["/pronotron-tech-art-suite/_next/static/chunks/b111ccd7b7ec11b2.css","style"]
-:HL["/pronotron-tech-art-suite/_next/static/media/GeistMonoVF-s.p.2cee7d16.woff","font",{"crossOrigin":"","type":"font/woff"}]
-:HL["/pronotron-tech-art-suite/_next/static/media/GeistVF-s.p.4c3c0b96.woff","font",{"crossOrigin":"","type":"font/woff"}]
+:HL["/pronotron-tech-art-suite/_next/static/chunks/0uvz7ey9g8.e_.css","style"]
+:HL["/pronotron-tech-art-suite/_next/static/media/GeistMonoVF-s.p.0ifhplp~93ddj.woff","font",{"crossOrigin":"","type":"font/woff"}]
+:HL["/pronotron-tech-art-suite/_next/static/media/GeistVF-s.p.04dvp7dj03si8.woff","font",{"crossOrigin":"","type":"font/woff"}]
 :HL["https://img.shields.io/npm/v/@pronotron/pointer","image"]
 :HL["https://img.shields.io/bundlephobia/minzip/@pronotron/pointer","image"]
 :HL["https://codecov.io/gh/yunusbayraktaroglu/pronotron-tech-art-suite/branch/main/graph/badge.svg?flag=pronotron-pointer&precision=1","image"]
-0:{"buildId":"36_JGKsw2XznZzqXwHZG5","tree":{"name":"","paramType":null,"paramKey":"","hasRuntimePrefetch":false,"slots":{"children":{"name":"(routes)","paramType":null,"paramKey":"(routes)","hasRuntimePrefetch":false,"slots":{"children":{"name":"pointer","paramType":null,"paramKey":"pointer","hasRuntimePrefetch":false,"slots":{"children":{"name":"__PAGE__","paramType":null,"paramKey":"__PAGE__","hasRuntimePrefetch":false,"slots":null,"isRootLayout":false}},"isRootLayout":false}},"isRootLayout":true}},"isRootLayout":false},"staleTime":300}
+0:{"tree":{"name":"","param":null,"prefetchHints":0,"slots":{"children":{"name":"(routes)","param":null,"prefetchHints":16,"slots":{"children":{"name":"pointer","param":null,"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}}}},"staleTime":300,"buildId":"8muyzN3Y1gmmnRaFabCy_"}

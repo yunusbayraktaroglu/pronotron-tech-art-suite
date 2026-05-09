@@ -1,0 +1,5 @@
+:HL["/pronotron-tech-art-suite/_next/static/chunks/0uvz7ey9g8.e_.css","style"]
+:HL["/pronotron-tech-art-suite/_next/static/media/GeistMonoVF-s.p.0ifhplp~93ddj.woff","font",{"crossOrigin":"","type":"font/woff"}]
+:HL["/pronotron-tech-art-suite/_next/static/media/GeistVF-s.p.04dvp7dj03si8.woff","font",{"crossOrigin":"","type":"font/woff"}]
+:HL["/pronotron-tech-art-suite/_next/static/chunks/0026muo6xx15g.css","style"]
+0:{"tree":{"name":"","param":null,"prefetchHints":0,"slots":{"children":{"name":"(routes)","param":null,"prefetchHints":16,"slots":{"children":{"name":"labs","param":null,"prefetchHints":0,"slots":{"children":{"name":"demo-03","param":null,"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}}}}}},"staleTime":300,"buildId":"8muyzN3Y1gmmnRaFabCy_"}

@@ -1,0 +1,5 @@
+1:"$Sreact.fragment"
+2:I[63342,["/pronotron-tech-art-suite/_next/static/chunks/0p_9y_.1st7p-.js","/pronotron-tech-art-suite/_next/static/chunks/0y2fyz49qvf~a.js"],"PronotronIOProvider"]
+3:I[39756,["/pronotron-tech-art-suite/_next/static/chunks/01xlw8hd842-c.js","/pronotron-tech-art-suite/_next/static/chunks/0d3shmwh5_nmn.js"],"default"]
+4:I[37457,["/pronotron-tech-art-suite/_next/static/chunks/01xlw8hd842-c.js","/pronotron-tech-art-suite/_next/static/chunks/0d3shmwh5_nmn.js"],"default"]
+0:{"rsc":["$","$1","c",{"children":[[["$","script","script-0",{"src":"/pronotron-tech-art-suite/_next/static/chunks/0y2fyz49qvf~a.js","async":true}]],["$","$L2",null,{"children":["$","div",null,{"className":"flex flex-col min-h-screen","children":["$","$L3",null,{"parallelRouterKey":"children","template":["$","$L4",null,{}]}]}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"8muyzN3Y1gmmnRaFabCy_"}
