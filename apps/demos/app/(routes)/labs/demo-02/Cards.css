@@ -1,0 +1,9 @@
+.card {
+	box-shadow: 0 0 20px rgba( 0, 0, 0, 0.25 );
+	background-color: white;
+	position: absolute;
+	transform: 
+		translate3d( 0, calc( var( --card-progress ) * -100vh ), 0 ) 
+		rotate( calc( 10deg * calc( var( --scroll-progress ) * var( --total-cards ) - var( --card-id ) ) ) );
+	z-index: calc( 10 - var( --card-id ) );
+}
