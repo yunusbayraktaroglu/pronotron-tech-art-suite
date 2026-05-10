@@ -36,15 +36,15 @@ export function HardwareZoom()
 								loop
 								muted 
 								playsInline 
-								src="/large.mp4"
+								src={ `${ process.env.NEXT_PUBLIC_BASE_PATH }/large.mp4` }
 							/>
 						</div>
 						
 						<picture className="w-full h-full absolute hardware-image pointer-events-none">
-							<source srcSet="/video_hw__blfqisph35yu_small.png, /video_hw__blfqisph35yu_small_2x.png 2x" media="(max-width:734px)" />
-							<source srcSet="/video_hw__blfqisph35yu_medium.png, /video_hw__blfqisph35yu_medium_2x.png 2x" media="(max-width:1068px)" />
-							<source srcSet="/video_hw__blfqisph35yu_large.png, /video_hw__blfqisph35yu_large_2x.png 2x" media="(min-width:0px)" />
-							<img src="/video_hw__blfqisph35yu_large.png" className="w-full" />
+							<source srcSet={ `${ process.env.NEXT_PUBLIC_BASE_PATH }/video_hw__blfqisph35yu_small.png, ${ process.env.NEXT_PUBLIC_BASE_PATH }/video_hw__blfqisph35yu_small_2x.png 2x` } media="(max-width:734px)" />
+							<source srcSet={ `${ process.env.NEXT_PUBLIC_BASE_PATH }/video_hw__blfqisph35yu_medium.png, ${ process.env.NEXT_PUBLIC_BASE_PATH }/video_hw__blfqisph35yu_medium_2x.png 2x` } media="(max-width:1068px)" />
+							<source srcSet={ `${ process.env.NEXT_PUBLIC_BASE_PATH }/video_hw__blfqisph35yu_large.png, ${ process.env.NEXT_PUBLIC_BASE_PATH }/video_hw__blfqisph35yu_large_2x.png 2x` } media="(min-width:0px)" />
+							<img src={ `${ process.env.NEXT_PUBLIC_BASE_PATH }/video_hw__blfqisph35yu_large.png` } className="w-full" />
 						</picture>
 
 					</div>

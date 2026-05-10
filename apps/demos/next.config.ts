@@ -7,10 +7,23 @@ const nextConfig = ( phase: string ): NextConfig => {
 		return {
 			output: 'export',
 			basePath: '/pronotron-tech-art-suite',
+            env: {
+				/**
+				 * Solving image path issues in 'subdirectories'
+				 * 
+				 * @example
+				 * `${ process.env.NEXT_PUBLIC_BASE_PATH }/image-url.png`
+				 */
+                NEXT_PUBLIC_BASE_PATH: '/pronotron-tech-art-suite',
+            },
 		};
 	}
 
-	return {};
+	return {
+		env: {
+			NEXT_PUBLIC_BASE_PATH: '',
+		},
+	};
 };
 
 export default nextConfig;

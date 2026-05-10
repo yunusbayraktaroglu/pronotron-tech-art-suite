@@ -6,6 +6,7 @@
 		"dev": "next dev --port 3000",
 		"build": "next build",
 		"start": "next start",
+		"start:static": "npx serve@latest out",
 		"lint": "eslint --max-warnings 0",
 		"check-types": "next typegen && tsc --noEmit",
 		"clean": "rm -rf .turbo && rm -rf node_modules && rm -rf .next && rm -rf out"
