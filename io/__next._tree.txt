@@ -4,4 +4,4 @@
 :HL["https://img.shields.io/npm/v/@pronotron/io","image"]
 :HL["https://img.shields.io/bundlephobia/minzip/@pronotron/io","image"]
 :HL["https://codecov.io/gh/yunusbayraktaroglu/pronotron-tech-art-suite/branch/main/graph/badge.svg?flag=pronotron-io&precision=1","image"]
-0:{"tree":{"name":"","param":null,"prefetchHints":0,"slots":{"children":{"name":"(routes)","param":null,"prefetchHints":16,"slots":{"children":{"name":"io","param":null,"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}}}},"staleTime":300,"buildId":"8muyzN3Y1gmmnRaFabCy_"}
+0:{"tree":{"name":"","param":null,"prefetchHints":0,"slots":{"children":{"name":"(routes)","param":null,"prefetchHints":16,"slots":{"children":{"name":"io","param":null,"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}}}},"staleTime":300,"buildId":"dKhwKf9RbSkNgvTVMAtep"}
