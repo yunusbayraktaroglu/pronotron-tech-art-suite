@@ -310,9 +310,14 @@ export class PronotronAnimator
 			 * Check if the animation is finished.
 			 */
 			if ( time > table[ offset + AnimationData.ENDTIME ] ){
+				
 				animationReference.onEnd?.( false );
 				this._removeAnimationByInternalID( internalID );
+
+				// Re-examine this slot 
+				// It now holds the swapped-in element
 				i--;
+
 			}
 		}
 	}
