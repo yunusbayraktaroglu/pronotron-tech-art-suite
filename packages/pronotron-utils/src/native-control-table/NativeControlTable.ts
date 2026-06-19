@@ -111,11 +111,14 @@ export class NativeControlTable<EnumType extends number>
 		}
 
 		const availableSlotPosition = this._findEmptySlotPosition();
-		const emptyOffset = availableSlotPosition * this.stride;
 
-		// Object keys are always coerced to strings when you use the object literal syntax
-		for ( const [ key, value ] of Object.entries<number>( fullData ) ){
-			this.table[ emptyOffset + Number( key ) ] = value;
+		// Dedicated raw write loop. 
+		// Faster than modifyByPosition and protects against ghost-data leaks.
+		const emptyOffset = availableSlotPosition * this.stride;
+		const record = fullData as Record<number, number>;
+
+		for ( let i = 0; i < this.stride; i++ ) {
+			this.table[ emptyOffset + i ] = record[ i ]; 
 		}
 
 		this._slotIDToSlotPosition.set( ID, availableSlotPosition );
@@ -188,9 +191,11 @@ export class NativeControlTable<EnumType extends number>
 	/**
 	 * Modifies an existing slot identified by its ID with partial or complete data.
 	 * 
+	 * @note
+	 * Prefer direct table writes inside tick() for hot-path updates.
+	 * 
 	 * @param ID Slot ID to modify.
 	 * @param data Object with at least one property defined
-	 * @returns 
 	 */
 	modifyByID( ID: SlotID, data: RequireAtLeastOne<EnumValueMap<EnumType>> ): void
 	{
@@ -201,6 +206,10 @@ export class NativeControlTable<EnumType extends number>
 	/**
 	 * Updates a slot’s data when its table index (position) is already known.
 	 * Useful for internal iteration or when the ID-to-position mapping is already available.
+	 *
+	 * @note
+	 * Prefer direct table writes inside tick() for hot-path updates.
+	 * This method is intended for external callers, not internal animation logic.
 	 * 
 	 * @param position Index of the slot in the table.
 	 * @param data Partial or full node data.
@@ -208,10 +217,16 @@ export class NativeControlTable<EnumType extends number>
 	modifyByPosition( position: number, data: RequireAtLeastOne<EnumValueMap<EnumType>> ): void
 	{
 		const offset = position * this.stride;
+		const record = data as Record<number, number | undefined>;
 
-		// Object keys are always coerced to strings when you use the object literal syntax
-		for ( const [ key, value ] of Object.entries<number>( data ) ){
-			this.table[ offset + Number( key ) ] = value;
+		for ( let i = 0; i < this.stride; i++ ){
+			
+			const value = record[ i ];
+			
+			if ( value !== undefined ){
+				this.table[ offset + i ] = value;
+			}
+			
 		}
 	}
 
@@ -231,6 +246,8 @@ export class NativeControlTable<EnumType extends number>
 	 * 
 	 * @param ID Slot ID
 	 * @returns Error or SlotPosition
+	 * 
+	 * @internal
 	 */
 	private _getSlotPositionOrThrowError( ID: SlotID ): SlotPosition
 	{
