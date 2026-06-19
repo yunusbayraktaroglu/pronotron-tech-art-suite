@@ -1,7 +1,6 @@
-// IDPool.test.ts
-import { IDPool } from "../src/utils/IDPool"; // adjust path if needed
+import { IDPool } from "../src/utils/IDPool";
 
-describe( "IDPool (unit)", () => {
+describe( "IDPool (LIFO Stack Version)", () => {
 
 	let pool: IDPool;
 
@@ -9,78 +8,68 @@ describe( "IDPool (unit)", () => {
 		pool = new IDPool( 3 ); // small initial capacity for tests
 	} );
 
-	test( "get() returns lowest available id and consume marks it used", () => {
+	test( "get() returns IDs from the top of the stack in LIFO order", () => {
 
-		const a = pool.get();
-		expect( a ).toBe( 0 );
-		pool.consume( a );
-
-		const b = pool.get();
-		expect( b ).toBe( 1 );
-		pool.consume( b );
-
-		const c = pool.get();
-		expect( c ).toBe( 2 );
-		pool.consume( c );
+		// Stack is initialized as [0, 1, 2] with top at 3.
+		// get() pops from the top, so it returns 2 -> 1 -> 0.
+		expect( pool.get() ).toBe( 2 );
+		expect( pool.get() ).toBe( 1 );
+		expect( pool.get() ).toBe( 0 );
 
 	} );
 
-	test( "when all ids used get() expands capacity and returns next id (old capacity)", () => {
+	test( "when all ids are used, get() expands capacity and pops the newest minted ID", () => {
 
-		// Fill initial capacity (3)
-		pool.consume( pool.get() ); // 0
-		pool.consume( pool.get() ); // 1
-		pool.consume( pool.get() ); // 2
+		// Empty the initial pool
+		pool.get(); // 2
+		pool.get(); // 1
+		pool.get(); // 0
 
-		// Now all used. Next get should return 3 (old capacity) and trigger expansion.
-		const next = pool.get();
-		expect( next ).toBe( 3 );
-
-		// After expansion, subsequent get returns 4 (next free)
-		pool.consume( next );
-
-		const next2 = pool.get();
-		expect( next2 ).toBe( 4 );
+		// Pool is empty. Next get() triggers expansion to capacity 6.
+		// It pushes [3, 4, 5] onto the stack and pops the top one (5).
+		expect( pool.get() ).toBe( 5 );
+		
+		// Subsequent gets return the rest of the newly minted chunk
+		expect( pool.get() ).toBe( 4 );
+		expect( pool.get() ).toBe( 3 );
 
 	} );
 
-	test( "release() frees id and get() returns lowest freed id", () => {
+	test( "release() pushes ID back to stack, making it the very next ID returned", () => {
 
-		const ids: number[] = [];
+		const id1 = pool.get(); // 2
+		const id2 = pool.get(); // 1
+		pool.get();             // 0
 
-		ids.push( pool.get() ); pool.consume( ids[ 0 ] ); // 0
-		ids.push( pool.get() ); pool.consume( ids[ 1 ] ); // 1
-		ids.push( pool.get() ); pool.consume( ids[ 2 ] ); // 2
+		// Release 1, then release 2.
+		// Stack top receives 1, then 2.
+		pool.release( id2 );
+		pool.release( id1 );
 
-		// Expand once
-		const id3 = pool.get(); pool.consume( id3 ); // 3
-
-		// Release id 1 and 0, should be reused in get()
-		pool.release( 1 );
-		const reused = pool.get();
-		expect( reused ).toBe( 1 );
-
-		// Release 0 and expect next get to return 0 (lowest available)
-		pool.release( 0 );
-		const reused0 = pool.get();
-		expect( reused0 ).toBe( 0 );
+		// Next get() should pop the LAST released ID (LIFO: 2)
+		expect( pool.get() ).toBe( id1 ); // 2
+		
+		// Next get() should pop the preceding released ID (1)
+		expect( pool.get() ).toBe( id2 ); // 1
 
 	} );
 
-	test( "multiple expansions double capacity each time (behavioral check)", () => {
+	test( "multiple expansions double capacity and manage the LIFO chunks correctly", () => {
 
 		// Start capacity = 1 to force multiple expansions quickly
 		const small = new IDPool( 1 );
 		const got: number[] = [];
 		
-		// consume a bunch to force expansions: 0..7
 		for ( let i = 0; i < 8; i++ ) {
-			const id = small.get();
-			got.push( id );
-			small.consume( id );
+			got.push( small.get() );
 		}
-		// We expect returned ids are sequential starting at 0
-		expect( got ).toEqual( [ 0, 1, 2, 3, 4, 5, 6, 7 ] );
+		
+		// Expected LIFO extraction sequence:
+		// Cap 1: prefilled [0]          -> pops 0
+		// Exp 2: pushes [1]             -> pops 1
+		// Exp 4: pushes [2, 3]          -> pops 3, then 2
+		// Exp 8: pushes [4, 5, 6, 7]    -> pops 7, 6, 5, 4
+		expect( got ).toEqual( [ 0, 1, 3, 2, 7, 6, 5, 4 ] );
 
 	} );
 } );

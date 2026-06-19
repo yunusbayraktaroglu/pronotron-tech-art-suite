@@ -243,7 +243,6 @@ export class PronotronAnimator
 		} );
 
 		this._animationClientIDtoInternalID.set( animationOption.id, animationInternalID );
-		this._animationInternalIDsPool.consume( animationInternalID );
 		this._animationReferences[ animationInternalID ] = animationOption;
 	}
 
