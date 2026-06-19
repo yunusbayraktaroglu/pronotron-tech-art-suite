@@ -169,4 +169,86 @@ describe( "PronotronAnimator (unit)", () =>
 
 	} );
 
+	/**
+	 * Parametrized suite that verifies exact callback fire counts for N concurrent animations.
+	 * 
+	 * Tests the NativeControlTable swap-remove integrity by ensuring an early-terminating 
+	 * animation correctly exits without causing ghost reads or skipping newly swapped slots.
+	 */
+	describe( 'Callback fire counts across N concurrent animations (Swap-Remove Integrity)', () => {
+
+		const testCases = [
+			[ 2,  'start', 0 ],
+			[ 2,  'end',   1 ],
+			[ 3,  'start', 0 ],
+			[ 3,  'mid',   1 ],
+			[ 3,  'end',   2 ],
+			[ 5,  'start', 0 ],
+			[ 5,  'mid',   2 ],
+			[ 5,  'end',   4 ],
+			[ 10, 'start', 0 ],
+			[ 10, 'mid',   4 ],
+			[ 10, 'end',   9 ],
+		];
+
+		it.each( testCases )( 'N=%i, finishing from %s (index %i)', ( N, position, shortIndex ) => {
+
+			// Single mock functions that capture the index of the caller
+			const mockBegin  = jest.fn();
+			const mockRender = jest.fn();
+			const mockEnd    = jest.fn();
+
+			// Setup baseline time
+			now.mockReturnValue( 0 );
+			clock.tick();
+			animator.tick(); 
+
+			// Populate NativeControlTable
+			for ( let i = 0; i < N; i++ ){
+
+				const isShort = i === shortIndex;
+				
+				animator.add( {
+					id: isShort ? 'short' : `long-${ i }`,
+					autoPause: false,
+					duration: isShort ? 1 : 10,
+					onBegin:  () => mockBegin( i ),
+					onRender: () => mockRender( i ),
+					onEnd:    () => mockEnd( i ),
+				} );
+
+			}
+
+			// Tick 1: 'short' ends (duration 1s), triggering the swap-remove
+			now.mockReturnValue( 1.1 * 1000 );
+			clock.tick();
+			animator.tick();
+
+			// Tick 2: verifies 'long' animations survive the swap and continue ticking
+			now.mockReturnValue( 2.0 * 1000 );
+			clock.tick();
+			animator.tick();
+
+			// --- ASSERTIONS ---
+
+			// Every single animation should begin exactly once. No duplicates.
+			expect( mockBegin ).toHaveBeenCalledTimes( N );
+
+			// Only the 'short' animation ends, and it ends exactly once.
+			expect( mockEnd ).toHaveBeenCalledTimes( 1 );
+			expect( mockEnd ).toHaveBeenCalledWith( shortIndex );
+
+			// Render count math:
+			// - The 1 'short' animation renders exactly once (in Tick 1).
+			// - The N-1 'long' animations render twice (in Tick 1 and Tick 2).
+			// - Total expected renders: 1 + (N - 1) * 2 = 2N - 1
+			expect( mockRender ).toHaveBeenCalledTimes( 2 * N - 1 );
+
+			// Ensure the short animation wasn't accidentally kept alive and rendered in Tick 2
+			expect( mockRender ).not.toHaveBeenLastCalledWith( shortIndex );
+
+		} );
+
+	} );
+
 } );

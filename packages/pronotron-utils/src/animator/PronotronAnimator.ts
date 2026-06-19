@@ -275,10 +275,10 @@ export class PronotronAnimator
 	 */
 	tick(): void
 	{
-		const { table, usedSlots, stride } = this._controlTable;
+		const { table, stride } = this._controlTable;
 		const { elapsedTime, elapsedPausedTime } = this._clock.getTime();
 		
-		for ( let i = 0; i < usedSlots; i++ ){
+		for ( let i = 0; i < this._controlTable.usedSlots; i++ ){
 		
 			const offset = i * stride;
 			const time = ( table[ offset + AnimationData.TIMESTYLE ] === AnimationTimeStyle.CONTINIOUS ) ? elapsedTime : elapsedPausedTime;
@@ -313,6 +313,7 @@ export class PronotronAnimator
 			if ( time > table[ offset + AnimationData.ENDTIME ] ){
 				animationReference.onEnd?.( false );
 				this._removeAnimationByInternalID( internalID );
+				i--;
 			}
 		}
 	}
