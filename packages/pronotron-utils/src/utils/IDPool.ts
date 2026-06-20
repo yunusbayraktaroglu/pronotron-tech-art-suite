@@ -1,99 +1,93 @@
+type AllowedIDTable = Uint8Array | Uint16Array | Uint32Array;
+
 /**
  * IDPool
  * 
- * Manages a pool of unique numeric IDs, providing efficient allocation and release of IDs using an internal bit array.
+ * Manages a pool of unique numeric IDs, providing efficient allocation and release of IDs using a pre-allocated stack.
  * Supports automatic capacity expansion when all IDs are in use.
+ *  
+ * Uses LIFO stack for performance, so use it when you not need human-readability.
  * 
  * @example
  * ```typescript
- * const idPool = new IDPool();
+ * // Initialize with a capacity hint of 1024 IDs, backed by a Uint16Array (up to 65535)
+ * const idPool = new IDPool( 1024, Uint16Array );
  * const availableID: number = idPool.get();
- * idPool.consume( availableID );
  * idPool.release( availableID );
  * ```
  */
 export class IDPool
 {
-	/** @internal */
+	/**
+	 * A typed array acting as a fast LIFO stack for recycled IDs
+	 * @internal
+	 */
+	private _freeStack: AllowedIDTable;
+
+	/**
+	 * Total capacity of the pool
+	 * @internal
+	 */
 	private _capacity: number;
 
 	/**
-	 * We will store only 0 | 1 to define used or not
+	 * Tracks the highest ID that has ever been issued natively
 	 * @internal
 	 */
-	private _availableIDs: Uint8Array;
+	private _freeTop = 0;
 
-	/**
-	 * Initializes the IDPool with a given initial capacity.
-	 * 
-	 * @param capacityHint Initial number of IDs available; the pool will expand dynamically if needed.
-	 */
-	constructor( capacityHint: number )
+	constructor( capacityHint: number, tableType: { new ( length: number ): AllowedIDTable } = Uint16Array )
 	{
 		this._capacity = capacityHint;
-		this._availableIDs = new Uint8Array( capacityHint );
+		this._freeTop = capacityHint;
+
+		this._freeStack = new tableType( capacityHint );
+
+		// Pre-fill stack: [0, 1, 2, ..., N-1]
+		for ( let i = 0; i < capacityHint; i++ ){
+			this._freeStack[ i ] = i;
+		}
 	}
 
 	/**
-	 * Returns the first available numeric ID from the pool. 
-	 * If all IDs are used, the pool automatically expands and returns the next available ID.
-	 * 
-	 * ***Returned ID must be used with IDPool.consume( ID )***
-	 * 
-	 * @returns The available ID as a number.
+	 * Returns an ID from the pool.
 	 */
 	get(): number
 	{
-		// Search for first available ID
-		for ( let i = 0; i < this._availableIDs.length; i++ ){
-			if ( ! this._availableIDs[ i ] ){
-				return i;
-			}
+		if ( this._freeTop === 0 ){
+			this._expandCapacity();
 		}
 
-		// Hold current capacity, to return after expanding
-		const last = this._capacity;
-
-		this._expandCapacity();
-		return last;
+		return this._freeStack[ --this._freeTop ];
 	}
 
 	/**
-	 * Marks a specific ID as used in the pool.
-	 * 
-	 * @param ID Numeric ID to mark as consumed.
-	 */
-	consume( ID: number ): void
-	{
-		this._availableIDs[ ID ] = 1;
-	}
-
-	/**
-	 * Releases a previously consumed ID, making it available for future allocation.
-	 * 
-	 * @param ID Numeric ID to release.
+	 * Pushes given ID back onto the pool.
+	 * @param ID 
 	 */
 	release( ID: number ): void
 	{
-		this._availableIDs[ ID ] = 0;
+		// O(1) Push: Add the recycled ID back onto the stack
+		this._freeStack[ this._freeTop++ ] = ID;
 	}
 
 	/**
-	 * Doubles the internal storage capacity of the pool when all IDs are in use.
-	 * Copies existing ID usage state to the new storage.
-	 * 
+	 * Doubles the internal storage capacity of the pool.
 	 * @internal
 	 */
 	private _expandCapacity(): void
 	{
 		const newCapacity = this._capacity * 2;
+		const newStack = new ( this._freeStack.constructor as { new ( length: number ): AllowedIDTable } )( newCapacity );
 
-		// Create new array with increased size
-		const newAvailableIDsTable = new Uint8Array( newCapacity );
-		newAvailableIDsTable.set( this._availableIDs );
+		newStack.set( this._freeStack );
 
-		// Update references and capacity
-		this._availableIDs = newAvailableIDsTable;
+		// Push the newly added IDs onto the free stack
+		for ( let i = this._capacity; i < newCapacity; i++ ) {
+			newStack[ this._freeTop++ ] = i;
+		}
+
+		this._freeStack = newStack;
 		this._capacity = newCapacity;
 	}
 }

@@ -275,9 +275,6 @@ export abstract class PronotronIOBase<TEvents extends string>
 				[ IONodeStrideIndex.OnFastForward ]: fastForwardOption
 			} );
 
-			// IONode has been created successfully, consume ID
-			this._idPool.consume( internalID );
-
 			// IONode might be added while app is running. Calculate bounds
 			const { nodeStart, nodeEnd } = this._updateNodeBounds( internalID, newNodeOptions );
 

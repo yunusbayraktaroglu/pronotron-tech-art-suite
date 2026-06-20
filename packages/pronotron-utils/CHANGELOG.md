@@ -1,5 +1,15 @@
 # @pronotron/utils
 
+## 1.1.0
+
+### Minor Changes
+
+- Added fast-forward support to `PronotronAnimator`.
+- Fixed a ghost memory offset issue in `Animator.tick()`.
+- Improved internal performance of `IDPool`.
+- Implemented allocation-free iteration in `NativeControlTable`.
+- Expanded test coverage.
+
 ## 1.0.1
 
 ### Patch Changes

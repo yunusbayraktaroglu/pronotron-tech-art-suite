@@ -1,7 +1,6 @@
 import { PronotronClock } from "../clock/PronotronClock";
 import { NativeControlTable } from "../native-control-table/NativeControlTable";
 import { IDPool } from "../utils/IDPool";
-import { type RequireAtLeastOne } from "../utils/Types";
 
 /**
  * Calculating AnimationData stride with code, causes to make it constant. 
@@ -80,11 +79,6 @@ type RenderableAnimation = {
 	 */
 	onRender: ( currentTime: number, startTime: number, duration: number ) => void;
 	/**
-	 * Optional delay before the animation begins, in seconds. 
-	 * If omitted or `0`, the animation begins immediately when scheduled.
-	 */
-	delay?: number;
-	/**
 	 * Called when the animation finishes.
 	 * @param forced Indicates whether the animation was forcibly terminated (via removeAnimation()).
 	 */
@@ -102,10 +96,6 @@ type RenderableAnimation = {
  * must not expose a render callback.
  */
 type NonRenderableAnimation = {
-	/**
-	 * Delay before animation start, in seconds.
-	 */
-	delay: number;
 	/**
 	 * Called when the animation begins.
 	 */ 
@@ -138,6 +128,11 @@ export type AnimationOption = AnimationType & {
 	 * false → continues ticking
 	 */
 	autoPause: boolean;
+	/**
+	 * Optional delay before the animation begins, in seconds. 
+	 * If omitted or `0`, the animation begins immediately when scheduled.
+	 */
+	delay?: number;
 };
 
 /**
@@ -219,7 +214,7 @@ export class PronotronAnimator
 	 */
 	add( animationOption: AnimationOption ): void
 	{
-		if ( this._controlTable.isExist( animationOption.id ) ){
+		if ( this.has( animationOption.id ) ){
 			this.remove( animationOption.id, true );
 		}
 
@@ -243,7 +238,6 @@ export class PronotronAnimator
 		} );
 
 		this._animationClientIDtoInternalID.set( animationOption.id, animationInternalID );
-		this._animationInternalIDsPool.consume( animationInternalID );
 		this._animationReferences[ animationInternalID ] = animationOption;
 	}
 
@@ -275,12 +269,13 @@ export class PronotronAnimator
 	 */
 	tick(): void
 	{
-		const { table, usedSlots, stride } = this._controlTable;
+		const { table, stride } = this._controlTable;
 		const { elapsedTime, elapsedPausedTime } = this._clock.getTime();
 		
-		for ( let i = 0; i < usedSlots; i++ ){
+		for ( let i = 0; i < this._controlTable.usedSlots; i++ ){
 		
 			const offset = i * stride;
+			
 			const time = ( table[ offset + AnimationData.TIMESTYLE ] === AnimationTimeStyle.CONTINIOUS ) ? elapsedTime : elapsedPausedTime;
 			const startTime = table[ offset + AnimationData.STARTTIME ];
 
@@ -311,10 +306,52 @@ export class PronotronAnimator
 			 * Check if the animation is finished.
 			 */
 			if ( time > table[ offset + AnimationData.ENDTIME ] ){
+				
 				animationReference.onEnd?.( false );
 				this._removeAnimationByInternalID( internalID );
+
+				// Re-examine this slot 
+				// It now holds the swapped-in element (swap-remove pattern in NativeControlTable)
+				i--;
+
 			}
 		}
+	}
+
+	/**
+	 * Shifts a single animation's start/end window backwards by `seconds`, simulating
+	 * that much elapsed time for the given animation.
+	 *
+	 * Pending animations whose shifted start has already passed will fire onBegin on
+	 * the next tick(); ones whose shifted end has passed will fire onRender (with a
+	 * fully-advanced timeline, since (currentTime - startTime)/duration grows correctly
+	 * when startTime moves into the past) followed by onEnd and removal — all within
+	 * that one tick(), no extra bookkeeping.
+	 *
+	 * No-op if the animation already finished/was removed.
+	 */
+	fastForward( animationID: AnimationClientID, seconds: number ): void
+	{
+		if ( ! this.has( animationID ) ){
+			return;
+		}
+
+		const startTime = this._controlTable.getData( animationID, AnimationData.STARTTIME );
+		const endTime = this._controlTable.getData( animationID, AnimationData.ENDTIME );
+
+		this._controlTable.modifyByID( animationID, {
+			[ AnimationData.STARTTIME ]: startTime - seconds,
+			[ AnimationData.ENDTIME ]: endTime - seconds,
+		} );
+	}
+
+	/**
+	 * Checks if an animation with the given client ID is currently scheduled or running.
+	 * Lets orchestration layers (chains, groups) query state without reaching into internals.
+	 */
+	has( animationID: AnimationClientID ): boolean
+	{
+		return this._controlTable.isExist( animationID );
 	}
 
 	/**
