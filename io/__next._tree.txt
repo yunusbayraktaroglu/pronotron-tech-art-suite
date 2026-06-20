@@ -1,7 +1,7 @@
-:HL["/pronotron-tech-art-suite/_next/static/chunks/0uvz7ey9g8.e_.css","style"]
+:HL["/pronotron-tech-art-suite/_next/static/chunks/0f-0j16mfgvh3.css","style"]
 :HL["/pronotron-tech-art-suite/_next/static/media/GeistMonoVF-s.p.0ifhplp~93ddj.woff","font",{"crossOrigin":"","type":"font/woff"}]
 :HL["/pronotron-tech-art-suite/_next/static/media/GeistVF-s.p.04dvp7dj03si8.woff","font",{"crossOrigin":"","type":"font/woff"}]
 :HL["https://img.shields.io/npm/v/@pronotron/io","image"]
 :HL["https://img.shields.io/bundlephobia/minzip/@pronotron/io","image"]
 :HL["https://codecov.io/gh/yunusbayraktaroglu/pronotron-tech-art-suite/branch/main/graph/badge.svg?flag=pronotron-io&precision=1","image"]
-0:{"tree":{"name":"","param":null,"prefetchHints":0,"slots":{"children":{"name":"(routes)","param":null,"prefetchHints":16,"slots":{"children":{"name":"io","param":null,"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}}}},"staleTime":300,"buildId":"haVJeHOALc4ig1wpalJCa"}
+0:{"tree":{"name":"","param":null,"prefetchHints":0,"slots":{"children":{"name":"(routes)","param":null,"prefetchHints":16,"slots":{"children":{"name":"io","param":null,"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}}}},"staleTime":300,"buildId":"dTdk6TzB9ZOr-yTTznMTx"}
