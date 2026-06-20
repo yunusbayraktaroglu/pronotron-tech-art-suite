@@ -113,11 +113,11 @@ export class NativeControlTable<EnumType extends number>
 		const availableSlotPosition = this._findEmptySlotPosition();
 
 		// Dedicated raw write loop. 
-		// Faster than modifyByPosition and protects against ghost-data leaks.
+		// Faster than modifyByPosition() and protects against ghost-data leaks.
 		const emptyOffset = availableSlotPosition * this.stride;
 		const record = fullData as Record<number, number>;
 
-		for ( let i = 0; i < this.stride; i++ ) {
+		for ( let i = 0; i < this.stride; i++ ){
 			this.table[ emptyOffset + i ] = record[ i ]; 
 		}
 
