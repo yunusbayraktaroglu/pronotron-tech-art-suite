@@ -1,8 +1,12 @@
 # Pronotron Tech-Art Suite
 
-A high-performance TypeScript suite designed to enhance interaction, UI, and UX without compromising web standards. Each package prioritizes minimal bundle size and blazing-fast performance, making it a reliable choice for developers focused on immersive, efficient and user-friendly web experiences.
+A high-performance TypeScript suite designed to enhance interaction, UI, and UX without compromising web standards. 
+
+Each package prioritizes minimal bundle size and blazing-fast performance, making it a reliable choice for developers focused on building immersive and efficient experiences.
 
 <pre>npm i <a href="https://www.npmjs.com/package/@pronotron/io" target="_blank">@pronotron/io</a> <a href="https://www.npmjs.com/package/@pronotron/pointer" target="_blank">@pronotron/pointer</a> <a href="https://www.npmjs.com/package/@pronotron/utils" target="_blank">@pronotron/utils</a></pre>
+
+### [Explore the demos](https://yunusbayraktaroglu.github.io/pronotron-tech-art-suite/)
 
 ## Packages
 
@@ -29,8 +33,6 @@ A high-performance TypeScript suite designed to enhance interaction, UI, and UX 
 
 <br><br>
 
-live: [https://yunusbayraktaroglu.github.io/pronotron-tech-art-suite/](https://yunusbayraktaroglu.github.io/pronotron-tech-art-suite/)
-
 https://github.com/user-attachments/assets/218bc7aa-2e91-49aa-a42b-8e7af9820e41
 
 <br>
@@ -54,21 +56,21 @@ See [CONTRIBUTING ↗](.github/CONTRIBUTING.md)
 
 [npm-io]: https://img.shields.io/npm/v/@pronotron/io
 [npm-url-io]: https://www.npmjs.com/package/@pronotron/io
-[build-size-io]: https://img.shields.io/bundlephobia/minzip/@pronotron/io
-[build-size-url-io]: https://bundlephobia.com/result?p=@pronotron/io
+[build-size-io]: https://img.shields.io/bundlejs/size/@pronotron/io?format=minzip
+[build-size-url-io]: https://bundlejs.com/?q=@pronotron/io
 [codecov-io]: https://codecov.io/gh/yunusbayraktaroglu/pronotron-tech-art-suite/branch/main/graph/badge.svg?flag=pronotron-io&precision=1
 [codecov-url-io]: https://app.codecov.io/gh/yunusbayraktaroglu/pronotron-tech-art-suite?flags%5B0%5D=pronotron-io
 
 [npm-pointer]: https://img.shields.io/npm/v/@pronotron/pointer
 [npm-url-pointer]: https://www.npmjs.com/package/@pronotron/pointer
-[build-size-pointer]: https://img.shields.io/bundlephobia/minzip/@pronotron/pointer
-[build-size-url-pointer]: https://bundlephobia.com/result?p=@pronotron/pointer
+[build-size-pointer]: https://img.shields.io/bundlejs/size/@pronotron/pointer?format=minzip
+[build-size-url-pointer]: https://bundlejs.com/?q=@pronotron/pointer
 [codecov-pointer]: https://codecov.io/gh/yunusbayraktaroglu/pronotron-tech-art-suite/branch/main/graph/badge.svg?flag=pronotron-pointer&precision=1
 [codecov-url-pointer]: https://app.codecov.io/gh/yunusbayraktaroglu/pronotron-tech-art-suite?flags%5B0%5D=pronotron-pointer
 
 [npm-utils]: https://img.shields.io/npm/v/@pronotron/utils
 [npm-url-utils]: https://www.npmjs.com/package/@pronotron/utils
-[build-size-utils]: https://img.shields.io/bundlephobia/minzip/@pronotron/utils
-[build-size-url-utils]: https://bundlephobia.com/result?p=@pronotron/utils
+[build-size-utils]: https://img.shields.io/bundlejs/size/@pronotron/utils?format=minzip
+[build-size-url-utils]: https://bundlejs.com/?q=@pronotron/utils
 [codecov-utils]: https://codecov.io/gh/yunusbayraktaroglu/pronotron-tech-art-suite/branch/main/graph/badge.svg?flag=pronotron-utils&precision=1
 [codecov-url-utils]: https://app.codecov.io/gh/yunusbayraktaroglu/pronotron-tech-art-suite?flags%5B0%5D=pronotron-utils
