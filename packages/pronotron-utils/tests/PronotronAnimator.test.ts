@@ -20,7 +20,7 @@ describe( "PronotronAnimator (unit)", () =>
 
 	describe( 'Initialization', () => {
 		
-		it( 'add() registers animation' , () => {
+		it( 'add() registers animation', () => {
 
 			expect( animator.has( 'REGISTER_TEST' ) ).toBe( false );
 
@@ -219,9 +219,9 @@ describe( "PronotronAnimator (unit)", () =>
 					id: isShort ? 'short' : `long-${ i }`,
 					autoPause: false,
 					duration: isShort ? 1 : 10,
-					onBegin:  () => mockBegin( i ),
+					onBegin: () => mockBegin( i ),
 					onRender: () => mockRender( i ),
-					onEnd:    () => mockEnd( i ),
+					onEnd: () => mockEnd( i ),
 				} );
 
 			}
