@@ -34,9 +34,16 @@ export default function HomePage()
 	return (
 		<>
 			<div className="h-screen flex items-center justify-center bg-slate-900">
-				<div className="container max-w-[50%] font-sans text-center text-white space-y-spacing-base">
+				<div className="container max-w-[50%] font-sans text-center text-white space-y-spacing-lg">
 					<h1 className="text-xl">Labs</h1>
-					<p>Real-world UI and interaction experiments</p>
+					<div>
+						<p>Real-world UI and interaction experiments. Since the library is built to support these kinds of web animations, the implementations are extremely lightweight.</p>
+						<a 
+							className="text-link text-yellow-500 text-sm"
+							href="https://github.com/yunusbayraktaroglu/pronotron-tech-art-suite/tree/main/apps/demos/app/(routes)/labs"
+							target="_blank"
+						>Get the demo code</a>
+					</div>
 					<div className="text-slate-500 grid gap-spacing-base items-center justify-center">
 						{ demos.map( ( demo ) => (
 							<div key={ demo.url }>
