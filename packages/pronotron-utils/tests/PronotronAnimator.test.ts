@@ -1,3 +1,4 @@
+import { describe } from "node:test";
 import { PronotronAnimator } from "../src/animator/PronotronAnimator";
 import { PronotronClock } from "../src/clock/PronotronClock";
 
@@ -21,12 +22,14 @@ describe( "PronotronAnimator (unit)", () =>
 		
 		it( 'add() registers animation' , () => {
 
+			expect( animator.has( 'REGISTER_TEST' ) ).toBe( false );
+
 			const onBegin = jest.fn();
 			const onRender = jest.fn();
 			const onEnd = jest.fn();
 
 			animator.add( {
-				id: "anim-1",
+				id: "REGISTER_TEST",
 				autoPause: false,
 				duration: 1,
 				delay: 0.5,
@@ -40,6 +43,8 @@ describe( "PronotronAnimator (unit)", () =>
 			expect( onRender ).not.toHaveBeenCalled();
 			expect( onEnd ).not.toHaveBeenCalled();
 
+			expect( animator.has( 'REGISTER_TEST' ) ).toBe( true );
+
 		} );
 
 		it( 'adding duplicate id removes previous animation (forced) before adding new', () => {
@@ -48,7 +53,7 @@ describe( "PronotronAnimator (unit)", () =>
 			const onEndSecond = jest.fn();
 
 			animator.add( {
-				id: "dup",
+				id: "DUPLICATE_TEST",
 				duration: 1,
 				autoPause: false,
 				onBegin: jest.fn(),
@@ -58,7 +63,7 @@ describe( "PronotronAnimator (unit)", () =>
 
 			// second add with same client id: should force-remove first
 			animator.add( {
-				id: "dup",
+				id: "DUPLICATE_TEST",
 				duration: 0.5,
 				autoPause: false,
 				onBegin: jest.fn(),
@@ -78,7 +83,7 @@ describe( "PronotronAnimator (unit)", () =>
 			const onEnd = jest.fn();
 
 			animator.add( {
-				id: "anim-4",
+				id: "REMOVE_TEST",
 				duration: 1,
 				delay: 0,
 				autoPause: false,
@@ -87,10 +92,12 @@ describe( "PronotronAnimator (unit)", () =>
 				onEnd,
 			} );
 
-			animator.remove( "anim-4", true );
+			animator.remove( "REMOVE_TEST", true );
 
 			// remove(id, true) should execute onEnd(forced: true)
 			expect( onEnd ).toHaveBeenCalledWith( true );
+
+			expect( animator.has( 'REMOVE_TEST' ) ).toBe( false );
 
 		} );
 
@@ -99,7 +106,7 @@ describe( "PronotronAnimator (unit)", () =>
 			// Adding another node with same ref should warn and return false
 			const warnSpy = jest.spyOn( console, "warn" ).mockImplementation( () => {} );
 
-			animator.remove( "i-do-not-exist", true );
+			animator.remove( "I_DO_NOT_EXIST", true );
 
 			expect( warnSpy ).toHaveBeenCalled();
 
@@ -124,7 +131,7 @@ describe( "PronotronAnimator (unit)", () =>
 			animator.tick();
 
 			animator.add( {
-				id: "anim-2",
+				id: "TEST_ANIMATION",
 				duration: 2,
 				delay: 1,
 				autoPause: false,
@@ -249,6 +256,136 @@ describe( "PronotronAnimator (unit)", () =>
 
 		} );
 
+	} );
+
+	describe( 'Non-renderable animations (delay + onBegin only, no onRender/duration)', () => {
+ 
+		it( 'fires onBegin once and onEnd(false) once, without ever touching onRender', () => {
+ 
+			const onBegin = jest.fn();
+			const onEnd = jest.fn();
+ 
+			now.mockReturnValue( 0 );
+			clock.tick();
+			animator.tick();
+ 
+			// No `onRender`, no `duration` - this is the NonRenderableAnimation shape
+			// (e.g. a pure "wait then fire a callback" chain step).
+			animator.add( {
+				id: "non-renderable-1",
+				delay: 1,
+				autoPause: false,
+				onBegin,
+				onEnd,
+			} );
+ 
+			// reaches startTime (1s): onBegin fires; RENDERABLE is 0, so the table-driven
+			// tick() loop must skip the onRender call entirely instead of throwing on
+			// a missing function.
+			now.mockReturnValue( 1.0 * 1000 );
+			clock.tick();
+			animator.tick();
+ 
+			expect( onBegin ).toHaveBeenCalledTimes( 1 );
+			expect( onEnd ).not.toHaveBeenCalled();
+			expect( animator.has( "non-renderable-1" ) ).toBe( true );
+ 
+			// duration defaults to 0, so endTime === startTime; the next tick once
+			// time has moved past that instant finishes it naturally.
+			now.mockReturnValue( 1.1 * 1000 );
+			clock.tick();
+			animator.tick();
+ 
+			expect( onEnd ).toHaveBeenCalledTimes( 1 );
+			expect( onEnd ).toHaveBeenCalledWith( false );
+			expect( animator.has( "non-renderable-1" ) ).toBe( false );
+ 
+		} );
+ 
+	} );
+
+	describe( "fastForward()", () => {
+
+		it( 'is a no-op for an ID that does not exist (does not throw, no warning)', () => {
+ 
+			const warnSpy = jest.spyOn( console, "warn" ).mockImplementation( () => {} );
+ 
+			expect( () => animator.fastForward( "ghost", 5 ) ).not.toThrow();
+			expect( animator.has( "ghost" ) ).toBe( false );
+ 
+			// Unlike remove(), an unknown ID is expected (e.g. a chain step that
+			// already finished naturally), so this should stay silent.
+			expect( warnSpy ).not.toHaveBeenCalled();
+ 
+			warnSpy.mockRestore();
+ 
+		} );
+
+		it( 'produces a correctly advanced timeline when only partially fast-forwarded', () => {
+ 
+			const onBegin = jest.fn();
+			const onRender = jest.fn();
+			const onEnd = jest.fn();
+ 
+			now.mockReturnValue( 0 );
+			clock.tick();
+			animator.tick();
+ 
+			animator.add( {
+				id: "TEST_FAST_FORWARD",
+				duration: 4,
+				delay: 0, // window: [0, 4]
+				autoPause: false,
+				onBegin,
+				onRender,
+				onEnd,
+			} );
+ 
+			// jump 1s into the animation without advancing the global clock
+			animator.fastForward( "TEST_FAST_FORWARD", 1 );
+ 
+			clock.tick();
+			animator.tick();
+ 
+			// currentTime(0) - startTime(-1) = 1s elapsed of a 4s duration
+			expect( onRender ).toHaveBeenCalledWith( 0, -1, 4 );
+			expect( onEnd ).not.toHaveBeenCalled();
+			expect( animator.has( "TEST_FAST_FORWARD" ) ).toBe( true );
+ 
+		} );
+		
+	} );
+
+	describe( 'Internal capacity expansion', () => {
+ 
+		it( 'keeps working correctly once more animations are added than the initial capacity hint', () => {
+ 
+			// Capacity hint of 2: adding a 3rd concurrent animation forces both the
+			// internal IDPool and NativeControlTable to expand past their starting size.
+			const smallAnimator = new PronotronAnimator( clock, 2 );
+ 
+			const onBegin = jest.fn();
+			const onRender = jest.fn();
+ 
+			now.mockReturnValue( 0 );
+			clock.tick();
+ 
+			smallAnimator.add( { id: "cap-1", duration: 1, autoPause: false, onBegin: jest.fn(), onRender: jest.fn(), onEnd: jest.fn() } );
+			smallAnimator.add( { id: "cap-2", duration: 1, autoPause: false, onBegin: jest.fn(), onRender: jest.fn(), onEnd: jest.fn() } );
+ 
+			// this 3rd add exceeds the capacity hint of 2 and triggers expansion
+			smallAnimator.add( { id: "cap-3", duration: 1, autoPause: false, onBegin, onRender, onEnd: jest.fn() } );
+ 
+			expect( smallAnimator.has( "cap-3" ) ).toBe( true );
+ 
+			smallAnimator.tick();
+ 
+			// the expanded slot must behave identically to any other slot
+			expect( onBegin ).toHaveBeenCalledTimes( 1 );
+			expect( onRender ).toHaveBeenCalledTimes( 1 );
+ 
+		} );
+ 
 	} );
 
 } );
